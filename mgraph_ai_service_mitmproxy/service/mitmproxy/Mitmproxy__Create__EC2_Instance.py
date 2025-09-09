@@ -9,6 +9,7 @@ from osbot_utils.utils.Status           import status_error
 
 import mgraph_ai_service_mitmproxy
 
+MITMPROXY__PYTHON_FILE = 'fastapi_interceptor.py' # 'add_header.py' #
 DEFAULT__AWS__UBUNTU_LINUX_AMI  = 'ami-046c2381f11878233'
 DEFAULT__AWS__INSTANCE_TYPE     = 't2.micro'
 
@@ -47,7 +48,7 @@ class Mitmproxy__Create__EC2_Instance(Type_Safe):
         self.wait_for_ssh(instance_id)
         file_mitmproxy__certs              = path_combine(mgraph_ai_service_mitmproxy.path, '../_ec2_files/mitmproxy-certs-backup.tar.gz'         )
         file_mitmproxy__service            = path_combine(mgraph_ai_service_mitmproxy.path, '../_ec2_files/mitmproxy.service'                   )
-        file_mitmproxy__add_header         = path_combine(mgraph_ai_service_mitmproxy.path, '../_ec2_files/add_header.py'                   )
+        file_mitmproxy__add_header         = path_combine(mgraph_ai_service_mitmproxy.path, f'../_ec2_files/{MITMPROXY__PYTHON_FILE}'                   )
 
         #assert file_exists(file_mitmproxy__service)
 
@@ -77,7 +78,7 @@ class Mitmproxy__Create__EC2_Instance(Type_Safe):
 
     def ec2_update_service_files(self, instance_id):
         file_mitmproxy__service            = path_combine(mgraph_ai_service_mitmproxy.path, '../_ec2_files/mitmproxy.service' )
-        file_mitmproxy__add_header         = path_combine(mgraph_ai_service_mitmproxy.path, '../_ec2_files/add_header.py'     )
+        file_mitmproxy__add_header         = path_combine(mgraph_ai_service_mitmproxy.path, f'../_ec2_files/{MITMPROXY__PYTHON_FILE}'     )
         with self.ec2_instance_ssh(instance_id) as _:
             _.ssh_execute().print_after_exec = True
             _.scp().copy_file_to_host(file_mitmproxy__add_header  , '.' )

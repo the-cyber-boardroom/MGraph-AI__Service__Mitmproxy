@@ -15,11 +15,13 @@ import urllib.error
 from concurrent.futures import ThreadPoolExecutor
 
 # Configuration - will be set via environment or config
-FASTAPI_BASE_URL = os.getenv("FASTAPI_BASE_URL", "http://host.docker.internal:10016")
+#FASTAPI_BASE_URL = os.getenv("FASTAPI_BASE_URL", "http://host.docker.internal:8000")
+#FASTAPI_BASE_URL = "https://mitmproxy-api.dev.mgraph.ai"
+FASTAPI_BASE_URL  = "http://host.docker.internal:10016"     # todo: make this work with env vars
+
 REQUEST_ENDPOINT = "/proxy/process-request"
 RESPONSE_ENDPOINT = "/proxy/process-response"
 TIMEOUT = 0.5  # Reduced timeout for faster fallback
-FASTAPI_API_KEY = os.getenv("FASTAPI_API_KEY", "your-secret-key-here")
 
 # Stats tracking
 request_count = 0
@@ -29,16 +31,14 @@ errors_count = 0
 # Thread pool for non-blocking HTTP calls
 executor = ThreadPoolExecutor(max_workers=10)
 
+
 def call_fastapi_sync(endpoint: str, data: dict) -> dict:
     """Synchronous FastAPI call for use in thread pool"""
     url = f"{FASTAPI_BASE_URL}{endpoint}"
 
     try:
         json_data = json.dumps(data).encode('utf-8')
-        req = urllib.request.Request(url, data=json_data, headers={
-            'Content-Type': 'application/json',
-            'x-api-key': FASTAPI_API_KEY  # Add this line
-        })
+        req = urllib.request.Request(url, data=json_data, headers={'Content-Type': 'application/json'})
 
         with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
             if response.status == 200:
@@ -166,12 +166,17 @@ async def response(flow: http.HTTPFlow) -> None:
             stats = modifications.get("stats", {})
             flow.response.headers["X-Proxy-Stats"] = json.dumps(stats)
 
-        flow.response.headers["X-Proxy-Status"] = "fastapi-connected"
+        flow.response.headers["X-Proxy-Status"  ] = "fastapi-connected"
+        flow.response.headers["X-Fastapi-url"   ] = FASTAPI_BASE_URL
+        flow.response.headers["X-Fastapi-url-2" ] = FASTAPI_BASE_URL_2
+
         print(f"  ✓ Modified via FastAPI")
     else:
         # Fallback - FastAPI unavailable
         flow.response.headers["X-Proxy-Status"] = "fastapi-unavailable"
         flow.response.headers["X-Proxy-Fallback"] = "true"
+        flow.response.headers["X-Fastapi-url"   ] = FASTAPI_BASE_URL
+        flow.response.headers["X-Fastapi-url-2" ] = FASTAPI_BASE_URL_2
         errors_count += 1
         print(f"  ⚠ Fallback mode")
 

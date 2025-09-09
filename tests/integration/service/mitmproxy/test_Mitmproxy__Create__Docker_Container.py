@@ -60,6 +60,7 @@ class test_Mitmproxy__Create__Docker_Container(TestCase):
         with self.mitmproxy_docker as _:
             #_.setup()
 
+            # todo: remove references to add_headers
             # Check add_header.py exists
             add_header_path = path_combine(mgraph_ai_service_mitmproxy.path, f'../_ec2_files/{MITMPROXY__PYTHON_FILE}')
             assert file_exists(add_header_path)

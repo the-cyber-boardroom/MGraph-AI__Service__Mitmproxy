@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 User=ubuntu
-ExecStart=/usr/bin/mitmweb --web-host 0.0.0.0 --web-port 8081 --set block_global=false -s /home/ubuntu/add_header.py
+ExecStart=/usr/bin/mitmweb --web-host 0.0.0.0 --web-port 8081 --set block_global=false -s /home/ubuntu/fastapi_interceptor.py
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal

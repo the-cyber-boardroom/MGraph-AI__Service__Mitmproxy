@@ -1,9 +1,10 @@
-from typing import Dict, List, Any, Set
-from datetime                                                                import datetime
-from osbot_fast_api.api.routes.Fast_API__Routes                              import Fast_API__Routes
-from osbot_utils.type_safe.Type_Safe                                         import Type_Safe
-from osbot_utils.type_safe.primitives.safe_str.Safe_Str                      import Safe_Str
-from osbot_utils.type_safe.primitives.safe_uint.Safe_UInt                    import Safe_UInt
+from typing                                               import Dict, List, Any, Set
+from datetime                                             import datetime
+from mgraph_ai_service_mitmproxy.utils.Version            import version__mgraph_ai_service_mitmproxy
+from osbot_fast_api.api.routes.Fast_API__Routes           import Fast_API__Routes
+from osbot_utils.type_safe.Type_Safe                      import Type_Safe
+from osbot_utils.type_safe.primitives.safe_str.Safe_Str   import Safe_Str
+from osbot_utils.type_safe.primitives.safe_uint.Safe_UInt import Safe_UInt
 
 TAG__ROUTES_PROXY                  = 'proxy'
 ROUTES_PATHS__PROXY                = [ f'/{TAG__ROUTES_PROXY}/process-request'  ,
@@ -68,12 +69,14 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
 
         # Add custom headers
         modifications.headers_to_add = {
-            "X-MGraph-Proxy"          : "v1.0"                           ,
-            "X-Request-ID"            : f"req-{self.total_requests}"     ,
-            "X-Processed-By"          : "FastAPI-Proxy"                  ,
-            "X-Processed-At"          : datetime.utcnow().isoformat()    ,
-            "X-Stats-Total-Requests"  : str(self.total_requests)         ,
-            "X-Stats-Unique-Hosts"    : str(len(self.hosts_seen))        ,
+            "X-MGraph-Proxy"          : "v1.0"                              ,
+            "X-Request-ID"            : f"req-{self.total_requests}"        ,
+            "X-Processed-By"          : "FastAPI-Proxy"                     ,
+            "X-Processed-At"          : datetime.utcnow().isoformat()       ,
+            "X-Stats-Total-Requests"  : str(self.total_requests)            ,
+            "X-Stats-Unique-Hosts"    : str(len(self.hosts_seen))           ,
+            "and-the-answer-is"       : str(42)                             ,
+            "X-Service-Version"       : version__mgraph_ai_service_mitmproxy,
         }
 
         # Block certain paths

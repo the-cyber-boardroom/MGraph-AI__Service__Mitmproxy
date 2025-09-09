@@ -28,7 +28,7 @@ class test_Mitmproxy__Create__EC2_Instance(TestCase):
                                'spot_instance'      : True                      }
 
     #@pytest.mark.skip("this will create a new EC2 instance")
-    def test_deploy_cbr_website_to_instance_id(self):
+    def test_create_new___ec2_instance(self):
         instance_name = f'mitmproxy__{version__mgraph_ai_service_mitmproxy}'
         with self.create_ec2_instance as _:
             instance_id   = _.create_ec2_instance(instance_name=instance_name)

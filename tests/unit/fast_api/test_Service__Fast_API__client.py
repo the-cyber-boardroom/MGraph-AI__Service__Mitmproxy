@@ -38,14 +38,15 @@ class test_Service__Fast_API__client(TestCase):
         auth_key_value      = get_env(ENV_VAR__FAST_API__AUTH__API_KEY__VALUE)
         headers             = {auth_key_name: auth_key_value}
 
-        response__no_auth   = self.client.get(url=path, headers={})
+        # todo: read once auth is re-enabled
+        #response__no_auth   = self.client.get(url=path, headers={})
         response__with_auth = self.client.get(url=path, headers=headers)
 
-        assert response__no_auth.status_code == 401
-        assert response__no_auth.json()      == { 'data'   : None,
-                                                  'error'  : None,
-                                                  'message': 'Client API key is missing, you need to set it on a header or cookie',
-                                                  'status' : 'error'}
+        #assert response__no_auth.status_code == 401
+        #assert response__no_auth.json()      == { 'data'   : None,
+        #                                          'error'  : None,
+        #                                          'message': 'Client API key is missing, you need to set it on a header or cookie',
+        #                                          'status' : 'error'}
 
         assert auth_key_name                 is not None
         assert auth_key_value                is not None
