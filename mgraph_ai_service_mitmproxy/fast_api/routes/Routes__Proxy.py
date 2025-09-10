@@ -2,6 +2,7 @@ from typing                                               import Dict, List, Any
 from datetime                                             import datetime
 from mgraph_ai_service_mitmproxy.utils.Version            import version__mgraph_ai_service_mitmproxy
 from osbot_fast_api.api.routes.Fast_API__Routes           import Fast_API__Routes
+from osbot_fast_api.utils.Version import version__osbot_fast_api
 from osbot_utils.type_safe.Type_Safe                      import Type_Safe
 from osbot_utils.type_safe.primitives.safe_str.Safe_Str   import Safe_Str
 from osbot_utils.type_safe.primitives.safe_uint.Safe_UInt import Safe_UInt
@@ -75,7 +76,6 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
             "X-Processed-At"          : datetime.utcnow().isoformat()       ,
             "X-Stats-Total-Requests"  : str(self.total_requests)            ,
             "X-Stats-Unique-Hosts"    : str(len(self.hosts_seen))           ,
-            "and-the-answer-is"       : str(42)                             ,
             "X-Service-Version"       : version__mgraph_ai_service_mitmproxy,
         }
 
@@ -114,6 +114,8 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
             "X-Proxy-Stats-Responses"     : str(self.total_responses)           ,
             "X-Proxy-Stats-Hosts"         : str(len(self.hosts_seen))           ,
             "X-Proxy-Stats-Headers-Count" : str(stats["headers_received"])      ,
+            "Y-Version-Mitmproxy-Service" : version__mgraph_ai_service_mitmproxy,
+            "Y-Version-OSBot-Fast-API"    : version__osbot_fast_api             ,
         }
 
         # Add CORS headers for specific hosts
