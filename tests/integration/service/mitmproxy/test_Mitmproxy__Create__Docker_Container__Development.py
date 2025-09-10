@@ -199,44 +199,44 @@ print(response.json())""")
         print("✓ Cleanup complete!")
         print("="*60 + "\n")
 
-    def test_show_running_mitmproxy_containers(self):
-        """
-        Shows all running mitmproxy containers for debugging.
-        """
-        print("\n" + "="*60)
-        print("Running Mitmproxy Containers")
-        print("="*60)
-
-        mitmproxy_docker = Mitmproxy__Create__Docker_Container()
-        containers = mitmproxy_docker.containers_all_mitmproxy()
-
-        if not containers:
-            print("\n✓ No mitmproxy containers are currently running")
-        else:
-            print(f"\nFound {len(containers)} mitmproxy container(s):")
-            for container in containers:
-                info = container.info()
-                ports = container.ports()
-
-                print(f"\n  Container: {container.name()}")
-                print(f"    ID:     {container.short_id()}")
-                print(f"    Status: {container.status()}")
-                print(f"    Image:  {info.get('Config', {}).get('Image', 'unknown')}")
-
-                if ports:
-                    print(f"    Ports:")
-                    for container_port, host_ports in ports.items():
-                        if host_ports:
-                            for host_port in host_ports:
-                                print(f"      - {container_port} → localhost:{host_port.get('HostPort')}")
-
-                # Show recent logs
-                logs = container.logs(tail=5)
-                if logs:
-                    print(f"    Recent logs:")
-                    for line in logs.split('\n')[-5:]:
-                        if line.strip():
-                            print(f"      {line[:100]}")
+    # def test_show_running_mitmproxy_containers(self):
+    #     """
+    #     Shows all running mitmproxy containers for debugging.
+    #     """
+    #     print("\n" + "="*60)
+    #     print("Running Mitmproxy Containers")
+    #     print("="*60)
+    #
+    #     mitmproxy_docker = Mitmproxy__Create__Docker_Container()
+    #     containers = mitmproxy_docker.containers_all_mitmproxy()
+    #
+    #     if not containers:
+    #         print("\n✓ No mitmproxy containers are currently running")
+    #     else:
+    #         print(f"\nFound {len(containers)} mitmproxy container(s):")
+    #         for container in containers:
+    #             info = container.info()
+    #             ports = container.ports()
+    #
+    #             print(f"\n  Container: {container.name()}")
+    #             print(f"    ID:     {container.short_id()}")
+    #             print(f"    Status: {container.status()}")
+    #             print(f"    Image:  {info.get('Config', {}).get('Image', 'unknown')}")
+    #
+    #             if ports:
+    #                 print(f"    Ports:")
+    #                 for container_port, host_ports in ports.items():
+    #                     if host_ports:
+    #                         for host_port in host_ports:
+    #                             print(f"      - {container_port} → localhost:{host_port.get('HostPort')}")
+    #
+    #             # Show recent logs
+    #             logs = container.logs(tail=5)
+    #             if logs:
+    #                 print(f"    Recent logs:")
+    #                 for line in logs.split('\n')[-5:]:
+    #                     if line.strip():
+    #                         print(f"      {line[:100]}")
 
 
     def _create_development_script_template(self):

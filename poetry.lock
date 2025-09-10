@@ -34,34 +34,34 @@ trio = ["trio (>=0.26.1)"]
 
 [[package]]
 name = "boto3"
-version = "1.40.24"
+version = "1.40.27"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "boto3-1.40.24-py3-none-any.whl", hash = "sha256:24a19e275d33e918afc22a78c6a1e20c14d02cc00e2f786b05e2a4a32191457e"},
-    {file = "boto3-1.40.24.tar.gz", hash = "sha256:cc147ad13e8edf7ec69cbb4df8fe60f187f8b2c9ab8befa0fd1fbcfa4fc80b1f"},
+    {file = "boto3-1.40.27-py3-none-any.whl", hash = "sha256:397d8cde7924f03b25eb553d5ed69293697dbfa1ca29b07369b3fa2df8318eca"},
+    {file = "boto3-1.40.27.tar.gz", hash = "sha256:bf1e0f5aa79dbeedff14926dc2eb1b57bc119fa9015a190a24b6cd5bf9a60e9a"},
 ]
 
 [package.dependencies]
-botocore = ">=1.40.24,<1.41.0"
+botocore = ">=1.40.27,<1.41.0"
 jmespath = ">=0.7.1,<2.0.0"
-s3transfer = ">=0.13.0,<0.14.0"
+s3transfer = ">=0.14.0,<0.15.0"
 
 [package.extras]
 crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.40.24"
+version = "1.40.27"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "botocore-1.40.24-py3-none-any.whl", hash = "sha256:d566840f2291bb5df1c0903ad385c61c865927d562d41dcf6468c9cee4cc313a"},
-    {file = "botocore-1.40.24.tar.gz", hash = "sha256:af2b49e52950a12229440d7c297aaad0a7b75fd1c4f8700b164948b207a08cf0"},
+    {file = "botocore-1.40.27-py3-none-any.whl", hash = "sha256:47441c94913740f5c24abf3d7f6fa534f12705e4c6669cd2e8443f3b3ca9d7ca"},
+    {file = "botocore-1.40.27.tar.gz", hash = "sha256:f7cb28668751d85adc7f17929efa684640d8e2739800a86a05d4bc38f8443d1c"},
 ]
 
 [package.dependencies]
@@ -407,14 +407,14 @@ osbot-fast-api = "*"
 
 [[package]]
 name = "osbot-utils"
-version = "2.87.0"
+version = "2.90.0"
 description = "OWASP Security Bot - Utils"
 optional = false
 python-versions = "<4.0,>=3.7"
 groups = ["main"]
 files = [
-    {file = "osbot_utils-2.87.0-py3-none-any.whl", hash = "sha256:df34d35a1355f8a6b6d133db31743264a9ed36f6f1c0539c25577c24f805f5d5"},
-    {file = "osbot_utils-2.87.0.tar.gz", hash = "sha256:178b0da19f8922818a5038366e7c257f3879a16ab3a74e2f670f91b81914705d"},
+    {file = "osbot_utils-2.90.0-py3-none-any.whl", hash = "sha256:5395f2a3ca93dd290c77899c69f510629a1722962fff0ac2e1d988903888bb06"},
+    {file = "osbot_utils-2.90.0.tar.gz", hash = "sha256:d1f09294dd933a13395c0cb1112ff0bc6b29f281fce11a7c1032090b797f48ef"},
 ]
 
 [[package]]
@@ -718,14 +718,14 @@ jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
 name = "s3transfer"
-version = "0.13.1"
+version = "0.14.0"
 description = "An Amazon S3 Transfer Manager"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "s3transfer-0.13.1-py3-none-any.whl", hash = "sha256:a981aa7429be23fe6dfc13e80e4020057cbab622b08c0315288758d67cabc724"},
-    {file = "s3transfer-0.13.1.tar.gz", hash = "sha256:c3fdba22ba1bd367922f27ec8032d6a1cf5f10c934fb5d68cf60fd5a23d936cf"},
+    {file = "s3transfer-0.14.0-py3-none-any.whl", hash = "sha256:ea3b790c7077558ed1f02a3072fb3cb992bbbd253392f4b6e9e8976941c7d456"},
+    {file = "s3transfer-0.14.0.tar.gz", hash = "sha256:eff12264e7c8b4985074ccce27a3b38a485bb7f7422cc8046fee9be4983e4125"},
 ]
 
 [package.dependencies]
@@ -791,14 +791,14 @@ full = ["httpx (>=0.27.0,<0.29.0)", "itsdangerous", "jinja2", "python-multipart 
 
 [[package]]
 name = "typer"
-version = "0.17.3"
+version = "0.17.4"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "typer-0.17.3-py3-none-any.whl", hash = "sha256:643919a79182ab7ac7581056d93c6a2b865b026adf2872c4d02c72758e6f095b"},
-    {file = "typer-0.17.3.tar.gz", hash = "sha256:0c600503d472bcf98d29914d4dcd67f80c24cc245395e2e00ba3603c9332e8ba"},
+    {file = "typer-0.17.4-py3-none-any.whl", hash = "sha256:015534a6edaa450e7007eba705d5c18c3349dcea50a6ad79a5ed530967575824"},
+    {file = "typer-0.17.4.tar.gz", hash = "sha256:b77dc07d849312fd2bb5e7f20a7af8985c7ec360c45b051ed5412f64d8dc1580"},
 ]
 
 [package.dependencies]
