@@ -1,6 +1,12 @@
 from typing                                               import Dict, List, Any, Set, Optional
 from datetime                                             import datetime
 import json
+
+import requests
+from osbot_fast_api.schemas.consts__Fast_API import ENV_VAR__FAST_API__AUTH__API_KEY__NAME, ENV_VAR__FAST_API__AUTH__API_KEY__VALUE
+from osbot_utils.utils.Env import get_env
+from osbot_utils.utils.Http import GET_json
+
 from mgraph_ai_service_mitmproxy.utils.Version            import version__mgraph_ai_service_mitmproxy
 from osbot_fast_api.api.routes.Fast_API__Routes           import Fast_API__Routes
 from osbot_fast_api.utils.Version import version__osbot_fast_api
@@ -15,6 +21,9 @@ ROUTES_PATHS__PROXY                = [ f'/{TAG__ROUTES_PROXY}/process-request'  
                                        f'/{TAG__ROUTES_PROXY}/process-response' ,
                                        f'/{TAG__ROUTES_PROXY}/get-proxy-stats'  ,
                                        f'/{TAG__ROUTES_PROXY}/reset-proxy-stats']
+
+ENV_VAR__WCF_SERVICE__AUTH__API_KEY__NAME  = "WCF_SERVICE__AUTH__API_KEY__NAME"
+ENV_VAR__WCF_SERVICE__AUTH__API_KEY__VALUE = "WCF_SERVICE__AUTH__API_KEY__VALUE"
 
 # Domain-specific Safe types for proxy data
 class Safe_Str__HTTP_Method(Safe_Str):                                        # HTTP method validation
@@ -91,6 +100,49 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
         # Handle 'show' command - display internal data structures
         if 'show' in debug_params:
             show_value = debug_params['show']
+            #print('show', show_value)
+            if show_value.startswith('url-to') is True:
+                target_url   = response_data.request.get('url')
+                # if show_value == 'url-to-ratings':
+                #     wcf_url += "&model_to_use=google/gemini-2.0-flash-lite-001"
+                if show_value == 'url-to-html-min-rating:0.5':
+                    show_value = 'url-to-html-min-rating'
+                    target_url   += "&rating=0.5"
+
+                wcf_url      = f"https://dev.web-content-filtering.mgraph.ai/html-graphs/{show_value}/?url=" + target_url
+                headers       = { get_env(ENV_VAR__WCF_SERVICE__AUTH__API_KEY__NAME ) : get_env(ENV_VAR__WCF_SERVICE__AUTH__API_KEY__VALUE )}
+                response      = requests.get(wcf_url, headers=headers)
+                content_type  = response.headers.get('content-type')
+                #print(wcf_url, content_type)
+                #print(response.status_code)
+                if response.status_code == 200:
+                    if content_type == 'text/plain; charset=utf-8':
+                        modifications.modified_body = response.content.decode('utf-8')
+                        modifications.override_response = True
+                        modifications.override_status = 200
+                        modifications.override_content_type = content_type
+                        modifications.headers_to_add["x-debug-show"] = "response-data"
+                        return
+                    elif content_type == 'application/json':
+                        modifications.override_response     = True
+                        modifications.override_status       = 200
+                        modified_body                       = response.json()
+                        modifications.override_content_type = content_type
+                        modifications.modified_body         = json.dumps(modified_body, indent=2)
+                        modifications.headers_to_add["x-debug-show"] = "response-data"
+                        return
+                    elif content_type == 'text/html; charset=utf-8':
+                        modifications.modified_body         = response.content.decode('utf-8')
+                        modifications.override_response     = True
+                        modifications.override_status       = 200
+                        #modifications.override_content_type = content_type
+                        modifications.headers_to_add["x-debug-show"] = "response-data"
+                        #print(wcf_url)
+                        return
+                    # else:
+                    #     print(content_type)
+
+                    #modifications.headers_to_add["x-debug-show"] = "response-data"
 
             if show_value == 'response-data':
                 # Return the entire response_data as JSON

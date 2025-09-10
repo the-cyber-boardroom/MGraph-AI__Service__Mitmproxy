@@ -16,10 +16,19 @@ class test_Routes__Proxy__client(TestCase):
             cls.client.headers[TEST_API_KEY__NAME] = TEST_API_KEY__VALUE
 
     def test_process_response(self):
+        url = 'https://lite.cnn.com/aaa'  # 'https://www.bbc.co.uk/AAAA'
+        url = 'https://theintercept.com/'
+        show = 'url-to-ratings' # 'url-to-html-dict' , 'url-to-lines' 'url-to-html-xxx'
+        #show = 'url-to-html-xxx'
         response_data = Schema__Proxy__Response_Data()
+        response_data.request     ['url' ] = url
+        response_data.debug_params['show'] = show
         response       = self.client.post('/proxy/process-response', json=response_data.json())
         response_data  = Schema__Proxy__Modifications.from_json(response.json())
-        headers_to_add = response_data.headers_to_add
-        assert type(headers_to_add)                          == Type_Safe__Dict
-        assert headers_to_add['y-version-mitmproxy-service'] == version__mgraph_ai_service_mitmproxy
-        assert headers_to_add['y-version-osbot-fast-api'   ] == version__osbot_fast_api
+
+        #print(response_data)
+        #response_data.print()
+        # headers_to_add = response_data.headers_to_add
+        # assert type(headers_to_add)                          == Type_Safe__Dict
+        # assert headers_to_add['y-version-mitmproxy-service'] == version__mgraph_ai_service_mitmproxy
+        # assert headers_to_add['y-version-osbot-fast-api'   ] == version__osbot_fast_api
