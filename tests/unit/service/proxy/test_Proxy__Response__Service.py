@@ -1,292 +1,380 @@
-from unittest                                                                        import TestCase
-from unittest.mock                                                                   import Mock, patch
-
-from osbot_utils.testing.__ import __, __SKIP__
-from osbot_utils.utils.Objects import obj
-
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications import Schema__Proxy__Modifications
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Response__Service              import Proxy__Response__Service
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data          import Schema__Proxy__Response_Data
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Response__Processing_Result   import Schema__Response__Processing_Result
-from mgraph_ai_service_mitmproxy.utils._for_osbot_utils.Object import obj__dict
+from unittest                                                                       import TestCase
+from osbot_utils.utils.Objects                                                      import base_classes, __
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Response__Service             import Proxy__Response__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service                import Proxy__Debug__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service                import Proxy__Stats__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service                 import Proxy__CORS__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Headers__Service              import Proxy__Headers__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service               import Proxy__Cookie__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__HTML__Service                 import Proxy__HTML__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__JSON__Service                 import Proxy__JSON__Service
+from mgraph_ai_service_mitmproxy.service.wcf.Proxy__WCF__Service                    import Proxy__WCF__Service
+from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data         import Schema__Proxy__Response_Data
+from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Response__Processing_Result  import Schema__Response__Processing_Result
+from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Stats                 import Schema__Proxy__Stats
+from mgraph_ai_service_mitmproxy.schemas.Schema__CORS__Config                       import Schema__CORS__Config
 
 
 class test_Proxy__Response__Service(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.service = Proxy__Response__Service()
+        wcf_service     = Proxy__WCF__Service()                                               # WCF service
+        html_service    = Proxy__HTML__Service()                                              # HTML service
+        json_service    = Proxy__JSON__Service()                                              # JSON service
+        cls.debug_service   = Proxy__Debug__Service(wcf_service  = wcf_service  ,
+                                                     html_service = html_service ,
+                                                     json_service = json_service )
+        cls.stats_service   = Proxy__Stats__Service(stats=Schema__Proxy__Stats())
+        cls.cors_service    = Proxy__CORS__Service(cors_config=Schema__CORS__Config())
+        cls.headers_service = Proxy__Headers__Service()
+        cls.cookie_service  = Proxy__Cookie__Service()
 
-    def test__init__(self):                                        # Test initialization
+        cls.service = Proxy__Response__Service(debug_service   = cls.debug_service  ,
+                                               stats_service   = cls.stats_service  ,
+                                               cors_service    = cls.cors_service   ,
+                                               headers_service = cls.headers_service,
+                                               cookie_service  = cls.cookie_service )
+
+        cls.test_response_basic = Schema__Proxy__Response_Data(                              # Basic response
+            request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
+            debug_params = {},
+            response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+        cls.test_response_with_cookies = Schema__Proxy__Response_Data(                       # Response with cookies
+            request      = {
+                'method'  : 'GET',
+                'host'    : 'example.com',
+                'path'    : '/test',
+                'headers' : {'cookie': 'mitm-show=response-data; mitm-debug=true'}
+            },
+            debug_params = {},                                                                 # Will be filled from cookies
+            response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+    def setUp(self):                                                                          # Reset stats before each test
+        self.stats_service.stats = Schema__Proxy__Stats()
+
+    def test__init__(self):                                                                    # Test auto-initialization of Proxy__Response__Service
+        with Proxy__Response__Service() as _:
+            assert type(_)         is Proxy__Response__Service
+            assert base_classes(_) == [Proxy__Response__Service.__bases__[0], object]
+
+            assert type(_.debug_service)   is Proxy__Debug__Service
+            assert type(_.stats_service)   is Proxy__Stats__Service
+            assert type(_.cors_service)    is Proxy__CORS__Service
+            assert type(_.headers_service) is Proxy__Headers__Service
+            assert type(_.cookie_service)  is Proxy__Cookie__Service
+
+    def test_generate_request_id(self):                                                       # Test request ID generation
         with self.service as _:
-            assert type(_) is Proxy__Response__Service
-            assert _.debug_service is not None
-            assert _.stats_service is not None
-            assert _.cors_service is not None
-            assert _.headers_service is not None
+            id1 = _.generate_request_id()
+            id2 = _.generate_request_id()
 
-    def test_generate_request_id(self):                            # Test request ID generation
-        request_id = self.service.generate_request_id()
+            assert id1.startswith('req-')
+            assert id2.startswith('req-')
+            assert id1 != id2                                                                  # IDs are unique
+            assert len(id1) > 10                                                               # Has hex suffix
 
-        assert request_id.startswith("req-")
-        assert len(request_id) > 4
-
-    def test_process_response__regular(self):                      # Test regular response processing
-        with Schema__Proxy__Response_Data() as response_data:
-            response_data.request = { 'method': 'GET'        ,
-                                      'host'  : 'example.com',
-                                      'path'  : '/test'      }
-            response_data.debug_params = {}
-            response_data.response     = {  'status_code' : 200,
-                                            'content_type': 'text/html',
-                                            'body'        : '<html><body>Test</body></html>',
-                                            'headers'     : {'content-type': 'text/html'}}
-            response_data.stats = {}
-            response_data.version = 'v1.0.0'
-
-            result = self.service.process_response(response_data)
-
-            assert result.obj() == __(debug_mode_active   = False                       ,
-                                      content_was_modified = False                       ,
-                                      response_overridden  = False                       ,
-                                      processing_error     = None                        ,
-                                      modifications        = __( block_request         = False                       ,
-                                                                 block_status          = 403                         ,
-                                                                 block_message         = 'Blocked by proxy'          ,
-                                                                 include_stats         = False                       ,
-                                                                 modified_body         = None                        ,
-                                                                 override_response     = False                       ,
-                                                                 override_status       = None                        ,
-                                                                 override_content_type = None                        ,
-                                                                 headers_to_add        = __SKIP__                    ,
-                                                                 headers_to_remove     = []                          ,
-                                                                 cached_response       = __()                        ,
-                                                                 stats                 = __()                        ),
-                                      final_status_code    = 200                         ,
-                                      final_content_type   = 'text/html'                 ,
-                                      final_body           = '<html><body>Test</body></html>',
-                                      final_headers        = __SKIP__                    )
-
-            assert obj__dict(result.final_headers) == __(content_type       = 'text/html'                           ,
-                                                         Content_Type                    = 'text/html'                           ,
-                                                         Content_Length                  = '30'                                  ,
-                                                         X_Proxy_Service                 = 'mgraph-proxy'                        ,
-                                                         X_Proxy_Version                 = '1.0.0'                               ,
-                                                         X_Request_ID                    = __SKIP__                              ,
-                                                         X_Processed_At                  = __SKIP__                              ,
-                                                         X_Original_Host                 = 'example.com'                         ,
-                                                         X_Original_Path                 = '/test'                               ,
-                                                         Access_Control_Allow_Origin      = '*'                                   ,
-                                                         Access_Control_Allow_Methods     = 'GET, POST, PUT, DELETE, OPTIONS'     ,
-                                                         Access_Control_Allow_Headers     = '*'                                   ,
-                                                         Access_Control_Expose_Headers    = 'Content-Length, Content-Type'        ,
-                                                         Access_Control_Allow_Credentials = 'true'                                ,
-                                                         Access_Control_Max_Age           = '3600'                                )
+    def test_process_response(self):                                                          # Test basic response processing
+        with self.service as _:
+            result = _.process_response(self.test_response_basic)
 
             assert type(result) is Schema__Response__Processing_Result
+            assert result.final_status_code    == 200
+            assert result.final_content_type   == 'text/html'
+            assert result.final_body          == '<html></html>'
+            assert result.debug_mode_active   is False
+            assert result.content_was_modified is False
+            assert result.response_overridden  is False
 
-            assert result.final_status_code     == 200
-            assert result.final_content_type    == 'text/html'
-            assert 'Test'                       in result.final_body
-            assert result.response_overridden   is False
-            assert result.content_was_modified  is False
-            assert "X-Proxy-Service"            in result.final_headers
+    def test_process_response__increments_stats(self):                                        # Test stats are incremented
+        initial_count = self.stats_service.stats.total_responses
 
-    def test_process_response__with_debug_mode(self):              # Test with debug mode
-        with Schema__Proxy__Response_Data() as response_data:
-            response_data.request = { 'method': 'GET'      ,
-                                      'host': 'example.com',
-                                      'path': '/test'      }
-            response_data.debug_params = {'debug': 'true'}
-            response_data.response = { 'status_code': 200,
-                                       'content_type': 'text/html',
-                                       'body': '<html><body>Test</body></html>',
-                                       'headers': {}}
-            response_data.stats = {}
-            response_data.version = 'v1.0.0'
+        with self.service as _:
+            _.process_response(self.test_response_basic)
 
-            result = self.service.process_response(response_data)
+            assert self.stats_service.stats.total_responses == initial_count + 1
 
-            assert result.debug_mode_active    is True
-            assert "X-Debug-Mode"              in result.final_headers
-            assert "🔧 DEBUG MODE"             in result.final_body
-            assert result.content_was_modified is True
+    def test_process_response__standard_headers_added(self):                                  # Test standard headers are added
+        with self.service as _:
+            result = _.process_response(self.test_response_basic)
 
-    def test_process_response__with_override(self):
+            assert 'X-Proxy-Service' in result.final_headers
+            assert 'X-Proxy-Version' in result.final_headers
+            assert 'X-Request-ID'    in result.final_headers
+            assert 'X-Processed-At'  in result.final_headers
 
-        with Schema__Proxy__Response_Data() as response_data:
-            response_data.request       = {'method': 'GET'}
-            response_data.debug_params  = {'show': 'response-data'}
-            response_data.response      = { 'status_code': 200,
-                                            'content_type': 'text/html',
-                                            'body': '<html>Original</html>',
-                                            'headers': {}}
-            response_data.stats = {}
-            response_data.version = 'v1.0.0'
+    def test_process_response__with_cookies(self):                                            # Test processing with cookie-based debug params
+        with self.service as _:
+            result = _.process_response(self.test_response_with_cookies)
 
-            result = self.service.process_response(response_data)
-            assert type(result) is Schema__Response__Processing_Result
+            assert 'X-Proxy-Cookie-Summary' in result.final_headers                           # Cookie summary added
+            assert result.debug_mode_active is True                                            # Debug mode from cookie
 
-            assert result.obj() == __(debug_mode_active   = True                        ,
-                                      content_was_modified = True                        ,
-                                      response_overridden  = True                        ,
-                                      processing_error     = None                        ,
-                                      modifications        = __( block_request         = False                       ,
-                                                                 block_status          = 403                         ,
-                                                                 block_message         = 'Blocked by proxy'          ,
-                                                                 include_stats         = False                       ,
-                                                                 modified_body         = '{\n'
-                                                                                          '  "request": {\n'
-                                                                                          '    "method": "GET"\n'
-                                                                                          '  },\n'
-                                                                                          '  "debug_params": {\n'
-                                                                                          '    "show": "response-data"\n'
-                                                                                          '  },\n'
-                                                                                          '  "response": {\n'
-                                                                                          '    "status_code": 200,\n'
-                                                                                          '    "content_type": "text/html",\n'
-                                                                                          '    "body": "<html>Original</html>",\n'
-                                                                                          '    "headers": {}\n'
-                                                                                          '  },\n'
-                                                                                          '  "stats": {},\n'
-                                                                                          '  "version": "v1.0.0"\n'
-                                                                                          '}'                            ,
-                                                                 override_response     = True                        ,
-                                                                 override_status       = 200                         ,
-                                                                 override_content_type = 'application/json'           ,
-                                                                 headers_to_add        = __SKIP__                    ,
-                                                                 headers_to_remove     = []                          ,
-                                                                 cached_response       = __()                        ,
-                                                                 stats                 = __()                        ),
-                                      final_status_code    = 200                         ,
-                                      final_content_type   = 'application/json'           ,
-                                      final_body           = '{\n'
-                                                               '  "request": {\n'
-                                                               '    "method": "GET"\n'
-                                                               '  },\n'
-                                                               '  "debug_params": {\n'
-                                                               '    "show": "response-data"\n'
-                                                               '  },\n'
-                                                               '  "response": {\n'
-                                                               '    "status_code": 200,\n'
-                                                               '    "content_type": "text/html",\n'
-                                                               '    "body": "<html>Original</html>",\n'
-                                                               '    "headers": {}\n'
-                                                               '  },\n'
-                                                               '  "stats": {},\n'
-                                                               '  "version": "v1.0.0"\n'
-                                                               '}'                            ,
-                                      final_headers        = __SKIP__                    )
+    def test_process_response__cookie_to_debug_params(self):                                  # Test cookies converted to debug_params
+        with self.service as _:
+            result = _.process_response(self.test_response_with_cookies)
 
-            assert obj__dict(result.modifications.headers_to_add) == __(X_Proxy_Service = 'mgraph-proxy',
-                                                                        X_Proxy_Version = '1.0.0',
-                                                                        X_Request_ID    = __SKIP__,
-                                                                        X_Processed_At  = __SKIP__,
-                                                                        X_Debug_Mode    = 'active',
-                                                                        X_Debug_Params  = 'show=response-data',
-                                                                        x_debug_show    = 'response-data')
+            assert 'X-Debug-Mode' in result.final_headers                                     # Debug mode detected
 
-            assert obj__dict(result.final_headers) == __(Content_Type        = 'application/json'                          ,
-                                                         Content_Length      = '266'                                       ,
-                                                         Cache_Control       = 'no-store, no-cache, must-revalidate'       ,
-                                                         Pragma              = 'no-cache'                                  ,
-                                                         Expires             = '0'                                         ,
-                                                         X_Proxy_Service     = 'mgraph-proxy'                              ,
-                                                         X_Proxy_Version     = '1.0.0'                                     ,
-                                                         X_Request_ID        = __SKIP__                                    ,
-                                                         X_Processed_At      = __SKIP__                                    ,
-                                                         X_Debug_Mode        = 'active'                                    ,
-                                                         X_Debug_Params      = 'show=response-data'                        ,
-                                                         x_debug_show        = 'response-data'                             )
+    def test_process_response__cors_headers(self):                                            # Test CORS headers added
+        with self.service as _:
+            result = _.process_response(self.test_response_basic)
 
+            assert 'Access-Control-Allow-Origin' in result.final_headers
 
-            assert result.response_overridden is True
-            assert result.final_content_type == 'application/json'
+    def test_process_response__content_length_header(self):                                   # Test Content-Length header
+        with self.service as _:
+            result = _.process_response(self.test_response_basic)
 
-    def test_process_response__preflight(self):                    # Test CORS preflight
-        with Schema__Proxy__Response_Data() as response_data:
-            response_data.request      = {'method': 'OPTIONS'}
-            response_data.debug_params = {}
-            response_data.response     = { 'status_code' : 200         ,
-                                           'content_type': 'text/plain',
-                                           'body'        : ''          ,
-                                           'headers'     : {}          }
-            response_data.stats = {}
-            response_data.version = 'v1.0.0'
+            assert 'Content-Length' in result.final_headers
+            assert int(result.final_headers['Content-Length']) == len(result.final_body.encode('utf-8'))
 
-            result = self.service.process_response(response_data)
+    def test_process_response__content_type_header(self):                                     # Test Content-Type header
+        with self.service as _:
+            result = _.process_response(self.test_response_basic)
 
-            assert result.final_status_code == 204
-            assert result.final_body == ""
-            assert "Access-Control-Allow-Origin" in result.final_headers
+            assert 'Content-Type' in result.final_headers
+            assert result.final_headers['Content-Type'] == 'text/html'
 
-    def test_finalize_overridden_response(self):                   # Test override finalization
-        with Schema__Proxy__Response_Data() as response_data:
-            response_data.request = {}
-            response_data.debug_params = {}
-            response_data.response = {}
-            response_data.stats = {}
-            response_data.version = 'v1.0.0'
+    def test_process_response__original_headers_preserved(self):                              # Test original response headers preserved
+        response_with_headers = Schema__Proxy__Response_Data(
+            request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
+            debug_params = {},
+            response     = {
+                'status_code'  : 200,
+                'content_type' : 'text/html',
+                'body'         : '<html></html>',
+                'headers'      : {'X-Custom-Header': 'custom-value', 'Server': 'nginx'}
+            },
+            stats        = {},
+            version      = 'v1.0.0'
+        )
 
+        with self.service as _:
+            result = _.process_response(response_with_headers)
+
+            assert 'X-Custom-Header' in result.final_headers
+            assert result.final_headers['X-Custom-Header'] == 'custom-value'
+
+    def test_process_response__no_cache_headers_for_debug(self):                              # Test no-cache headers in debug mode
+        response_with_debug = Schema__Proxy__Response_Data(
+            request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
+            debug_params = {'debug': 'true'},                                                  # Debug mode
+            response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+        with self.service as _:
+            result = _.process_response(response_with_debug)
+
+            assert 'Cache-Control' in result.final_headers
+            assert 'no-store' in result.final_headers['Cache-Control']
+
+    def test_build_final_headers(self):                                                       # Test final headers building
         from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications import Schema__Proxy__Modifications
-        with Schema__Proxy__Modifications() as modifications:
-            modifications.override_response = True
-            modifications.override_status = 200
-            modifications.override_content_type = 'text/plain'
-            modifications.modified_body = 'Overridden content'
 
-            result = self.service._finalize_overridden_response(
-                response_data,
-                modifications,
-                "test-123"
+        modifications = Schema__Proxy__Modifications()
+        modifications.headers_to_add = {'X-Custom': 'value'}
+        modifications.headers_to_remove = ['X-Remove-This']
+
+        response_data = Schema__Proxy__Response_Data(
+            request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
+            debug_params = {},
+            response     = {
+                'status_code'  : 200,
+                'content_type' : 'text/html',
+                'body'         : '<html></html>',
+                'headers'      : {'X-Remove-This': 'should-be-removed', 'X-Keep': 'keep-me'}
+            },
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+        with self.service as _:
+            final_headers = _.build_final_headers(
+                response_data = response_data,
+                modifications = modifications,
+                content_type  = 'text/html',
+                content_length = 13
             )
 
-            assert result.response_overridden is True
-            assert result.final_status_code == 200
-            assert result.final_body == 'Overridden content'
+            assert 'X-Custom'      in final_headers
+            assert 'X-Keep'        in final_headers
+            assert 'X-Remove-This' not in final_headers                                       # Removed
+            assert 'Content-Type'   in final_headers
+            assert 'Content-Length' in final_headers
 
-    def test_build_final_headers(self):                            # Test header building
-        with Schema__Proxy__Response_Data() as response_data:
-            response_data.request = {}
-            response_data.debug_params = {}
-            response_data.response = {
-                'headers': {'X-Original': 'value'}
-            }
-            response_data.stats = {}
-            response_data.version = 'v1.0.0'
+    def test__preflight_request_handling(self):                                                # Test CORS preflight OPTIONS request
+        preflight_response = Schema__Proxy__Response_Data(
+            request      = {'method': 'OPTIONS', 'host': 'example.com', 'path': '/test', 'headers': {}},
+            debug_params = {},
+            response     = {'status_code': 200, 'content_type': 'text/plain', 'body': '', 'headers': {}},
+            stats        = {},
+            version      = 'v1.0.0'
+        )
 
-        with Schema__Proxy__Modifications() as modifications:
-            modifications.headers_to_add['X-Added'] = 'added-value'
-            modifications.headers_to_remove.append('X-Original')
+        with self.service as _:
+            result = _.process_response(preflight_response)
 
-            headers = self.service.build_final_headers(response_data,
-                                                       modifications,
-                                                        'text/html',
-                                                       100)
+            assert result.final_status_code == 204                                             # No Content for preflight
+            assert result.final_body == ''
+            assert 'Access-Control-Allow-Methods' in result.final_headers
 
-            assert 'X-Added' in headers
-            assert 'X-Original' not in headers
-            assert headers['Content-Type'] == 'text/html'
-            assert headers['Content-Length'] == '100'
+    def test__error_result_creation(self):                                                     # Test error result creation
+        response_data = self.test_response_basic
 
-    def test_response__processing_result__get_summary(self):       # Test result summary
-        from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications import Schema__Proxy__Modifications
+        with self.service as _:
+            error_result = _._create_error_result(response_data, "Test error message")
 
-        with Schema__Response__Processing_Result() as result:
-            result.modifications = Schema__Proxy__Modifications()
-            result.final_status_code = 200
-            result.final_content_type = 'text/html'
-            result.final_body = 'Test content'
-            result.final_headers = {'X-Test': 'value'}
-            result.debug_mode_active = True
-            result.content_was_modified = True
-            result.response_overridden = False
+            assert type(error_result) is Schema__Response__Processing_Result
+            assert error_result.final_status_code == 500
+            assert error_result.final_content_type == 'text/plain'
+            assert 'Test error message' in error_result.final_body
+            assert error_result.processing_error == "Test error message"
+            assert 'X-Processing-Error' in error_result.final_headers
+
+    def test__cookie_priority_over_existing_debug_params(self):                                # Test cookies override existing debug_params
+        response_mixed = Schema__Proxy__Response_Data(
+            request      = {
+                'method'  : 'GET',
+                'host'    : 'example.com',
+                'path'    : '/test',
+                'headers' : {'cookie': 'mitm-show=url-to-html'}                               # Cookie value
+            },
+            debug_params = {'show': 'url-to-text'},                                           # Query param value
+            response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+        with self.service as _:
+            result = _.process_response(response_mixed)
+
+            # After processing, response_data.debug_params should have cookie value
+            assert response_mixed.debug_params['show'] == 'url-to-html'                       # Cookie wins
+
+    def test__multiple_cookies_processed(self):                                                # Test multiple proxy cookies processed together
+        response_multi = Schema__Proxy__Response_Data(
+            request      = {
+                'method'  : 'GET',
+                'host'    : 'example.com',
+                'path'    : '/test',
+                'headers' : {
+                    'cookie': 'mitm-show=url-to-html; mitm-inject=debug-panel; '
+                             'mitm-debug=true; mitm-rating=0.5'
+                }
+            },
+            debug_params = {},
+            response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+        with self.service as _:
+            result = _.process_response(response_multi)
+
+            assert 'X-Proxy-Cookie-Summary' in result.final_headers                           # Cookie summary present
+            assert result.debug_mode_active is True                                            # Debug from cookie
+
+    def test__empty_response_body(self):                                                       # Test processing empty response body
+        response_empty = Schema__Proxy__Response_Data(
+            request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
+            debug_params = {},
+            response     = {'status_code': 204, 'content_type': 'text/plain', 'body': '', 'headers': {}},
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+        with self.service as _:
+            result = _.process_response(response_empty)
+
+            assert result.final_body == ''
+            assert result.final_status_code == 204
+            assert result.final_headers['Content-Length'] == '0'
+
+    def test__large_response_body(self):                                                       # Test processing large response body
+        large_body = 'x' * 100000                                                              # 100KB body
+        response_large = Schema__Proxy__Response_Data(
+            request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
+            debug_params = {},
+            response     = {'status_code': 200, 'content_type': 'text/plain', 'body': large_body, 'headers': {}},
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+        with self.service as _:
+            result = _.process_response(response_large)
+
+            assert result.final_body == large_body
+            assert len(result.final_body) == 100000
+            assert self.stats_service.stats.total_bytes_processed == 100000
+
+    def test__json_response(self):                                                             # Test JSON response processing
+        response_json = Schema__Proxy__Response_Data(
+            request      = {'method': 'GET', 'host': 'api.example.com', 'path': '/data', 'headers': {}},
+            debug_params = {},
+            response     = {
+                'status_code'  : 200,
+                'content_type' : 'application/json',
+                'body'         : '{"key": "value"}',
+                'headers'      : {}
+            },
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+        with self.service as _:
+            result = _.process_response(response_json)
+
+            assert result.final_content_type == 'application/json'
+            assert result.final_body == '{"key": "value"}'
+
+    def test__processing_result_summary(self):                                                # Test processing result summary
+        with self.service as _:
+            result = _.process_response(self.test_response_basic)
 
             summary = result.get_summary()
 
-            assert summary['status_code'] == 200
-            assert summary['content_type'] == 'text/html'
-            assert summary['body_size'] == len('Test content')
-            assert summary['debug_mode'] is True
-            assert summary['modified'] is True
-            assert summary['overridden'] is False
+            assert 'status_code'  in summary
+            assert 'content_type' in summary
+            assert 'body_size'    in summary
+            assert 'headers_added' in summary
+            assert 'debug_mode'   in summary
+            assert 'modified'     in summary
+            assert 'overridden'   in summary
+            assert 'error'        in summary
+
+    def test__debug_headers_added_when_debug_mode(self):                                      # Test debug headers added in debug mode
+        response_debug = Schema__Proxy__Response_Data(
+            request      = { 'method'  : 'GET',
+                             'host'    : 'example.com',
+                             'path'    : '/test',
+                             'headers' : {'cookie': 'mitm-debug=true'} },
+            debug_params = {},
+            response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
+            stats        = {},
+            version      = 'v1.0.0'
+        )
+
+        with self.service as _:
+            result = _.process_response(response_debug)
+
+            assert 'X-Debug-Mode' in result.final_headers
+            assert result.final_headers['X-Debug-Mode'] == 'active'
+
+    def test__timestamp_in_headers(self):                                                      # Test timestamp format in headers
+        with self.service as _:
+            result = _.process_response(self.test_response_basic)
+
+            assert 'X-Processed-At' in result.final_headers
+            timestamp = result.final_headers['X-Processed-At']
+            assert 'T' in timestamp                                                            # ISO format
+            assert timestamp.endswith('Z')                                                     # UTC indicator

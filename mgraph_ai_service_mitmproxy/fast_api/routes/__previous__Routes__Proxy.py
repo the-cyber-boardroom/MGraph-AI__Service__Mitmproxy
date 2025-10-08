@@ -5,6 +5,7 @@ from typing                                                                     
 from datetime                                                                       import datetime
 from osbot_utils.type_safe.primitives.core.Safe_Str                                 import Safe_Str
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                import Safe_UInt
+from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text import Safe_Str__Text
 from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Version     import Safe_Str__Version
 from osbot_utils.type_safe.primitives.domains.identifiers.safe_str.Safe_Str__Id     import Safe_Str__Id
 from osbot_utils.utils.Env                                                          import get_env
@@ -55,7 +56,7 @@ class Schema__Proxy__Modifications(Type_Safe):                            # Modi
     cached_response   : Dict                                              # allow direct response to proxy
     block_request     : bool            = False                           # Whether to block request
     block_status      : Safe_UInt__HTTP_Status = 403                      # Status code if blocked
-    block_message     : Safe_Str        = "Blocked by proxy"              # Block message
+    block_message     : Safe_Str__Text        = "Blocked by proxy"        # Block message
     include_stats     : bool            = False                           # Include stats in response
     stats             : Dict[str, Any]                                    # Statistics to include
     modified_body     : Optional[str]   = None                            # Modified body content (if any)
