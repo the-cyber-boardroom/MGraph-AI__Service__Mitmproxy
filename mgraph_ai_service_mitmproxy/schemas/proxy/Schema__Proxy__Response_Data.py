@@ -3,8 +3,8 @@ from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Version 
 from typing                                                                          import Dict, Any
 
 class Schema__Proxy__Response_Data(Type_Safe):                       # Incoming response from mitmproxy
-    request       : Dict[str, Any]                                   # Original request info
-    debug_params  : Dict[str, str]                                   # Debug parameters from request
+    request       : Dict[str, Any]                                   # Original request info (includes headers with Cookie)
+    debug_params  : Dict[str, str]                                   # Empty from interceptor - populated from cookies
     response      : Dict[str, Any]                                   # Response details
     stats         : Dict[str, Any]                                   # Response statistics
     version       : Safe_Str__Version                                # Interceptor version

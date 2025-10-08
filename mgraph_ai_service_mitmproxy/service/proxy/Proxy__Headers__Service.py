@@ -11,57 +11,57 @@ class Proxy__Headers__Service(Type_Safe):                        # Standard resp
                             response_data : Schema__Proxy__Response_Data,
                             request_id    : str = None           # Optional request ID
                             ) -> Dict[str, str]:                 # Standard headers
-        """Generate standard headers for all responses"""
+        """Generate standard headers for all responses - lowercase for HTTP/2 compatibility"""
         headers = {}
 
-        # Service identification
-        headers["X-Proxy-Service"] = self.service_name
-        headers["X-Proxy-Version"] = self.service_version
+        # Service identification (lowercase for HTTP/2)
+        headers["x-proxy-service"] = self.service_name
+        headers["x-proxy-version"] = self.service_version
 
         # Request tracking
         if request_id:
-            headers["X-Request-ID"] = request_id
+            headers["x-request-id"] = request_id
 
         # Timestamp
-        headers["X-Processed-At"] = datetime.utcnow().isoformat() + "Z"
+        headers["x-processed-at"] = datetime.utcnow().isoformat() + "Z"
 
         # Original request info
         if 'host' in response_data.request:
-            headers["X-Original-Host"] = response_data.request['host']
+            headers["x-original-host"] = response_data.request['host']
 
         if 'path' in response_data.request:
-            headers["X-Original-Path"] = response_data.request['path']
+            headers["x-original-path"] = response_data.request['path']
 
         return headers
 
     def get_debug_headers(self,                                  # Get debug-specific headers
                          response_data : Schema__Proxy__Response_Data
                          ) -> Dict[str, str]:                    # Debug headers
-        """Generate debug headers when debug mode is active"""
+        """Generate debug headers when debug mode is active - lowercase for HTTP/2"""
         headers = {}
 
         debug_params = response_data.debug_params
         if not debug_params:
             return headers
 
-        # Add debug mode indicator
-        headers["X-Debug-Mode"] = "active"
+        # Add debug mode indicator (lowercase)
+        headers["x-debug-mode"] = "active"
 
-        # Add debug parameters as header
+        # Add debug parameters as header (lowercase)
         debug_params_str = ";".join([f"{k}={v}" for k, v in debug_params.items()])
-        headers["X-Debug-Params"] = debug_params_str
+        headers["x-debug-params"] = debug_params_str
 
         return headers
 
     def get_cache_headers(self,                                  # Get cache control headers
                          no_cache : bool = False                 # Whether to disable caching
                          ) -> Dict[str, str]:                    # Cache headers
-        """Generate cache control headers"""
+        """Generate cache control headers - lowercase for HTTP/2"""
         if no_cache:
             return {
-                "Cache-Control": "no-store, no-cache, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0"
+                "cache-control": "no-store, no-cache, must-revalidate",
+                "pragma": "no-cache",
+                "expires": "0"
             }
         return {}
 
@@ -69,8 +69,8 @@ class Proxy__Headers__Service(Type_Safe):                        # Standard resp
                            content_type : str,                   # Content type
                            content_length : int                  # Content length in bytes
                            ) -> Dict[str, str]:                  # Content headers
-        """Generate content-related headers"""
+        """Generate content-related headers - lowercase for HTTP/2"""
         return {
-            "Content-Type": content_type,
-            "Content-Length": str(content_length)
+            "content-type": content_type,
+            "content-length": str(content_length)
         }

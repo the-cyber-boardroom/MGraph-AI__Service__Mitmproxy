@@ -1,4 +1,6 @@
 from osbot_utils.type_safe.Type_Safe                                                 import Type_Safe
+from osbot_utils.utils.Dev import pprint
+
 from mgraph_ai_service_mitmproxy.schemas.debug.Schema__Debug__Command                import Schema__Debug__Command
 from mgraph_ai_service_mitmproxy.schemas.debug.Schema__HTML__Injection               import Schema__HTML__Injection
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data          import Schema__Proxy__Response_Data
@@ -75,16 +77,12 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
 
         return None
 
-    def process_debug_mode(self,
-                          response_data : Schema__Proxy__Response_Data  # Response data
-                          ) -> Optional[Schema__HTML__Injection]:  # Injection config or None
-        """Process debug mode (inject banner)"""
+    def process_debug_mode(self,  response_data : Schema__Proxy__Response_Data      # Process debug mode (inject banner)
+                             ) -> Optional[Schema__HTML__Injection]:
         injection = Schema__HTML__Injection()
         injection.inject_banner = True
-        injection.banner_content = self.html_service.create_debug_banner(
-            debug_params = response_data.debug_params,
-            request_path = response_data.request.get('path', '/')
-        )
+        injection.banner_content = self.html_service.create_debug_banner(debug_params = response_data.debug_params,
+                                                                         request_path = response_data.request.get('path', '/') )
         return injection
 
     def process_replace_command(self,
@@ -139,6 +137,7 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
 
             # Check for inject commands
             for command in commands:
+                command.print()
                 if command.is_inject_command():
                     injection = self.process_inject_command(command, response_data)
                     if injection:

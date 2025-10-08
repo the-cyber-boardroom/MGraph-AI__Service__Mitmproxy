@@ -1,7 +1,10 @@
-from http.cookies                                                import SimpleCookie
-from osbot_utils.type_safe.Type_Safe                            import Type_Safe
-from typing                                                     import Dict, Optional
-from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type import Enum__WCF__Command_Type
+from http.cookies                                                       import SimpleCookie
+from osbot_utils.type_safe.Type_Safe                                    import Type_Safe
+from typing                                                             import Dict, Optional
+
+from osbot_utils.utils.Misc import list_set
+
+from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type  import Enum__WCF__Command_Type
 
 
 class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based proxy control service
@@ -37,7 +40,7 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
             return {}
 
         cookie = SimpleCookie()
-        cookie.load(cookie_header)
+        cookie.load(cookie_header)                          # todo: figure out why this is not working for some sites
 
         return {key: morsel.value for key, morsel in cookie.items()}
 
@@ -49,9 +52,10 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
         # Filter for proxy control cookies (mitm-*)
         proxy_cookies = {}
         for key, value in all_cookies.items():
+            print(key)
             if key.startswith(self.COOKIE_PREFIX):
                 proxy_cookies[key] = value
-
+        print(proxy_cookies)
         return proxy_cookies
 
     def get_show_command(self, headers: Dict[str, str]           # Get show command from cookies

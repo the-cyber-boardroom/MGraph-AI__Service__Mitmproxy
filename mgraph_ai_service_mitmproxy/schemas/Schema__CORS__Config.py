@@ -15,12 +15,12 @@ class Schema__CORS__Config(Type_Safe):                           # CORS configur
         self.allowed_origins  = ["*"]                                           # Allowed origins
         self.allowed_methods  = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]     # Allowed methods
         self.allowed_headers  = ["*"]                                           # Allowed headers
-        self.expose_headers   = ["Content-Length", "Content-Type"]              # Exposed headers
+        self.expose_headers   = ["content-length", "content-type"]              # Exposed headers (lowercase)
 
 
     def get_cors_headers(self, request_origin: str = None       # Get CORS headers
                         ) -> Dict[str, str]:                     # CORS headers dict
-        """Generate CORS headers based on configuration"""
+        """Generate CORS headers based on configuration - lowercase for HTTP/2 compatibility"""
         if not self.enabled:
             return {}
 
@@ -30,19 +30,19 @@ class Schema__CORS__Config(Type_Safe):                           # CORS configur
         if request_origin and self.allowed_origins != ["*"]:
             # Check if origin is in allowed list
             if request_origin in self.allowed_origins:
-                headers["Access-Control-Allow-Origin"] = request_origin
+                headers["access-control-allow-origin"] = request_origin
         else:
-            headers["Access-Control-Allow-Origin"] = "*"
+            headers["access-control-allow-origin"] = "*"
 
-        # Add other CORS headers
-        headers["Access-Control-Allow-Methods"] = ", ".join(self.allowed_methods)
-        headers["Access-Control-Allow-Headers"] = ", ".join(self.allowed_headers)
-        headers["Access-Control-Expose-Headers"] = ", ".join(self.expose_headers)
+        # Add other CORS headers (all lowercase for HTTP/2)
+        headers["access-control-allow-methods"] = ", ".join(self.allowed_methods)
+        headers["access-control-allow-headers"] = ", ".join(self.allowed_headers)
+        headers["access-control-expose-headers"] = ", ".join(self.expose_headers)
 
         if self.allow_credentials:
-            headers["Access-Control-Allow-Credentials"] = "true"
+            headers["access-control-allow-credentials"] = "true"
 
-        headers["Access-Control-Max-Age"] = str(self.max_age)
+        headers["access-control-max-age"] = str(self.max_age)
 
         return headers
 

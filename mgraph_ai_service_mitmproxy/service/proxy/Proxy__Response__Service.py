@@ -31,9 +31,10 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
         1. Update statistics
         2. Create modifications object
         3. Add standard headers
-        4. Process cookie-based debug commands (may override)
-        5. Add CORS headers
-        6. Finalize response
+        4. Extract cookies from request headers and merge with debug_params
+        5. Process debug commands (may override)
+        6. Add CORS headers
+        7. Finalize response
         """
         try:
             # Generate request ID
@@ -48,8 +49,11 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             # Create modifications object
             modifications = Schema__Proxy__Modifications()
 
-            # Merge cookie-based debug params with existing debug_params
+            # Extract request headers (includes Cookie header)
             request_headers = response_data.request.get('headers', {})
+
+            # Parse cookie-based debug params from request headers
+            # The interceptor sends request headers in response_data.request['headers']
             cookie_debug_params = self.cookie_service.convert_to_debug_params(request_headers)
 
             # Combine: cookies take precedence over query params
@@ -66,6 +70,7 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             modifications.headers_to_add.update(standard_headers)
 
             # Add cookie summary header if any proxy cookies present
+            print('has cookies', self.cookie_service.has_any_proxy_cookies(request_headers))
             if self.cookie_service.has_any_proxy_cookies(request_headers):
                 cookie_summary = self.cookie_service.get_cookie_summary(request_headers)
                 modifications.headers_to_add["X-Proxy-Cookie-Summary"] = str(cookie_summary)

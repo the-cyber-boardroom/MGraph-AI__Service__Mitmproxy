@@ -24,7 +24,10 @@ class Proxy__Request__Service(Type_Safe):                            # Request p
         # Create response with modifications
         modifications = Schema__Proxy__Modifications()
 
-        # Check for cached response using cookies instead of query params
+        # Parse cookies from headers (interceptor sends them in headers dict)
+        # The cookie_service methods already work with headers dict
+
+        # Check for cached response using cookies
         if self.cookie_service.is_cache_enabled(request_data.headers):
             cached_response = self.content_service.check_cached_response(
                 request_data   = request_data,
@@ -47,16 +50,17 @@ class Proxy__Request__Service(Type_Safe):                            # Request p
             "y-version-interceptor"   : request_data.version                     ,
         }
 
-        # Add cookie-based debug params to headers if present
-        if self.cookie_service.has_any_proxy_cookies(request_data.headers):
-            cookie_summary = self.cookie_service.get_cookie_summary(request_data.headers)
-            modifications.headers_to_add["x-proxy-cookies"] = json.dumps(cookie_summary)
-
-        # Convert cookies to debug_params for backward compatibility
+        # Extract cookie-based debug params and merge with path-based params
+        # cookie_service.convert_to_debug_params() parses cookies from headers
         debug_params_from_cookies = self.cookie_service.convert_to_debug_params(request_data.headers)
 
         # Merge with any existing debug_params from query string (cookies take precedence)
         combined_debug_params = {**request_data.debug_params, **debug_params_from_cookies}
+
+        # Add cookie summary to headers if any proxy cookies present
+        if self.cookie_service.has_any_proxy_cookies(request_data.headers):
+            cookie_summary = self.cookie_service.get_cookie_summary(request_data.headers)
+            modifications.headers_to_add["x-proxy-cookies"] = json.dumps(cookie_summary)
 
         if combined_debug_params:
             modifications.headers_to_add["x-debug-params"] = json.dumps(combined_debug_params)

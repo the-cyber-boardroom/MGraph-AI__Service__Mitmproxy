@@ -49,42 +49,109 @@ class Proxy__HTML__Service(Type_Safe):                           # HTML content 
                         html_content : str,                      # Original HTML content
                         injection    : Schema__HTML__Injection   # Injection configuration
                         ) -> Optional[str]:                      # Modified HTML or None
-        """Inject debug content into HTML"""
+        """
+        Inject debug content into HTML with multiple fallback strategies
+
+        Strategies (in order):
+        1. After <body> tag (if exists)
+        2. After <head> tag (if exists)
+        3. After <!DOCTYPE> (if exists)
+        4. At the very beginning of the HTML
+        """
         if not injection.has_injections():
             return None
 
         modified_html = html_content
         injected = False
 
-        # Inject debug banner
+        # Inject debug banner (should be at top)
         if injection.inject_banner and injection.banner_content:
-            # Try to inject after <body> tag
-            if "<body" in modified_html:
+            banner_injected = False
+
+            # Strategy 1: After <body> tag
+            if "<body" in modified_html.lower():
                 modified_html = re.sub(
                     r'(<body[^>]*>)',
                     r'\1' + injection.banner_content,
                     modified_html,
-                    count=1
+                    count=1,
+                    flags=re.IGNORECASE
                 )
-                injected = True
-            # Fallback: inject before </body>
-            elif "</body>" in modified_html:
-                modified_html = modified_html.replace(
-                    "</body>",
-                    f"{injection.banner_content}</body>",
-                    1
+                banner_injected = True
+
+            # Strategy 2: After </head> tag (before body)
+            elif "</head>" in modified_html.lower():
+                modified_html = re.sub(
+                    r'(</head>)',
+                    r'\1' + injection.banner_content,
+                    modified_html,
+                    count=1,
+                    flags=re.IGNORECASE
                 )
+                banner_injected = True
+
+            # Strategy 3: After <!DOCTYPE>
+            elif "<!doctype" in modified_html.lower():
+                # Find end of doctype declaration
+                doctype_match = re.search(r'<!doctype[^>]*>', modified_html, re.IGNORECASE)
+                if doctype_match:
+                    insert_pos = doctype_match.end()
+                    modified_html = (modified_html[:insert_pos] +
+                                   injection.banner_content +
+                                   modified_html[insert_pos:])
+                    banner_injected = True
+
+            # Strategy 4: After <html> tag
+            elif "<html" in modified_html.lower():
+                modified_html = re.sub(
+                    r'(<html[^>]*>)',
+                    r'\1' + injection.banner_content,
+                    modified_html,
+                    count=1,
+                    flags=re.IGNORECASE
+                )
+                banner_injected = True
+
+            # Strategy 5: Prepend to entire content (last resort)
+            else:
+                modified_html = injection.banner_content + modified_html
+                banner_injected = True
+
+            if banner_injected:
                 injected = True
 
-        # Inject debug panel
+        # Inject debug panel (should be at bottom)
         if injection.inject_panel and injection.panel_content:
-            # Try to inject before </body>
-            if "</body>" in modified_html:
-                modified_html = modified_html.replace(
-                    "</body>",
-                    f"{injection.panel_content}</body>",
-                    1
+            panel_injected = False
+
+            # Strategy 1: Before </body> tag
+            if "</body>" in modified_html.lower():
+                modified_html = re.sub(
+                    r'(</body>)',
+                    injection.panel_content + r'\1',
+                    modified_html,
+                    count=1,
+                    flags=re.IGNORECASE
                 )
+                panel_injected = True
+
+            # Strategy 2: Before </html> tag
+            elif "</html>" in modified_html.lower():
+                modified_html = re.sub(
+                    r'(</html>)',
+                    injection.panel_content + r'\1',
+                    modified_html,
+                    count=1,
+                    flags=re.IGNORECASE
+                )
+                panel_injected = True
+
+            # Strategy 3: Append to entire content (last resort)
+            else:
+                modified_html = modified_html + injection.panel_content
+                panel_injected = True
+
+            if panel_injected:
                 injected = True
 
         if injected:
