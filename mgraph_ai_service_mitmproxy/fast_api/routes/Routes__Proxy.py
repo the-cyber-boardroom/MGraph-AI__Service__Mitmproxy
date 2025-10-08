@@ -1,19 +1,19 @@
-from typing                                               import Dict, List, Any, Set, Optional
-from datetime                                             import datetime
-import json
+from http.cookies import SimpleCookie
 
 import requests
-from osbot_fast_api.schemas.consts__Fast_API import ENV_VAR__FAST_API__AUTH__API_KEY__NAME, ENV_VAR__FAST_API__AUTH__API_KEY__VALUE
-from osbot_utils.utils.Env import get_env
-from osbot_utils.utils.Http import GET_json
-
-from mgraph_ai_service_mitmproxy.utils.Version            import version__mgraph_ai_service_mitmproxy
-from osbot_fast_api.api.routes.Fast_API__Routes           import Fast_API__Routes
-from osbot_fast_api.utils.Version import version__osbot_fast_api
-from osbot_utils.type_safe.Type_Safe                      import Type_Safe
-from osbot_utils.type_safe.primitives.safe_str.Safe_Str   import Safe_Str
-from osbot_utils.type_safe.primitives.safe_str.git.Safe_Str__Version import Safe_Str__Version
-from osbot_utils.type_safe.primitives.safe_uint.Safe_UInt import Safe_UInt
+import json
+from typing                                                                         import Dict, List, Any, Set, Optional
+from datetime                                                                       import datetime
+from osbot_utils.type_safe.primitives.core.Safe_Str                                 import Safe_Str
+from osbot_utils.type_safe.primitives.core.Safe_UInt                                import Safe_UInt
+from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Version     import Safe_Str__Version
+from osbot_utils.type_safe.primitives.domains.files.safe_str.Safe_Str__File__Path   import Safe_Str__File__Path
+from osbot_utils.type_safe.primitives.domains.identifiers.safe_str.Safe_Str__Id     import Safe_Str__Id
+from osbot_utils.utils.Env                                                          import get_env
+from mgraph_ai_service_mitmproxy.utils.Version                                      import version__mgraph_ai_service_mitmproxy
+from osbot_fast_api.api.routes.Fast_API__Routes                                     import Fast_API__Routes
+from osbot_fast_api.utils.Version                                                   import version__osbot_fast_api
+from osbot_utils.type_safe.Type_Safe                                                import Type_Safe
 from osbot_utils.utils.Dev import pprint
 
 TAG__ROUTES_PROXY                  = 'proxy'
@@ -29,12 +29,6 @@ ENV_VAR__WCF_SERVICE__AUTH__API_KEY__VALUE = "WCF_SERVICE__AUTH__API_KEY__VALUE"
 class Safe_Str__HTTP_Method(Safe_Str):                                        # HTTP method validation
     max_length = 10
 
-class Safe_Str__Host(Safe_Str):                                           # Host/domain validation
-    max_length = 255
-
-class Safe_Str__Path(Safe_Str):                                           # URL path validation
-    max_length = 2048
-
 class Safe_UInt__HTTP_Status(Safe_UInt):                                  # HTTP status codes
     min_value = 100
     max_value = 599
@@ -42,8 +36,8 @@ class Safe_UInt__HTTP_Status(Safe_UInt):                                  # HTTP
 # Request/Response schemas using Type_Safe
 class Schema__Proxy__Request_Data(Type_Safe):                             # Incoming request from mitmproxy
     method        : Safe_Str__HTTP_Method                                 # HTTP method (GET, POST, etc)
-    host          : Safe_Str__Host                                        # Target host
-    path          : Safe_Str__Path                                        # Request path
+    host          : Safe_Str__Id                                          # Target host
+    path          : str                                                   # Request path        # todo: replace with Type_Safe__Primitive
     original_path : Optional[str] = None                                  # Original path with debug params
     debug_params  : Dict[str, str]                                        # Debug parameters extracted
     headers       : Dict[str, str]                                        # Request headers
@@ -60,6 +54,7 @@ class Schema__Proxy__Response_Data(Type_Safe):                            # Inco
 class Schema__Proxy__Modifications(Type_Safe):                            # Modifications to apply
     headers_to_add    : Dict[str, str]                                    # Headers to add
     headers_to_remove : List[str]                                         # Headers to remove
+    cached_response   : Dict                                              # allow direct response to proxy
     block_request     : bool            = False                           # Whether to block request
     block_status      : Safe_UInt__HTTP_Status = 403                      # Status code if blocked
     block_message     : Safe_Str        = "Blocked by proxy"              # Block message
@@ -90,7 +85,6 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
         ALL content modifications happen here in FastAPI, not in the interceptor
         """
         debug_params = response_data.debug_params
-
         if not debug_params:
             return
 
@@ -110,11 +104,15 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
                     target_url   += "&rating=0.5"
 
                 wcf_url      = f"https://dev.web-content-filtering.mgraph.ai/html-graphs/{show_value}/?url=" + target_url
+
+                print('------')
+                print(wcf_url)
                 headers       = { get_env(ENV_VAR__WCF_SERVICE__AUTH__API_KEY__NAME ) : get_env(ENV_VAR__WCF_SERVICE__AUTH__API_KEY__VALUE )}
                 response      = requests.get(wcf_url, headers=headers)
                 content_type  = response.headers.get('content-type')
                 #print(wcf_url, content_type)
                 #print(response.status_code)
+
                 if response.status_code == 200:
                     if content_type == 'text/plain; charset=utf-8':
                         modifications.modified_body = response.content.decode('utf-8')
@@ -132,10 +130,20 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
                         modifications.headers_to_add["x-debug-show"] = "response-data"
                         return
                     elif content_type == 'text/html; charset=utf-8':
+
+                        # response_json = {"answer": 42}
+                        # modifications.override_response = True
+                        # modifications.override_status = 200
+                        # modifications.override_content_type = "application/json"
+                        # modifications.modified_body = json.dumps(response_json, indent=2)
+                        # modifications.headers_to_add["x-debug-show"] = "response-data"
+                        # print('all done....')
+                        # #return  # Early return - we're replacing everything
+
                         modifications.modified_body         = response.content.decode('utf-8')
                         modifications.override_response     = True
                         modifications.override_status       = 200
-                        #modifications.override_content_type = content_type
+                        modifications.override_content_type = content_type
                         modifications.headers_to_add["x-debug-show"] = "response-data"
                         #print(wcf_url)
                         return
@@ -246,8 +254,49 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
         self.hosts_seen.add(request_data.host)
         self.paths_seen.add(request_data.path)
 
-        # Create response with modifications
+        # Create response with modifications            # TEST TO See if we can cache the response
         modifications = Schema__Proxy__Modifications()
+
+        # TEST: Check for cache_test debug param to return cached HTML
+        cookies = self.parse_cookies(request_data.headers)
+        pprint(cookies)
+        if cookies.get('cache_test') == 'true':
+            try:
+                cached_html = """
+               <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>CACHED RESPONSE TEST</title>
+                </head>
+                <body style="background: #00ff00; padding: 40px; font-family: monospace;">
+                    <h1>🎯 SUCCESS! This is a CACHED response</h1>
+                    <p>This HTML was returned directly from FastAPI without hitting the upstream server!</p>
+                    <ul>                                                
+                        <li>Original Path: """ + (request_data.original_path or "N/A") + """</li>
+                        <li>Path: """ + str(f"{request_data.path}") + """ </li>
+                        <li>Request Count: """ + str(self.total_requests) + """</li>
+                    </ul>
+                </body>
+                </html>
+                """
+
+                modifications.cached_response = {
+                    "status_code": 200,
+                    "body": cached_html,
+                    "headers": {
+                        "Content-Type": "text/html; charset=utf-8",
+                        "X-Cache-Source": "fastapi-test-cache",
+                        "X-Cache-Timestamp": datetime.utcnow().isoformat()
+                    }
+                }
+
+                print(f"      🎯   Returning CACHED response for cache_test")
+                return modifications
+            except Exception as e:
+                print(e)
+
+
+
 
         # Add custom headers
         modifications.headers_to_add = {
@@ -381,8 +430,36 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
             "previous_stats" : old_stats
         }
 
+    def parse_cookies(self, headers: Dict[str, str]) -> Dict[str, str]:   # Parse cookies using Python's SimpleCookie"""
+        cookie_header = headers.get('cookie') or headers.get('Cookie')
+        if not cookie_header:
+            return {}
+
+        cookie = SimpleCookie()
+        cookie.load(cookie_header)
+
+        return {key: morsel.value for key, morsel in cookie.items()}
+
     def setup_routes(self):                                                # Configure FastAPI routes
         self.add_route_post(self.process_request   )
         self.add_route_post(self.process_response  )
         self.add_route_get (self.get_proxy_stats   )
         self.add_route_post(self.reset_proxy_stats )
+
+
+# simple curl to make a request
+# curl 'https://docs.diniscruz.ai/%7Bshow=url-to-html-xxx%7D/' \
+#    --http1.1  --insecure --compressed \
+#   -x http://192.168.0.165:8080 \
+#   -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0' \
+#   -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
+#   -H 'Accept-Language: en-GB,en;q=0.5' \
+#   -H 'Cookie: mitm-show=value'
+
+# just show response headers
+# curl --http1.1 --insecure -sS -D - -o /dev/null -x http://192.168.0.165:8080 \
+#   -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0' \
+#   -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
+#   -H 'Accept-Language: en-GB,en;q=0.5' \
+#   -H 'Cookie: mitm-show=value' \
+#   'https://docs.diniscruz.ai/%7Bshow=url-to-html-xxx%7D/'

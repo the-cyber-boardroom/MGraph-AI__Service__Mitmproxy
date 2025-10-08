@@ -1,6 +1,7 @@
-from osbot_utils.type_safe.primitives.safe_str.git.Safe_Str__Version        import Safe_Str__Version
-from osbot_utils.type_safe.Type_Safe                                        import Type_Safe
-from osbot_utils.type_safe.primitives.safe_str.identifiers.Safe_Id          import Safe_Id
+
+from osbot_utils.type_safe.Type_Safe                                             import Type_Safe
+from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Version  import Safe_Str__Version
+from osbot_utils.type_safe.primitives.domains.identifiers.Safe_Id                import Safe_Id
 from mgraph_ai_service_mitmproxy.config                                          import SERVICE_NAME
 from mgraph_ai_service_mitmproxy.service.info.schemas.Enum__Service_Environment  import Enum__Service_Environment
 from mgraph_ai_service_mitmproxy.service.info.schemas.Enum__Service_Status       import Enum__Service_Status

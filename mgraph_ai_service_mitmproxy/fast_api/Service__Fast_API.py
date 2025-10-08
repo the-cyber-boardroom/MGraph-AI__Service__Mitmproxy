@@ -8,21 +8,18 @@ from mgraph_ai_service_mitmproxy.utils.Version                    import version
 
 
 class Service__Fast_API(Serverless__Fast_API):
-    enable_api_key = False
 
-    def fast_api__title(self):                                       # todo: move this to the Fast_API class
-        return FAST_API__TITLE
+
 
     def setup(self):
-        super().setup()
-        self.setup_fast_api_title_and_version()
-        return self
+        with self.config as _:
+            _.name           = FAST_API__TITLE
+            _.version        =  version__mgraph_ai_service_mitmproxy
+            _.enable_api_key = False
 
-    def setup_fast_api_title_and_version(self):                     # todo: move this to the Fast_API class
-        app       = self.app()
-        app.title = self.fast_api__title()
-        app.version = version__mgraph_ai_service_mitmproxy
-        return self
+        return super().setup()
+
+
     def setup_routes(self):
         self.add_routes(Routes__Info      )
         self.add_routes(Routes__Proxy     )

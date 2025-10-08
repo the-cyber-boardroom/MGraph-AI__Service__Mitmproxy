@@ -18,13 +18,13 @@ from concurrent.futures import ThreadPoolExecutor
 #FASTAPI_BASE_URL = os.getenv("FASTAPI_BASE_URL", "http://host.docker.internal:8000")
 # on EC2 use this
 FASTAPI_BASE_URL = "https://mitmproxy-api.dev.mgraph.ai"
-# on local docker use this
-#FASTAPI_BASE_URL  = "http://host.docker.internal:10016"     # todo: make this work with env vars
+# on local docker use this (note: at the moment this is done manually during development)
+FASTAPI_BASE_URL  = "http://host.docker.internal:10016"     # todo: make this work with env vars
 
 REQUEST_ENDPOINT     = "/proxy/process-request"
 RESPONSE_ENDPOINT    = "/proxy/process-response"
-TIMEOUT              = 0.5  # Reduced timeout for faster fallback
-VERSION__INTERCEPTOR = "v0.1.3"                                 # version of the interceptor (manual set)
+TIMEOUT              = 5.0                                      # timeout requests (this might need to be higher to take into account the need to calculate the hashes)
+VERSION__INTERCEPTOR = "v0.1.4"                                 # version of the interceptor (manual set)
 
 # Stats tracking
 request_count = 0
@@ -206,11 +206,50 @@ async def request(flow: http.HTTPFlow) -> None:
     # Always add basic tracking headers
     flow.request.headers["x-proxy-request-count"] = str(request_count)
 
+    # # Prepare and send data to FastAPI
+    # request_data = prepare_request_data(flow, debug_params, original_path)
+    # modifications = await call_fastapi_async(REQUEST_ENDPOINT, request_data)
+    #
+    # if modifications:
+    #     # Apply modifications and check if blocked
+    #     if apply_request_modifications(flow, modifications):
+    #         print(f"  ❌ Request blocked")
+    #         return
+    #
+    #     flow.request.headers["x-proxy-status"] = "fastapi-connected"
+    #     print(f"  ✓ Modified via FastAPI")
+    # else:
+    #     # Fallback - FastAPI unavailable
+    #     flow.request.headers["x-proxy-status"] = "fastapi-unavailable"
+    #     flow.request.headers["x-proxy-fallback"] = "true"
+    #     errors_count += 1
+    #     print(f"  ⚠ Fallback mode")
     # Prepare and send data to FastAPI
+
     request_data = prepare_request_data(flow, debug_params, original_path)
     modifications = await call_fastapi_async(REQUEST_ENDPOINT, request_data)
 
     if modifications:
+
+        # Check if FastAPI provided a cached response
+        if modifications.get("cached_response"):
+            cached = modifications["cached_response"]
+
+            # Create response directly from cache
+            flow.response = http.Response.make(
+                cached.get("status_code", 200),
+                cached.get("body", "").encode('utf-8') if isinstance(cached.get("body"), str) else cached.get("body", b""),
+                cached.get("headers", {"Content-Type": "text/html"})
+            )
+
+            # Add cache indicators
+            flow.response.headers["x-proxy-status"] = "fastapi-cached"
+            flow.response.headers["x-cache-hit"] = "true"
+            flow.response.headers["x-fastapi-url"] = FASTAPI_BASE_URL
+
+            print(f"  ✓ Served from cache ({len(flow.response.content)} bytes)")
+            return  # Skip upstream request entirely
+
         # Apply modifications and check if blocked
         if apply_request_modifications(flow, modifications):
             print(f"  ❌ Request blocked")
