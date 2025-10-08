@@ -34,7 +34,7 @@ class Proxy__WCF__Service(Type_Safe):                        # WCF service integ
             url     = wcf_request.construct_wcf_url()                                           # Construct URL and headers
             headers = wcf_request.get_auth_headers()
 
-            print(f"🌐 WCF Request: {url}")
+            #print(f"🌐 WCF Request: {url}")
 
             response = requests.get(url     = url         ,                                     # Make HTTP request
                                     headers = headers     ,

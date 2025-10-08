@@ -3,12 +3,20 @@ from typing                                                                     
 
 class Schema__CORS__Config(Type_Safe):                           # CORS configuration
     enabled            : bool         = True                     # Whether CORS is enabled
-    allowed_origins    : List[str]    = ["*"]                    # Allowed origins
-    allowed_methods    : List[str]    = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]  # Allowed methods
-    allowed_headers    : List[str]    = ["*"]                    # Allowed headers
-    expose_headers     : List[str]    = ["Content-Length", "Content-Type"]  # Exposed headers
+    allowed_origins    : List[str]    = None                     # Allowed origins
+    allowed_methods    : List[str]    = None                     # Allowed methods
+    allowed_headers    : List[str]    = None                     # Allowed headers
+    expose_headers     : List[str]    = None                     # Exposed headers
     allow_credentials  : bool         = True                     # Allow credentials
     max_age            : int          = 3600                     # Preflight cache duration
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.allowed_origins  = ["*"]                                           # Allowed origins
+        self.allowed_methods  = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]     # Allowed methods
+        self.allowed_headers  = ["*"]                                           # Allowed headers
+        self.expose_headers   = ["Content-Length", "Content-Type"]              # Exposed headers
+
 
     def get_cors_headers(self, request_origin: str = None       # Get CORS headers
                         ) -> Dict[str, str]:                     # CORS headers dict

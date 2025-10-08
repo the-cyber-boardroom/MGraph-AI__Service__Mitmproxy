@@ -6,8 +6,8 @@ class Enum__WCF__Command_Type(Enum):
     url_to_html_xxx              = 'url-to-html-xxx'
     url_to_html_min_rating       = 'url-to-html-min-rating'
     url_to_ratings               = 'url-to-ratings'
-    url_to_json                  = 'url-to-json'
-    url_to_markdown              = 'url-to-markdown'
+    url_to_text_nodes            = 'url-to-text-nodes'
+    url_to_lines                 = 'url-to-lines'
     url_to_text                  = 'url-to-text'
 
     @classmethod

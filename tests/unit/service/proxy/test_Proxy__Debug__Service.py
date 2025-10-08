@@ -31,15 +31,12 @@ class test_Proxy__Debug__Service(TestCase):
         assert len(commands) == 3
         assert all(isinstance(cmd, Schema__Debug__Command) for cmd in commands)
 
-    #@patch.object(Proxy__Debug__Service, 'wcf_service')
     def test_process_show_command__wcf_command(self):    # Test WCF show command
         # Create command
         with Schema__Debug__Command() as command:
             command.command_type = Enum__Debug__Command_Type.show
             command.command_value                 = 'url-to-html'
             command.show_type                     = Enum__Show__Command_Type.wcf_command
-            #command.is_wcf_show_command           = True
-            #command.is_response_data_show_command = False
 
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
@@ -162,12 +159,10 @@ class test_Proxy__Debug__Service(TestCase):
     def test_process_debug_commands__html_with_banner(self):       # Test HTML with debug banner
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
-            response_data.request = {'path': '/test'}
-            response_data.debug_params = {'debug': 'true'}
-            response_data.response = {
-                'content_type': 'text/html',
-                'body': '<html><body><h1>Test</h1></body></html>'
-            }
+            response_data.request       = { 'path': '/test' }
+            response_data.debug_params  = { 'debug': 'true' }
+            response_data.response      = { 'content_type': 'text/html',
+                                            'body': '<html><body><h1>Test</h1></body></html>'}
             response_data.stats = {}
             response_data.version = 'v1.0.0'
 
@@ -186,10 +181,8 @@ class test_Proxy__Debug__Service(TestCase):
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'path': '/api/test'}
             response_data.debug_params = {'inject_debug': 'true'}
-            response_data.response = {
-                'content_type': 'application/json',
-                'body': '{"key": "value"}'
-            }
+            response_data.response     = {  'content_type': 'application/json',
+                                            'body': '{"key": "value"}'  }
             response_data.stats = {}
             response_data.version = 'v1.0.0'
 

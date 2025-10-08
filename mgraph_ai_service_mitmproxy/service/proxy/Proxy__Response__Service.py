@@ -41,10 +41,7 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             body_size = len(response_data.response.get("body", ""))
             status_code = response_data.response.get("status_code", 200)
 
-            self.stats_service.increment_response(
-                bytes_processed = body_size,
-                status_code     = status_code
-            )
+            self.stats_service.increment_response(  bytes_processed = body_size)
 
             # Create modifications object
             modifications = Schema__Proxy__Modifications()
@@ -66,14 +63,9 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
 
             # Check if debug command overrode the response
             if modifications.override_response:
-                self.stats_service.increment_debug_override()
-
-                # For overridden responses, finalize and return
-                return self._finalize_overridden_response(
-                    response_data,
-                    modifications,
-                    request_id
-                )
+                return self._finalize_overridden_response(response_data ,                # For overridden responses, finalize and return
+                                                          modifications ,
+                                                          request_id    )
 
             # Check if content was modified (but not overridden)
             if modifications.modified_body:
@@ -114,7 +106,7 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
         final_body = modifications.modified_body or ""
 
         # Get final headers
-        final_headers = self._build_final_headers(
+        final_headers = self.build_final_headers(
             response_data,
             modifications,
             modifications.override_content_type,
@@ -174,7 +166,7 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
         final_status = response_data.response.get("status_code", 200)
 
         # Build final headers
-        final_headers = self._build_final_headers(
+        final_headers = self.build_final_headers(
             response_data,
             modifications,
             final_content_type,
@@ -192,21 +184,14 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             response_overridden  = False
         )
 
-    def _build_final_headers(self,                               # Build complete header set
-                            response_data   : Schema__Proxy__Response_Data,
-                            modifications   : Schema__Proxy__Modifications,
-                            content_type    : str,
-                            content_length  : int
-                            ) -> Dict[str, str]:                 # Final headers
-        """Build the complete set of final headers"""
-        # Start with original response headers
-        final_headers = response_data.response.get("headers", {}).copy()
+    def build_final_headers(self, response_data   : Schema__Proxy__Response_Data,  # Build the complete set of final headers
+                                  modifications   : Schema__Proxy__Modifications,
+                                  content_type    : str,
+                                  content_length  : int
+                             ) -> Dict[str, str]:                 # Final headers
 
-        # Add content headers
-        content_headers = self.headers_service.get_content_headers(
-            content_type,
-            content_length
-        )
+        final_headers   = response_data.response.get("headers", {}).copy()                            # Start with original response headers
+        content_headers = self.headers_service.get_content_headers(content_type, content_length)    # Add content headers
         final_headers.update(content_headers)
 
         # Add cache headers (no-cache for debug mode)

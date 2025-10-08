@@ -1,10 +1,10 @@
 from unittest                                                               import TestCase
 from mgraph_ai_service_mitmproxy.schemas.debug.Schema__Debug__Params        import Schema__Debug__Params
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Request__Service      import Proxy__Request__Service
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Request__Info        import Schema__Request__Info
+from mgraph_ai_service_mitmproxy.service.request.Proxy__Request__Service    import Proxy__Request__Service
 
 
-class test_Proxy__Request__Service(TestCase):
+class test_Request__Proxy__Request__Service(TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -17,15 +17,13 @@ class test_Proxy__Request__Service(TestCase):
             assert _.url_builder is not None
 
     def test_parse_request_info__basic(self):                     # Test basic request parsing
-        request_info = self.service.parse_request_info(
-            method       = 'GET',
-            host         = 'example.com',
-            port         = 443,
-            path         = '/api/test',
-            scheme       = 'https',
-            headers      = {'User-Agent': 'Test/1.0'},
-            query_string = 'key=value'
-        )
+        request_info = self.service.parse_request_info( method       = 'GET',
+                                                        host         = 'example.com',
+                                                        port         = 443,
+                                                        path         = '/api/test',
+                                                        scheme       = 'https',
+                                                        headers      = {'User-Agent': 'Test/1.0'},
+                                                        query_string = 'key=value'              )
 
         assert type(request_info) is Schema__Request__Info
         assert request_info.method == 'GET'

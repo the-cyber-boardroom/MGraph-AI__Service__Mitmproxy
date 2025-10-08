@@ -1,18 +1,18 @@
-from unittest                                                                        import TestCase
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__CORS__Config                  import Schema__CORS__Config
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service                  import Proxy__CORS__Service
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data          import Schema__Proxy__Response_Data
+from unittest                                                                import TestCase
+from mgraph_ai_service_mitmproxy.schemas.Schema__CORS__Config                import Schema__CORS__Config
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service          import Proxy__CORS__Service
+from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data  import Schema__Proxy__Response_Data
 
 class test_CORS_Schema_And_Service(TestCase):
 
     def test_schema__cors__config__defaults(self):                # Test default configuration
         with Schema__CORS__Config() as config:
-            assert config.enabled is True
-            assert config.allowed_origins == ["*"]
-            assert "GET" in config.allowed_methods
-            assert "POST" in config.allowed_methods
+            assert config.enabled           is True
+            assert config.allowed_origins   == ["*"]
+            assert "GET"                    in config.allowed_methods
+            assert "POST"                   in config.allowed_methods
             assert config.allow_credentials is True
-            assert config.max_age == 3600
+            assert config.max_age           == 3600
 
     def test_schema__cors__config__get_cors_headers(self):        # Test CORS header generation
         with Schema__CORS__Config() as config:
@@ -49,9 +49,10 @@ class test_CORS_Schema_And_Service(TestCase):
     def test_proxy__cors__service__init(self):                    # Test service initialization
         service = Proxy__CORS__Service()
 
-        assert type(service) is Proxy__CORS__Service
-        assert service.cors_config is not None
-        assert service.cors_config.enabled is True
+        assert type(service)                is Proxy__CORS__Service
+        assert type(service.cors_config)    is Schema__CORS__Config
+        assert service.cors_config          is not None
+        assert service.cors_config.enabled  is True
 
     def test_proxy__cors__service__should_add_cors_headers(self):  # Test CORS header check
         service = Proxy__CORS__Service()
@@ -69,10 +70,8 @@ class test_CORS_Schema_And_Service(TestCase):
         service = Proxy__CORS__Service()
 
         with Schema__Proxy__Response_Data() as response_data:
-            response_data.request = {
-                'method': 'GET',
-                'headers': {'origin': 'https://example.com'}
-            }
+            response_data.request = { 'method': 'GET',
+                                      'headers': {'origin': 'https://example.com'}  }
             response_data.debug_params = {}
             response_data.response = {}
             response_data.stats = {}

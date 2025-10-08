@@ -1,5 +1,5 @@
-from unittest                                                                        import TestCase
 import json
+from unittest                                                                        import TestCase
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__JSON__Service                  import Proxy__JSON__Service
 
 class test_Proxy__JSON__Service(TestCase):

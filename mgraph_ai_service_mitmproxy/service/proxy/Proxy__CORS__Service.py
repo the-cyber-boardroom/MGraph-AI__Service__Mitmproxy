@@ -1,5 +1,5 @@
 from osbot_utils.type_safe.Type_Safe                                                 import Type_Safe
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__CORS__Config                  import Schema__CORS__Config
+from mgraph_ai_service_mitmproxy.schemas.Schema__CORS__Config                        import Schema__CORS__Config
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data          import Schema__Proxy__Response_Data
 from typing                                                                          import Dict
 

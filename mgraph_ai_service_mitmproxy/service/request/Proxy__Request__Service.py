@@ -1,4 +1,5 @@
 from osbot_utils.type_safe.Type_Safe                                           import Type_Safe
+from mgraph_ai_service_mitmproxy.schemas.debug.Schema__Debug__Params           import Schema__Debug__Params
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Request__Info           import Schema__Request__Info
 from typing                                                                    import Dict, Optional
 from mgraph_ai_service_mitmproxy.service.request.Proxy__Query__Parser__Service import Proxy__Query__Parser__Service
@@ -62,21 +63,18 @@ class Proxy__Request__Service(Type_Safe):                        # Main request 
             origin       = origin
         )
 
-    def parse_debug_params(self,
-                          request_info : Schema__Request__Info   # Request info with query params
-                          ) -> Schema__Debug__Params:            # Parsed debug params
-        """Parse debug parameters from request"""
-        return Schema__Debug__Params.from_query_params(request_info.query_params)
+    def parse_debug_params(self, request_info : Schema__Request__Info                     # Request info with query params
+                            ) -> Schema__Debug__Params:                                   # Parsed debug params
+        return Schema__Debug__Params.from_query_params(request_info.query_params)         # Parse debug parameters from request
 
-    def extract_request_data(self,
-                            method       : str,                  # HTTP method
-                            host         : str,                  # Host
-                            port         : int,                  # Port
-                            path         : str,                  # Path
-                            scheme       : str,                  # Scheme
-                            headers      : Dict[str, str],       # Headers
-                            query_string : Optional[str] = None  # Query string
-                            ) -> Dict:                           # Request data dict
+    def extract_request_data(self, method       : str,                  # HTTP method
+                                   host         : str,                  # Host
+                                   port         : int,                  # Port
+                                   path         : str,                  # Path
+                                   scheme       : str,                  # Scheme
+                                   headers      : Dict[str, str],       # Headers
+                                   query_string : Optional[str] = None  # Query string
+                              ) -> Dict:                                # Request data dict
         """
         Main entry point: Extract complete request data
 

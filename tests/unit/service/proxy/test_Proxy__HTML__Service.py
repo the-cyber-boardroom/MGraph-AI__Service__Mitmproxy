@@ -1,6 +1,7 @@
-from unittest                                                                        import TestCase
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__HTML__Service                  import Proxy__HTML__Service
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__HTML__Injection               import Schema__HTML__Injection
+from unittest                                                          import TestCase
+from mgraph_ai_service_mitmproxy.schemas.debug.Schema__HTML__Injection import Schema__HTML__Injection
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__HTML__Service    import Proxy__HTML__Service
+
 
 class test_Proxy__HTML__Service(TestCase):
 
