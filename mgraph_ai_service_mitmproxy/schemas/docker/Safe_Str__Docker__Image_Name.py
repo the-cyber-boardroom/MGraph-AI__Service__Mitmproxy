@@ -1,5 +1,7 @@
-from osbot_utils.type_safe.primitives.safe_str.Safe_Str              import Safe_Str
+
 import re
+
+from osbot_utils.type_safe.primitives.core.Safe_Str import Safe_Str
 
 # Docker Image Name
 # Format: [registry/]namespace/name

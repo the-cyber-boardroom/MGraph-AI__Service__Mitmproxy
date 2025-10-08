@@ -26,7 +26,7 @@ class test_Mitmproxy__Create__Docker_Container__Development(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        pytest.skip("Manual execution only - remove this skip to run")
+        #pytest.skip("Manual execution only - remove this skip to run")
         cls.api_docker = API_Docker()
 
     def test_create_persistent_container_for_development(self):

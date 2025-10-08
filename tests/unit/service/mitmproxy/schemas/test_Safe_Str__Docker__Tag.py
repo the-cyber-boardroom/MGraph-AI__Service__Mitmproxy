@@ -1,5 +1,5 @@
 from unittest                                                         import TestCase
-from osbot_utils.type_safe.primitives.safe_str.Safe_Str               import Safe_Str
+from osbot_utils.type_safe.primitives.core.Safe_Str                   import Safe_Str
 from osbot_utils.utils.Objects                                        import base_classes
 from mgraph_ai_service_mitmproxy.schemas.docker.Safe_Str__Docker__Tag import Safe_Str__Docker__Tag
 
