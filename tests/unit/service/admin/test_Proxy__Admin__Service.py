@@ -4,6 +4,8 @@ from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service           
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service            import Proxy__Stats__Service
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Stats             import Schema__Proxy__Stats
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Request_Data      import Schema__Proxy__Request_Data
+from pathlib                                                                    import Path
+import json
 
 
 class test_Proxy__Admin__Service(TestCase):
@@ -18,393 +20,282 @@ class test_Proxy__Admin__Service(TestCase):
         assert type(self.admin_service)                is Proxy__Admin__Service
         assert type(self.admin_service.cookie_service) is Proxy__Cookie__Service
         assert type(self.admin_service.stats_service)  is Proxy__Stats__Service
+        assert self.admin_service.current_version       == "v0.1.0"
+        assert isinstance(self.admin_service.admin_ui_root, Path)
 
     def test__is_admin_path(self):                                              # Test admin path detection
         # Positive cases
-        assert self.admin_service.is_admin_path('/mitm-proxy')          is True
-        assert self.admin_service.is_admin_path('/mitm-proxy/')         is True
-        assert self.admin_service.is_admin_path('/mitm-proxy/cookies')  is True
-        assert self.admin_service.is_admin_path('/mitm-proxy/settings') is True
+        assert self.admin_service.is_admin_path('/mitm-proxy'              )  is True
+        assert self.admin_service.is_admin_path('/mitm-proxy/'             )  is True
+        assert self.admin_service.is_admin_path('/mitm-proxy/v0/v0.1.0'    )  is True
+        assert self.admin_service.is_admin_path('/mitm-proxy/admin-ui.json') is True
 
         # Negative cases
-        assert self.admin_service.is_admin_path('/')                    is False
+        assert self.admin_service.is_admin_path('/'            )        is False
         assert self.admin_service.is_admin_path('/regular/path')        is False
         assert self.admin_service.is_admin_path('/api/endpoint')        is False
-        assert self.admin_service.is_admin_path('/mitm-prox')           is False  # Typo
-        assert self.admin_service.is_admin_path('mitm-proxy')           is False  # Missing leading slash
+        assert self.admin_service.is_admin_path('/mitm-prox'   )        is False  # Typo
+        assert self.admin_service.is_admin_path('mitm-proxy'   )        is False  # Missing leading slash
 
-    def test__get_admin_endpoint(self):                                         # Test endpoint extraction
-        # Valid endpoints
-        assert self.admin_service.get_admin_endpoint('/mitm-proxy')          == 'index'
-        assert self.admin_service.get_admin_endpoint('/mitm-proxy/')         == 'index'
-        assert self.admin_service.get_admin_endpoint('/mitm-proxy/cookies')  == 'cookies'
-        assert self.admin_service.get_admin_endpoint('/mitm-proxy/settings') == 'settings'
+    def test__redirect_to_latest(self):                                         # Test root redirect
+        result = self.admin_service.redirect_to_latest()
 
-        # Trailing slash handling
-        assert self.admin_service.get_admin_endpoint('/mitm-proxy/cookies/') == 'cookies'
+        assert type(result)               is dict
+        assert result['status_code']      == 302
+        assert 'Location'                 in result['headers']
+        assert result['headers']['Location'] == f"/mitm-proxy/v0/{self.admin_service.current_version}/index.html"
+        assert 'text/html'                in result['headers']['content-type']
+        assert 'meta http-equiv="refresh"' in result['body']
 
-        # Invalid paths
-        assert self.admin_service.get_admin_endpoint('/regular/path')        is None
-        assert self.admin_service.get_admin_endpoint('/')                    is None
-
-    def test__generate_dashboard_page__basic(self):                            # Test dashboard generation
+    def test__handle_admin_request__root(self):                                 # Test root path redirect
         request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                   host         = 'test.example.com',
-                                                   path         = '/mitm-proxy/'    ,
-                                                   headers      = {}                ,
-                                                   debug_params = {}                ,
-                                                   stats        = {}                ,
-                                                   version      = 'v1.0.0'          )
+                                                    host         = 'test.example.com',
+                                                    path         = '/mitm-proxy'     ,
+                                                    headers      = {}                ,
+                                                    debug_params = {}                ,
+                                                    stats        = {}                ,
+                                                    version      = 'v1.0.0'          )
 
-        html = self.admin_service.generate_dashboard_page(request_data)
-        assert type(html)                is str
-        assert len(html)                 > 0
-        assert 'Dashboard'               in html
-        assert 'test.example.com'        in html
-        assert 'DOCTYPE html'            in html
-        assert 'Proxy Statistics'        in html
-        assert 'Cookie Status'           in html
-        assert 'Current Request'         in html
+        result = self.admin_service.handle_admin_request(request_data)
 
-    def test__generate_dashboard_page__with_stats(self):                       # Test dashboard with statistics
-        # Add some stats
+        assert result is not None
+        assert result['status_code'] == 302                                     # Redirect
+
+    def test__handle_admin_request__root_with_slash(self):                      # Test root path with trailing slash
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
+                                                    host         = 'test.example.com',
+                                                    path         = '/mitm-proxy/'    ,
+                                                    headers      = {}                ,
+                                                    debug_params = {}                ,
+                                                    stats        = {}                ,
+                                                    version      = 'v1.0.0'          )
+
+        result = self.admin_service.handle_admin_request(request_data)
+
+        assert result is not None
+        assert result['status_code'] == 302                                     # Redirect
+
+    def test__handle_admin_request__json_api(self):                             # Test JSON API endpoint
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'                   ,
+                                                    host         = 'test.example.com'      ,
+                                                    path         = '/mitm-proxy/admin-ui.json',
+                                                    headers      = {}                      ,
+                                                    debug_params = {}                      ,
+                                                    stats        = {}                      ,
+                                                    version      = 'v1.0.0'                )
+
+        result = self.admin_service.handle_admin_request(request_data)
+
+        assert result is not None
+        assert result['status_code']  == 200
+        assert 'application/json'     in result['headers']['content-type']
+        assert 'no-cache'             in result['headers']['cache-control']
+
+        # Parse and validate JSON response
+        data = json.loads(result['body'])
+        assert 'stats'                in data
+        assert 'cookies'              in data
+        assert 'request'              in data
+        assert 'server'               in data
+        assert 'timestamp'            in data
+
+    def test__handle_admin_request__static_file(self):                          # Test static file path
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'                              ,
+                                                    host         = 'test.example.com'                ,
+                                                    path         = '/mitm-proxy/v0/v0.1.0/index.html',
+                                                    headers      = {}                                ,
+                                                    debug_params = {}                                ,
+                                                    stats        = {}                                ,
+                                                    version      = 'v1.0.0'                          )
+
+        result = self.admin_service.handle_admin_request(request_data)
+
+        assert result is not None
+        assert result['status_code'] == 200
+
+    def test__handle_admin_request__non_admin_path(self):                         # Test non-admin path returns None
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
+                                                    host         = 'test.example.com',
+                                                    path         = '/api/data'       ,
+                                                    headers      = {}                ,
+                                                    debug_params = {}                ,
+                                                    stats        = {}                ,
+                                                    version      = 'v1.0.0'          )
+
+        result = self.admin_service.handle_admin_request(request_data)
+
+        assert result is None                                                   # Non-admin paths return None
+
+    def test__serve_admin_data(self):                                             # Test JSON API data structure
         self.stats_service.stats.total_requests       = 42
         self.stats_service.stats.total_responses      = 40
         self.stats_service.stats.total_bytes_processed = 123456
 
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
-
-        html = self.admin_service.generate_dashboard_page(request_data)
-
-        assert '42'     in html  # total_requests
-        assert '40'     in html  # total_responses
-        assert '123,456' in html  # bytes formatted with commas
-
-    def test__generate_dashboard_page__with_cookies(self):                     # Test dashboard with active cookies
         request_data = Schema__Proxy__Request_Data(
-            method       = 'GET'             ,
-            host         = 'example.com'     ,
-            path         = '/mitm-proxy/'    ,
+            method       = 'GET'                   ,
+            host         = 'example.com'           ,
+            path         = '/mitm-proxy/admin-ui.json',
             headers      = { 'Cookie': 'mitm-show=url-to-html-xxx; mitm-debug=true'},
-            debug_params = {}                ,
-            stats        = {}                ,
-            version      = 'v1.0.0'           )
+            debug_params = {}                      ,
+            stats        = {}                      ,
+            version      = 'v1.0.0'                )
 
-        html = self.admin_service.generate_dashboard_page(request_data)
+        result = self.admin_service.serve_admin_data(request_data)
 
-        assert 'mitm-show'       in html
-        assert 'url-to-html-xxx' in html
-        assert 'mitm-debug'      in html
-        assert 'true'            in html
+        assert result['status_code']  == 200
+        assert 'application/json'     in result['headers']['content-type']
 
-    def test__generate_cookies_page__basic(self):                              # Test cookie page generation
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/cookies',
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
+        data = json.loads(result['body'])
 
-        html = self.admin_service.generate_cookies_page(request_data)
+        # Verify stats
+        assert data['stats']['total_requests']        == 42
+        assert data['stats']['total_responses']       == 40
+        assert data['stats']['total_bytes_processed'] == 123456
 
-        assert type(html)                  is str
-        assert len(html)                   > 0
-        assert 'Cookie Management'         in html
-        assert 'example.com'               in html
-        assert 'Set New Proxy Cookie'      in html
-        assert 'Available Cookie Controls' in html
-        assert 'mitm-show'                 in html
-        assert 'mitm-inject'               in html
-        assert 'mitm-debug'                in html
+        # Verify cookies
+        assert 'cookies'              in data
+        assert 'active'               in data['cookies']
+        assert 'count'                in data['cookies']
+        assert 'summary'              in data['cookies']
+        assert data['cookies']['count'] == 2                                    # mitm-show and mitm-debug
 
-    def test__generate_cookies_page__with_active_cookies(self):                # Test cookie page with active cookies
+        # Verify request info
+        assert data['request']['host']   == 'example.com'
+        assert data['request']['path']   == '/mitm-proxy/admin-ui.json'
+        assert data['request']['method'] == 'GET'
+
+        # Verify server info
+        assert data['server']['version']            == '1.0.0'
+        assert data['server']['current_ui_version'] == self.admin_service.current_version
+
+        # Verify timestamp
+        assert 'timestamp'            in data
+        assert data['timestamp'].endswith('Z')                                  # ISO format with Z
+
+    def test__serve_404__with_custom_404(self):                                # Test 404 page
+        result = self.admin_service.serve_404('/mitm-proxy/nonexistent')
+
+        assert result['status_code']  == 404
+        assert 'text/html'            in result['headers']['content-type']
+        assert '404'                  in result['body']
+        #assert '/mitm-proxy/nonexistent' in result['body']
+        assert 'Not Found'            in result['body']
+
+    def test__get_content_type(self):                                           # Test content type mapping
+        assert self.admin_service.get_content_type('.html') == 'text/html; charset=utf-8'
+        assert self.admin_service.get_content_type('.css')  == 'text/css; charset=utf-8'
+        assert self.admin_service.get_content_type('.js')   == 'application/javascript; charset=utf-8'
+        assert self.admin_service.get_content_type('.json') == 'application/json; charset=utf-8'
+        assert self.admin_service.get_content_type('.png')  == 'image/png'
+        assert self.admin_service.get_content_type('.jpg')  == 'image/jpeg'
+        assert self.admin_service.get_content_type('.jpeg') == 'image/jpeg'
+        assert self.admin_service.get_content_type('.gif')  == 'image/gif'
+        assert self.admin_service.get_content_type('.svg')  == 'image/svg+xml'
+        assert self.admin_service.get_content_type('.ico')  == 'image/x-icon'
+        assert self.admin_service.get_content_type('.txt')  == 'text/plain; charset=utf-8'
+        assert self.admin_service.get_content_type('.md')   == 'text/markdown; charset=utf-8'
+        assert self.admin_service.get_content_type('.xyz')  == 'application/octet-stream'  # Unknown type
+
+    def test__serve_static_file__security(self):                                  # Test path traversal security
+        # Attempt path traversal
+        result = self.admin_service.serve_static_file('/mitm-proxy/../../../etc/passwd')
+
+        assert result['status_code'] == 404                                     # Security check prevents access
+
+    def test__serve_static_file__nonexistent(self):                               # Test nonexistent file
+        result = self.admin_service.serve_static_file('/mitm-proxy/nonexistent.html')
+
+        assert result['status_code'] == 404
+
+    def test__multiple_cookie_types(self):                                      # Test JSON API with multiple cookies
         request_data = Schema__Proxy__Request_Data(
-            method       = 'GET'                 ,
-            host         = 'example.com'         ,
-            path         = '/mitm-proxy/cookies' ,
+            method       = 'GET'                   ,
+            host         = 'example.com'           ,
+            path         = '/mitm-proxy/admin-ui.json',
             headers      = {
-                'Cookie': 'mitm-show=url-to-html-xxx; mitm-rating=0.5; mitm-cache=true'
+                'Cookie': 'mitm-show=url-to-html-xxx; mitm-inject=debug-panel; mitm-rating=0.5'
             },
-            debug_params = {}                    ,
-            stats        = {}                    ,
-            version      = 'v1.0.0'               )
+            debug_params = {}                      ,
+            stats        = {}                      ,
+            version      = 'v1.0.0'                )
 
-        html = self.admin_service.generate_cookies_page(request_data)
+        result = self.admin_service.serve_admin_data(request_data)
+        data = json.loads(result['body'])
 
-        # Check for active cookies in table
-        assert 'mitm-show'       in html
-        assert 'url-to-html-xxx' in html
-        assert 'mitm-rating'     in html
-        assert '0.5'             in html
-        assert 'mitm-cache'      in html
-        assert 'true'            in html
+        assert data['cookies']['count'] == 3
+        assert 'mitm-show'              in data['cookies']['active']
+        assert 'mitm-inject'            in data['cookies']['active']
+        assert 'mitm-rating'            in data['cookies']['active']
 
-        # Should show active cookies table, not empty state
-        assert 'No proxy cookies are currently active' not in html
+    def test__no_cookies(self):                                                 # Test JSON API with no cookies
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'                   ,
+                                                    host         = 'example.com'           ,
+                                                    path         = '/mitm-proxy/admin-ui.json',
+                                                    headers      = {}                      ,
+                                                    debug_params = {}                      ,
+                                                    stats        = {}                      ,
+                                                    version      = 'v1.0.0'                )
 
-    def test__generate_cookies_page__empty_state(self):                        # Test cookie page with no cookies
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'                 ,
-                                                    host         = 'example.com'         ,
-                                                    path         = '/mitm-proxy/cookies' ,
-                                                    headers      = {}                    ,
-                                                    debug_params = {}                    ,
-                                                    stats        = {}                    ,
-                                                    version      = 'v1.0.0'               )
+        result = self.admin_service.serve_admin_data(request_data)
+        data = json.loads(result['body'])
 
-        html = self.admin_service.generate_cookies_page(request_data)
+        assert data['cookies']['count']  == 0
+        assert data['cookies']['active'] == {}
 
-        assert 'No proxy cookies are currently active' in html
+    def test__version_consistency(self):                                        # Test version information
+        # Verify version used in redirect
+        redirect = self.admin_service.redirect_to_latest()
+        assert f'v0/{self.admin_service.current_version}' in redirect['headers']['Location']
 
-    def test__generate_404_page(self):                                          # Test 404 page generation
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/invalid',
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
+        # Verify version in JSON API
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'                   ,
+                                                    host         = 'example.com'           ,
+                                                    path         = '/mitm-proxy/admin-ui.json',
+                                                    headers      = {}                      ,
+                                                    debug_params = {}                      ,
+                                                    stats        = {}                      ,
+                                                    version      = 'v1.0.0'                )
 
-        result = self.admin_service.generate_404_page(request_data, 'invalid')
+        result = self.admin_service.serve_admin_data(request_data)
+        data = json.loads(result['body'])
 
-        assert type(result)                is dict
-        assert result['status_code']       == 404
-        assert 'text/html'                 in result['headers']['content-type']
-        assert 'x-admin-page'              in result['headers']
-        assert result['headers']['x-admin-page'] == 'error-404'
+        assert data['server']['current_ui_version'] == self.admin_service.current_version
 
-        body = result['body']
-        assert '404'                       in body
-        assert 'Admin Page Not Found'      in body
-        assert '/invalid'                  in body
-        assert 'example.com'               in body
-
-    def test__generate_admin_page__index(self):                                # Test admin page routing to index
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
-
-        result = self.admin_service.generate_admin_page(request_data, 'index')
-
-        assert type(result)                is dict
-        assert result['status_code']       == 200
-        assert 'text/html'                 in result['headers']['content-type']
-        assert result['headers']['x-admin-page'] == 'index'
-        assert 'Dashboard'                 in result['body']
-
-    def test__generate_admin_page__cookies(self):                              # Test admin page routing to cookies
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'                 ,
-                                                    host         = 'example.com'         ,
-                                                    path         = '/mitm-proxy/cookies' ,
-                                                    headers      = {}                    ,
-                                                    debug_params = {}                    ,
-                                                    stats        = {}                    ,
-                                                    version      = 'v1.0.0'               )
-
-        result = self.admin_service.generate_admin_page(request_data, 'cookies')
-
-        assert result['status_code']             == 200
-        assert result['headers']['x-admin-page'] == 'cookies'
-        assert 'Cookie Management'               in result['body']
-
-    def test__generate_admin_page__invalid_endpoint(self):                     # Test admin page with invalid endpoint
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/invalid',
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
-
-        result = self.admin_service.generate_admin_page(request_data, 'invalid')
-
-        assert result['status_code']             == 404
-        assert result['headers']['x-admin-page'] == 'error-404'
-        assert '404'                             in result['body']
-
-    def test__format_cookie_list__empty(self):                                 # Test cookie list formatting with no cookies
-        html = self.admin_service._format_cookie_list({})
-
-        assert 'No proxy cookies active' in html
-        assert type(html)                is str
-
-    def test__format_cookie_list__with_cookies(self):                          # Test cookie list formatting with cookies
-        cookies = {
-            'mitm-show'  : 'url-to-html-xxx',
-            'mitm-debug' : 'true',
-            'mitm-rating': '0.5'
-        }
-
-        html = self.admin_service._format_cookie_list(cookies)
-
-        assert 'mitm-show'       in html
-        assert 'url-to-html-xxx' in html
-        assert 'mitm-debug'      in html
-        assert 'true'            in html
-        assert 'mitm-rating'     in html
-        assert '0.5'             in html
-        assert '<code>'          in html  # Cookie values should be in code tags
-
-    def test__format_active_cookies_table__empty(self):                        # Test cookies table formatting with no cookies
-        html = self.admin_service._format_active_cookies_table({})
-
-        assert 'No proxy cookies are currently active' in html
-        assert 'empty-state'                           in html
-
-    def test__format_active_cookies_table__with_cookies(self):                 # Test cookies table formatting with cookies
-        cookies = {
-            'mitm-show'  : 'url-to-html-xxx',
-            'mitm-inject': 'debug-panel'
-        }
-
-        html = self.admin_service._format_active_cookies_table(cookies)
-
-        assert '<table'          in html
-        assert 'cookie-table'    in html
-        assert 'mitm-show'       in html
-        assert 'url-to-html-xxx' in html
-        assert 'mitm-inject'     in html
-        assert 'debug-panel'     in html
-        assert '<thead>'         in html
-        assert '<tbody>'         in html
-
-    def test__dashboard_navigation_links(self):                                # Test dashboard contains navigation links
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
-
-        html = self.admin_service.generate_dashboard_page(request_data)
-
-        assert '/mitm-proxy/cookies'    in html
-        assert 'Cookie Management'      in html
-        assert '/mitm-proxy/site-info'  in html
-        assert '/mitm-proxy/stats'      in html
-        assert '/mitm-proxy/settings'   in html
-
-    def test__cookies_page_back_link(self):                                    # Test cookies page has back link
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'                 ,
-                                                    host         = 'example.com'         ,
-                                                    path         = '/mitm-proxy/cookies' ,
-                                                    headers      = {}                    ,
-                                                    debug_params = {}                    ,
-                                                    stats        = {}                    ,
-                                                    version      = 'v1.0.0'               )
-
-        html = self.admin_service.generate_cookies_page(request_data)
-
-        assert '/mitm-proxy/'            in html
-        assert 'Back to Dashboard'       in html
-        assert 'back-link'               in html
-
-    def test__html_structure_valid(self):                                      # Test generated HTML has valid structure
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
-
-        html = self.admin_service.generate_dashboard_page(request_data)
-
-        # Check HTML structure
-        assert '<!DOCTYPE html>'         in html
-        assert '<html'                   in html
-        assert '</html>'                 in html
-        assert '<head>'                  in html
-        assert '</head>'                 in html
-        assert '<body>'                  in html
-        assert '</body>'                 in html
-        assert '<meta charset="UTF-8">'  in html
-        assert '<meta name="viewport"'   in html
-        assert '<title>'                 in html
-        assert '<style>'                 in html
-        assert '</style>'                in html
-
-    def test__css_included(self):                                              # Test pages include CSS styling
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
-
-        html = self.admin_service.generate_dashboard_page(request_data)
-
-        # Check for CSS classes
-        assert 'container'               in html
-        assert 'header'                  in html
-        assert 'card'                    in html
-        assert 'card-title'              in html
-        assert 'gradient'                in html  # Purple gradient background
-
-    def test__javascript_included_in_cookies_page(self):                       # Test cookies page includes JavaScript
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'                 ,
-                                                    host         = 'example.com'         ,
-                                                    path         = '/mitm-proxy/cookies' ,
-                                                    headers      = {}                    ,
-                                                    debug_params = {}                    ,
-                                                    stats        = {}                    ,
-                                                    version      = 'v1.0.0'               )
-
-        html = self.admin_service.generate_cookies_page(request_data)
-
-        assert '<script>'                in html
-        assert '</script>'               in html
-        assert 'document.cookie'         in html
-        assert 'addEventListener'        in html
-        assert 'cookieForm'              in html
-
-    def test__multiple_hosts(self):                                            # Test admin pages work for different hosts
-        hosts = ['example.com', 'google.com', 'github.com', 'api.service.com']
-
-        for host in hosts:
-            request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                        host         = host              ,
-                                                        path         = '/mitm-proxy/'    ,
-                                                        headers      = {}                ,
-                                                        debug_params = {}                ,
-                                                        stats        = {}                ,
-                                                        version      = 'v1.0.0'           )
-
-            html = self.admin_service.generate_dashboard_page(request_data)
-
-            assert host                  in html
-            assert 'Dashboard'           in html
-            assert len(html)             > 0
-
-    def test__stats_incrementation_not_affected(self):                         # Test stats service still works independently
+    def test__stats_incrementation_not_affected(self):                          # Test stats service still works independently
         initial_requests = self.stats_service.stats.total_requests
 
-        # Generate admin page
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
+        # Request admin data
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'                   ,
+                                                    host         = 'example.com'           ,
+                                                    path         = '/mitm-proxy/admin-ui.json',
+                                                    headers      = {}                      ,
+                                                    debug_params = {}                      ,
+                                                    stats        = {}                      ,
+                                                    version      = 'v1.0.0'                )
 
-        self.admin_service.generate_dashboard_page(request_data)
+        self.admin_service.serve_admin_data(request_data)
 
-        # Stats should not auto-increment from admin page generation
-        assert self.stats_service.stats.total_requests == initial_requests
+        assert self.stats_service.stats.total_requests == initial_requests          # Stats should not auto-increment from admin data serving
 
-        # But manual increment should still work
-        self.stats_service.increment_request(host='example.com', path='/test')
+        self.stats_service.increment_request(host='example.com', path='/test')      # But manual increment should still work
         assert self.stats_service.stats.total_requests == initial_requests + 1
+
+    def test__response_headers(self):                                           # Test response headers are correct
+        # Test redirect headers
+        redirect = self.admin_service.redirect_to_latest()
+        assert 'Location'     in redirect['headers']
+        assert 'content-type' in redirect['headers']
+
+        # Test JSON API headers
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'                   ,
+                                                    host         = 'example.com'           ,
+                                                    path         = '/mitm-proxy/admin-ui.json',
+                                                    headers      = {}                      ,
+                                                    debug_params = {}                      ,
+                                                    stats        = {}                      ,
+                                                    version      = 'v1.0.0'                )
+
+        json_result = self.admin_service.serve_admin_data(request_data)
+        assert 'content-type'  in json_result['headers']
+        assert 'cache-control' in json_result['headers']
+        assert json_result['headers']['cache-control'] == 'no-cache'            # Dev mode, no caching

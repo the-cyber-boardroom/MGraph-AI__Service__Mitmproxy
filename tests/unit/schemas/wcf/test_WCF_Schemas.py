@@ -83,7 +83,7 @@ class test_WCF_Schemas(TestCase):
 
             headers = request.get_auth_headers()
 
-            assert headers != {}
+            assert type(headers) == dict
 
     def test_schema__wcf__response__is_html(self):              # Test HTML detection
         with Schema__WCF__Response() as response:

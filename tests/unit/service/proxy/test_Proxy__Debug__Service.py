@@ -1,5 +1,7 @@
+import pytest
 from unittest                                                               import TestCase
 from osbot_utils.testing.__                                                 import __, __SKIP__
+from osbot_utils.utils.Env                                                  import in_github_action
 from mgraph_ai_service_mitmproxy.schemas.debug.Enum__Debug__Command_Type    import Enum__Debug__Command_Type
 from mgraph_ai_service_mitmproxy.schemas.debug.Enum__Show__Command_Type     import Enum__Show__Command_Type
 from mgraph_ai_service_mitmproxy.schemas.debug.Schema__Debug__Command       import Schema__Debug__Command
@@ -32,6 +34,8 @@ class test_Proxy__Debug__Service(TestCase):
         assert all(isinstance(cmd, Schema__Debug__Command) for cmd in commands)
 
     def test_process_show_command__wcf_command(self):    # Test WCF show command
+        if in_github_action():
+            pytest.skip("Skipping in GH actions because WCF credentials are not setup there")
         # Create command
         with Schema__Debug__Command() as command:
             command.command_type = Enum__Debug__Command_Type.show

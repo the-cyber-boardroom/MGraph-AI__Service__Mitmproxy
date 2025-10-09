@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Management - MITM Proxy</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/cookies.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <a href="/mitm-proxy/" class="back-link">← Back to Dashboard</a>
+            <h1>🍪 Cookie Management</h1>
+            <p class="subtitle">Control proxy behavior via cookies for: <strong id="host-name">Loading...</strong></p>
+        </header>
+        
+        <!-- Active Cookies Display -->
+        <section class="card">
+            <div class="card-title">Currently Active Proxy Cookies</div>
+            <div id="active-cookies-container">
+                <!-- Cookie table will be injected here -->
+            </div>
+        </section>
+        
+        <!-- Cookie Management Form -->
+        <section class="card">
+            <div class="card-title">Set New Proxy Cookie</div>
+            
+            <!-- Info Box -->
+            <div class="info-box">
+                <h3>Available Cookie Controls</h3>
+                <ul id="cookie-controls-list">
+                    <!-- Cookie options will be injected here -->
+                </ul>
+            </div>
+            
+            <!-- Form -->
+            <form id="cookieForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cookieName">Cookie Name</label>
+                        <select id="cookieName" name="cookieName" required>
+                            <option value="">-- Select Cookie --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cookieValue">Cookie Value</label>
+                        <input type="text" id="cookieValue" name="cookieValue" 
+                               placeholder="Enter value..." required>
+                        <div class="help-text" id="helpText">Select a cookie to see suggested values</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Set Cookie & Reload</button>
+                    <button type="button" class="btn btn-secondary" id="clearAllBtn">Clear All Proxy Cookies</button>
+                </div>
+            </form>
+        </section>
+    </div>
+    
+    <!-- Web Components -->
+    <script src="js/components/cookie-table.js"></script>
+    
+    <!-- Services -->
+    <script src="js/services/api-client.js"></script>
+    
+    <!-- Main App -->
+    <script src="js/cookies.js"></script>
+</body>
+</html>

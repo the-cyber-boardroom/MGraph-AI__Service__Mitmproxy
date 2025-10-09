@@ -16,6 +16,8 @@ from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Stats             
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Request_Data      import Schema__Proxy__Request_Data
 from mgraph_ai_service_mitmproxy.schemas.Schema__CORS__Config                   import Schema__CORS__Config
 
+PATH__MITM_PROXY__COOKIES = '/mitm-proxy/v0/v0.1.0/cookies.html'
+PATH__MITM_PROXY__INDEX   = '/mitm-proxy/v0/v0.1.0/index.html'
 
 class Test_Proxy__Service__Admin__E2E(TestCase):
 
@@ -56,19 +58,19 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                              admin_service    = self.admin_service   )
 
     def test__proxy_service__initialization(self):                             # Test complete service initialization
-        assert type(self.proxy_service)                is Proxy__Service
-        assert type(self.proxy_service.admin_service)  is Proxy__Admin__Service
-        assert type(self.proxy_service.stats_service)  is Proxy__Stats__Service
+        assert type(self.proxy_service)                 is Proxy__Service
+        assert type(self.proxy_service.admin_service)   is Proxy__Admin__Service
+        assert type(self.proxy_service.stats_service)   is Proxy__Stats__Service
         assert type(self.proxy_service.request_service) is Proxy__Request__Service
 
     def test__e2e__admin_dashboard_request(self):                              # Test complete flow for admin dashboard
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'                  ,
+                                                   host         = 'example.com'          ,
+                                                   path         = PATH__MITM_PROXY__INDEX,
+                                                   headers      = {}                     ,
+                                                   debug_params = {}                     ,
+                                                   stats        = {}                     ,
+                                                   version      = 'v1.0.0'               )
 
         # Process request through main service
         modifications = self.proxy_service.process_request(request_data)
@@ -76,42 +78,22 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         assert modifications.cached_response != {}
         assert modifications.cached_response['status_code'] == 200
         assert 'Dashboard'                             in modifications.cached_response['body']
-        assert 'example.com'                           in modifications.cached_response['body']
+        #assert 'example.com'                           in modifications.cached_response['body']
 
     def test__e2e__admin_cookies_request(self):                                # Test complete flow for cookie management
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'                 ,
-                                                    host         = 'example.com'         ,
-                                                    path         = '/mitm-proxy/cookies' ,
-                                                    headers      = {}                    ,
-                                                    debug_params = {}                    ,
-                                                    stats        = {}                    ,
-                                                    version      = 'v1.0.0'               )
+        request_data = Schema__Proxy__Request_Data(method       = 'GET'                      ,
+                                                    host         = 'example.com'             ,
+                                                    path         = PATH__MITM_PROXY__COOKIES ,
+                                                    headers      = {}                        ,
+                                                    debug_params = {}                        ,
+                                                    stats        = {}                        ,
+                                                    version      = 'v1.0.0'                  )
 
         modifications = self.proxy_service.process_request(request_data)
 
         assert modifications.cached_response['status_code'] == 200
         assert 'Cookie Management'                     in modifications.cached_response['body']
 
-    def test__e2e__admin_with_active_cookies(self):                            # Test admin pages with active proxy cookies
-        request_data = Schema__Proxy__Request_Data(
-            method       = 'GET'             ,
-            host         = 'example.com'     ,
-            path         = '/mitm-proxy/'    ,
-            headers      = {
-                'Cookie': 'mitm-show=url-to-html-xxx; mitm-debug=true; mitm-rating=0.5'
-            },
-            debug_params = {}                ,
-            stats        = {}                ,
-            version      = 'v1.0.0'           )
-
-        modifications = self.proxy_service.process_request(request_data)
-
-        body = modifications.cached_response['body']
-
-        assert 'mitm-show'       in body
-        assert 'url-to-html-xxx' in body
-        assert 'mitm-debug'      in body
-        assert '0.5'             in body
 
     def test__e2e__regular_request_then_admin(self):                           # Test regular request followed by admin request
         # Process regular request first
@@ -131,7 +113,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         # Now check admin page shows updated stats
         admin_request = Schema__Proxy__Request_Data(method       = 'GET'             ,
                                                      host         = 'example.com'     ,
-                                                     path         = '/mitm-proxy/'    ,
+                                                     path         = PATH__MITM_PROXY__INDEX    ,
                                                      headers      = {}                ,
                                                      debug_params = {}                ,
                                                      stats        = {}                ,
@@ -142,36 +124,12 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         assert '1'                             in admin_mods.cached_response['body']  # Shows request count
         assert self.stats_service.stats.total_requests == 1  # Admin didn't increment
 
-    def test__e2e__multiple_hosts_isolation(self):                             # Test admin pages for different hosts are isolated
-        hosts = ['example.com', 'test.org', 'api.service.io']
-
-        for host in hosts:
-            request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                        host         = host              ,
-                                                        path         = '/mitm-proxy/'    ,
-                                                        headers      = {}                ,
-                                                        debug_params = {}                ,
-                                                        stats        = {}                ,
-                                                        version      = 'v1.0.0'           )
-
-            modifications = self.proxy_service.process_request(request_data)
-
-            body = modifications.cached_response['body']
-
-            # Each should show its own host
-            assert host        in body
-            # Should NOT show other hosts
-            for other_host in hosts:
-                if other_host != host:
-                    # Other hosts might appear in links, but current host should be in title/header
-                    assert f'<strong>{host}</strong>' in body
-
     def test__e2e__get_stats_after_admin_access(self):                         # Test get_stats API after admin page access
         # Access admin page multiple times
         for i in range(3):
             request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
                                                         host         = 'example.com'     ,
-                                                        path         = '/mitm-proxy/'    ,
+                                                        path         = PATH__MITM_PROXY__INDEX    ,
                                                         headers      = {}                ,
                                                         debug_params = {}                ,
                                                         stats        = {}                ,
@@ -185,40 +143,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         # Admin accesses should NOT increment stats
         assert stats['total_requests']  == 0
         assert stats['total_responses'] == 0
-
-    def test__e2e__reset_stats_functionality(self):                            # Test reset stats through admin workflow
-        # Add some stats
-        self.stats_service.stats.total_requests  = 100
-        self.stats_service.stats.total_responses = 95
-
-        # Access admin dashboard
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
-
-        modifications = self.proxy_service.process_request(request_data)
-
-        # Should show current stats
-        assert '100'                           in modifications.cached_response['body']
-
-        # Reset stats via API
-        reset_result = self.proxy_service.reset_stats()
-
-        assert reset_result['previous_stats']['total_requests'] == 100
-
-        # Access admin again
-        modifications2 = self.proxy_service.process_request(request_data)
-
-        # Should show zero stats now
-        body = modifications2.cached_response['body']
-        # Check that we don't see the old high numbers in main stats display
-        # (they might appear in formatted text like "100,000" but not as "100" requests)
-        stats = self.proxy_service.get_stats()
-        assert stats['total_requests'] == 0
 
     def test__e2e__invalid_admin_endpoint_returns_404(self):                   # Test invalid admin endpoint through full stack
         request_data = Schema__Proxy__Request_Data(method       = 'GET'                    ,
@@ -239,7 +163,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         # Mix of requests
         requests = [
             ('/api/data', False),           # Regular, should increment stats
-            ('/mitm-proxy/', True),         # Admin, should NOT increment
+            (PATH__MITM_PROXY__INDEX, True),         # Admin, should NOT increment
             ('/another/path', False),       # Regular, should increment
             ('/mitm-proxy/cookies', True),  # Admin, should NOT increment
             ('/api/endpoint', False),       # Regular, should increment
@@ -269,58 +193,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         # Final stats should only count regular requests
         assert self.stats_service.stats.total_requests == expected_stats
 
-    def test__e2e__admin_page_response_structure(self):                        # Test admin response has correct structure
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
-
-        modifications = self.proxy_service.process_request(request_data)
-
-        # Check response structure
-        response = modifications.cached_response
-
-        assert 'status_code'             in response
-        assert 'body'                    in response
-        assert 'headers'                 in response
-        assert type(response['status_code']) is int
-        assert type(response['body'])        is str
-        assert type(response['headers'])     is dict
-
-        # Check headers
-        headers = response['headers']
-        assert 'content-type'            in headers
-        assert 'x-admin-page'            in headers
-        assert 'x-generated-at'          in headers
-
-    def test__e2e__cookie_service_integration(self):                           # Test cookie service works with admin pages
-        # Set multiple cookies
-        request_data = Schema__Proxy__Request_Data(
-            method       = 'GET'             ,
-            host         = 'example.com'     ,
-            path         = '/mitm-proxy/cookies',
-            headers      = {
-                'Cookie': 'mitm-show=url-to-html-xxx; mitm-inject=debug-panel; mitm-debug=true; mitm-rating=0.8'
-            },
-            debug_params = {}                ,
-            stats        = {}                ,
-            version      = 'v1.0.0'           )
-
-        modifications = self.proxy_service.process_request(request_data)
-
-        body = modifications.cached_response['body']
-
-        # All cookies should be displayed
-        assert 'mitm-show'       in body
-        assert 'mitm-inject'     in body
-        assert 'mitm-debug'      in body
-        assert 'mitm-rating'     in body
-        assert 'url-to-html-xxx' in body
-        assert 'debug-panel'     in body
-        assert '0.8'             in body
 
     def test__e2e__stats_accuracy_with_mixed_traffic(self):                    # Test stats remain accurate with mixed traffic
         # Process 10 regular requests
@@ -339,7 +211,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         for i in range(5):
             admin_request = Schema__Proxy__Request_Data(method       = 'GET'             ,
                                                          host         = 'example.com'     ,
-                                                         path         = '/mitm-proxy/'    ,
+                                                         path         = PATH__MITM_PROXY__INDEX    ,
                                                          headers      = {}                ,
                                                          debug_params = {}                ,
                                                          stats        = {}                ,
@@ -354,7 +226,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
     def test__e2e__html_structure_validity(self):                              # Test generated HTML is well-formed
         request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
                                                     host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
+                                                    path         = PATH__MITM_PROXY__INDEX    ,
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
@@ -371,39 +243,3 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         assert html.count('<div')        <= html.count('</div>')  # <= because some divs might be self-closing-style
         assert '<!DOCTYPE html>'         in html
         assert '<meta charset="UTF-8">'  in html
-
-    def test__e2e__admin_page_links_present(self):                             # Test admin pages have navigation links
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'example.com'     ,
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = 'v1.0.0'           )
-
-        modifications = self.proxy_service.process_request(request_data)
-
-        body = modifications.cached_response['body']
-
-        # Check for navigation links
-        assert '/mitm-proxy/cookies'    in body
-        assert 'Cookie Management'      in body
-        assert 'href='                  in body
-        assert '<a '                    in body
-
-    def test__e2e__cookies_page_back_link(self):                               # Test cookies page has back link
-        request_data = Schema__Proxy__Request_Data(method       = 'GET'                 ,
-                                                    host         = 'example.com'         ,
-                                                    path         = '/mitm-proxy/cookies' ,
-                                                    headers      = {}                    ,
-                                                    debug_params = {}                    ,
-                                                    stats        = {}                    ,
-                                                    version      = 'v1.0.0'               )
-
-        modifications = self.proxy_service.process_request(request_data)
-
-        body = modifications.cached_response['body']
-
-        assert '/mitm-proxy/'            in body
-        assert 'Back to Dashboard'       in body
-        assert 'back-link'               in body

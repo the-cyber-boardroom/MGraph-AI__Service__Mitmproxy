@@ -303,6 +303,10 @@ def should_process_request(flow: http.HTTPFlow) -> bool:        # Check if reque
     if flow.request.method.upper() != 'GET':
         return False
 
+    # ALWAYS process admin paths (they need to reach FastAPI for static file serving)
+    if flow.request.path.startswith('/mitm-proxy'):
+        return True
+
     # Strip query string first
     url_path = urlparse(flow.request.path).path.lower()
 
