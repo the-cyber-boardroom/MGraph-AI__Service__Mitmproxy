@@ -107,10 +107,20 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
 
         # Parse commands
         commands = self.parse_debug_commands(debug_params)
-
         # Process show commands first (they override everything)
         for command in commands:
             if command.is_show_command():
+
+
+                if command.is_wcf_show_command():                                       #  Only process WCF commands for HTML responses
+                    content_type = response_data.response.get("content_type", "")       # todo: move this logic to a better place
+
+                    # Skip if not HTML content
+                    if not self.html_service.is_html_content(content_type):
+                        # Add header to indicate why it was skipped
+                        modifications.headers_to_add["x-wcf-skipped"] = "non-html-content"
+                        continue  # Skip this command
+
                 show_mods = self.process_show_command(command, response_data)
                 if show_mods and show_mods.override_response:
                     # Show command wants to override - apply and return

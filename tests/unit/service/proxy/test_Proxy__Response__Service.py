@@ -1,4 +1,6 @@
 from unittest                                                                       import TestCase
+
+from osbot_utils.utils.Misc import list_set
 from osbot_utils.utils.Objects                                                      import base_classes, __
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Response__Service             import Proxy__Response__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service                import Proxy__Debug__Service
@@ -295,10 +297,23 @@ class test_Proxy__Response__Service(TestCase):
 
         with self.service as _:
             result = _.process_response(response_empty)
-
+            assert list_set(result.final_headers) == ['access-control-allow-credentials',
+                                                      'access-control-allow-headers',
+                                                      'access-control-allow-methods',
+                                                      'access-control-allow-origin',
+                                                      'access-control-expose-headers',
+                                                      'access-control-max-age',
+                                                      'content-length',
+                                                      'content-type',
+                                                      'x-original-host',
+                                                      'x-original-path',
+                                                      'x-processed-at',
+                                                      'x-proxy-service',
+                                                      'x-proxy-version',
+                                                      'x-request-id']
             assert result.final_body == ''
             assert result.final_status_code == 204
-            assert result.final_headers['Content-Length'] == '0'
+            assert result.final_headers['content-length'] == '0'
 
     def test__large_response_body(self):                                                       # Test processing large response body
         large_body = 'x' * 100000                                                              # 100KB body
