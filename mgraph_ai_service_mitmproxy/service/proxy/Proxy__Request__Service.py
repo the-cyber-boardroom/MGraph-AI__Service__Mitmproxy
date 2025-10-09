@@ -4,6 +4,7 @@ from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications impo
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service        import Proxy__Stats__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Content__Service      import Proxy__Content__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service       import Proxy__Cookie__Service
+from mgraph_ai_service_mitmproxy.service.admin.Proxy__Admin__Service        import Proxy__Admin__Service
 from mgraph_ai_service_mitmproxy.utils.Version                              import version__mgraph_ai_service_mitmproxy
 from datetime                                                               import datetime
 import json
@@ -12,9 +13,15 @@ class Proxy__Request__Service(Type_Safe):                            # Request p
     stats_service   : Proxy__Stats__Service                          # Statistics tracking
     content_service : Proxy__Content__Service                        # Content processing
     cookie_service  : Proxy__Cookie__Service                         # Cookie-based control
+    admin_service   : Proxy__Admin__Service                          # Admin page generation
 
     def process_request(self, request_data : Schema__Proxy__Request_Data  # Process incoming request
                         ) -> Schema__Proxy__Modifications:
+
+        # CHECK FOR ADMIN PATHS FIRST (before any other processing)
+        if self.admin_service.is_admin_path(request_data.path):
+            return self._handle_admin_request(request_data)
+
         # Update statistics
         self.stats_service.increment_request(
             host = request_data.host,
@@ -74,5 +81,22 @@ class Proxy__Request__Service(Type_Safe):                            # Request p
         for header in request_data.headers:
             if any(sensitive in header for sensitive in ["Secret", "Private", "Token"]):
                 modifications.headers_to_remove.append(header)
+
+        return modifications
+
+    def _handle_admin_request(self,
+                             request_data : Schema__Proxy__Request_Data  # Admin request data
+                             ) -> Schema__Proxy__Modifications:     # Modifications with cached response
+        modifications = Schema__Proxy__Modifications()
+
+        # Get admin endpoint
+        endpoint = self.admin_service.get_admin_endpoint(request_data.path)
+
+        # Generate admin page
+        cached_response = self.admin_service.generate_admin_page(request_data, endpoint)
+
+        if cached_response:
+            modifications.cached_response = cached_response
+            print(f"      🔧   Returning ADMIN PAGE: {endpoint}")
 
         return modifications
