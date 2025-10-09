@@ -1,8 +1,31 @@
-from http.cookies                                                       import SimpleCookie
-from osbot_utils.type_safe.Type_Safe                                    import Type_Safe
-from typing                                                             import Dict, Optional
-from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type  import Enum__WCF__Command_Type
+import re
+from http.cookies                                                               import SimpleCookie
+from osbot_utils.type_safe.Type_Safe                                            import Type_Safe
+from typing                                                                     import Dict, Optional, List
+from osbot_utils.type_safe.primitives.core.Safe_Str                             import Safe_Str
+from osbot_utils.type_safe.primitives.core.enums.Enum__Safe_Str__Regex_Mode     import Enum__Safe_Str__Regex_Mode
+from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text    import Safe_Str__Text
+from osbot_utils.type_safe.type_safe_core.decorators.type_safe                  import type_safe
+from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type          import Enum__WCF__Command_Type
 
+class Safe_Str__Cookie_Name(Safe_Str):                                          # Cookie names: alphanumeric, dots, underscores, hyphens
+    max_length       = 256                                                      # Max cookie name length per RFC 6265
+    regex            = re.compile(r'[^a-zA-Z0-9._-]')                           # Remove invalid cookie name characters
+    regex_mode       = Enum__Safe_Str__Regex_Mode.REPLACE                       # Replace mode for sanitization
+    replacement_char = '_'                                                      # Replace with underscore
+    allow_empty      = False                                                    # Cookie names cannot be empty
+
+class Safe_Str__Cookie_Value(Safe_Str):                                         # Cookie values: permissive but safe
+    max_length       = 4096                                                     # Max cookie value length (browser limit)
+    regex            = re.compile(r'[\x00-\x1F\x7F]')                           # Remove control characters only
+    regex_mode       = Enum__Safe_Str__Regex_Mode.REPLACE                       # Replace mode for sanitization
+    replacement_char = ''                                                       # Remove control chars entirely
+    allow_empty      = True                                                     # Cookie values can be empty
+
+class Schema__Cookie_Parser__Result(Type_Safe):                                 # Result of cookie header parsing
+    cookies          : Dict[Safe_Str__Cookie_Name, Safe_Str__Cookie_Value]      # Parsed cookie name-value pairs
+    parse_errors     : List[Safe_Str__Text]                                     # Any parsing errors encountered
+    malformed_tokens : List[Safe_Str__Text]                                     # Tokens that couldn't be parsed
 
 class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based proxy control service
     """
@@ -34,16 +57,98 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
         if not cookie_header:
             return {}
 
-        # Parse cookies manually instead of using SimpleCookie (which has issues with certain formats)
-        cookies = {}
+        parser_result = self.parse_cookies_from_header(cookie_header)
+        return parser_result.cookies.json()                             # todo: change to return Schema__Cookie_Parser__Result instead of the json representation
 
-        for cookie_pair in cookie_header.split(';'):                # Split by semicolon and parse each cookie
-            cookie_pair = cookie_pair.strip()
-            if '=' in cookie_pair:
-                name, value = cookie_pair.split('=', 1)
-                cookies[name.strip()] = value.strip()
 
-        return cookies
+
+    @type_safe
+    def parse_cookies_from_header(self, cookie_header: str                 # Raw Cookie header value
+                                   ) -> Schema__Cookie_Parser__Result:           # Parsed cookies and errors
+        """
+        Parse HTTP Cookie header with support for:
+        - Malformed headers using commas instead of semicolons (BBC cookies)
+        - JSON values containing braces and quotes
+        - Escape sequences in quoted strings
+        - Flag-like cookies without values
+
+        Algorithm:
+        1. Character-by-character scan tracking brace/quote depth
+        2. Split on comma/semicolon only when depth is zero
+        3. Extract name=value pairs from tokens
+        4. Return sanitized Safe_Str types
+        """
+        parts           = []                                                     # Collected token strings
+        cur             = []                                                     # Current token being built
+        braces          = 0                                                      # Depth of { } nesting
+        in_quote        = False                                                  # Inside " " quotes
+        escape          = False                                                  # Next char is escaped
+
+        for ch in cookie_header:                                                 # Character-by-character parsing
+            if escape:                                                           # Previous char was backslash
+                cur.append(ch)                                                   # Add escaped character literally
+                escape = False
+                continue
+
+            if ch == '\\':                                                       # Escape sequence start
+                cur.append(ch)                                                   # Preserve backslash
+                escape = True
+                continue
+
+            if ch == '"':                                                        # Quote toggle
+                in_quote = not in_quote                                          # Track quote state
+                cur.append(ch)
+                continue
+
+            if ch == '{' and not in_quote:                                       # Open brace (not in string)
+                braces += 1                                                      # Increase nesting depth
+                cur.append(ch)
+                continue
+
+            if ch == '}' and not in_quote and braces > 0:                        # Close brace (not in string)
+                braces -= 1                                                      # Decrease nesting depth
+                cur.append(ch)
+                continue
+
+            if (ch == ';' or ch == ',') and braces == 0 and not in_quote:        # Separator at depth zero
+                token = ''.join(cur).strip()                                     # Complete current token
+                if token:
+                    parts.append(token)
+                cur = []                                                         # Start new token
+                continue
+
+            cur.append(ch)                                                       # Regular character
+
+        last = ''.join(cur).strip()                                             # Final token after loop
+        if last:
+            parts.append(last)
+
+        cookies         = {}                                                     # Result dictionary
+        parse_errors    = []                                                     # Tokens that failed parsing
+        malformed_tokens = []                                                    # Tokens without '=' separator
+
+        for token in parts:                                                      # Process each token
+            if '=' in token:                                                     # Standard name=value format
+                name, value = token.split('=', 1)                                # Split on first equals only
+                try:
+                    safe_name  = Safe_Str__Cookie_Name(name.strip())            # Sanitize cookie name
+                    safe_value = Safe_Str__Cookie_Value(value.strip())          # Sanitize cookie value
+                    cookies[safe_name] = safe_value
+                except Exception as e:
+                    parse_errors.append(f"Error parsing '{token}': {str(e)}")
+            else:                                                                # Flag cookie (no value)
+                try:
+                    safe_name = Safe_Str__Cookie_Name(token.strip())
+                    cookies[safe_name] = Safe_Str__Cookie_Value('')             # Empty value for flags
+                except Exception as e:
+                    malformed_tokens.append(token)
+                    parse_errors.append(f"Malformed token '{token}': {str(e)}")
+
+        return Schema__Cookie_Parser__Result(cookies          = cookies         ,
+                                             parse_errors     = parse_errors    ,
+                                             malformed_tokens = malformed_tokens)
+
+
 
     def get_proxy_cookies(self, headers: Dict[str, str]          # Get only proxy control cookies
                          ) -> Dict[str, str]:                    # Proxy cookie name/value pairs

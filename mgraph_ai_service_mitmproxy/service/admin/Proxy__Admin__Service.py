@@ -1,11 +1,9 @@
 import mgraph_ai_service_mitmproxy__admin_ui
 from osbot_utils.type_safe.Type_Safe                                                                      import Type_Safe
-from osbot_utils.type_safe.primitives.domains.files.safe_str.Safe_Str__File__Path                        import Safe_Str__File__Path
-from osbot_utils.type_safe.primitives.domains.http.safe_str.Safe_Str__Http__Content_Type                 import Safe_Str__Http__Content_Type
-from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Version                          import Safe_Str__Version
-from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Url                                 import Safe_Str__Url
-from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text                             import Safe_Str__Text
-from osbot_utils.type_safe.primitives.core.Safe_UInt                                                     import Safe_UInt
+from osbot_utils.type_safe.primitives.domains.files.safe_str.Safe_Str__File__Path                         import Safe_Str__File__Path
+from osbot_utils.type_safe.primitives.domains.http.safe_str.Safe_Str__Http__Content_Type                  import Safe_Str__Http__Content_Type
+from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Version                           import Safe_Str__Version
+from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text                              import Safe_Str__Text
 from pathlib                                                                                              import Path
 from datetime                                                                                             import datetime
 from typing                                                                                               import Dict, Optional

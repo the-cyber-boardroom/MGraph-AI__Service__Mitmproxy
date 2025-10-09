@@ -73,25 +73,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinksComponent = document.createElement('navigation-links');
     navLinksComponent.setData([
         {
-            href: '/mitm-proxy/cookies',
+            href: './cookies.html',
             text: 'Cookie Management',
             badge: `${cookieCount} active`,
             badgeType: 'info'
         },
         {
-            href: '/mitm-proxy/site-info',
+            href: './mitm-proxy/site-info',
             text: 'Site Information',
             badge: 'Coming Soon',
             badgeType: 'success'
         },
         {
-            href: '/mitm-proxy/stats',
+            href: './mitm-proxy/stats',
             text: 'Detailed Statistics',
             badge: 'Coming Soon',
             badgeType: 'success'
         },
         {
-            href: '/mitm-proxy/settings',
+            href: './mitm-proxy/settings',
             text: 'Proxy Settings',
             badge: 'Coming Soon',
             badgeType: 'success'
