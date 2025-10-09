@@ -1,3 +1,4 @@
+import pytest
 from unittest                                                           import TestCase
 from osbot_utils.testing.__                                             import __, __SKIP__
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type  import Enum__WCF__Command_Type
@@ -12,6 +13,8 @@ class test_Proxy__WCF__Service(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.service = Proxy__WCF__Service()
+        if Schema__WCF__Request().get_auth_headers() == {}:
+            pytest.skip("Skipping theses tests because WCF__Request auth is not available")
 
     def test__init__(self):                                      # Test initialization
         with self.service as _:
