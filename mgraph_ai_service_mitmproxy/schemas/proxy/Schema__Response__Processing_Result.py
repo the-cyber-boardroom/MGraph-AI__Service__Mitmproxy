@@ -1,11 +1,11 @@
 from osbot_utils.type_safe.Type_Safe                                                 import Type_Safe
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications          import Schema__Proxy__Modifications
-from mgraph_ai_service_mitmproxy.schemas.Safe_UInt__HTTP_Status                      import Safe_UInt__HTTP_Status
+from mgraph_ai_service_mitmproxy.schemas.Safe_UInt__HTTP__Status                     import Safe_UInt__HTTP__Status
 from typing                                                                          import Dict, Optional
 
 class Schema__Response__Processing_Result(Type_Safe):            # Complete response processing result
     modifications       : Schema__Proxy__Modifications           # Content modifications
-    final_status_code   : Safe_UInt__HTTP_Status                 # Final HTTP status
+    final_status_code   : Safe_UInt__HTTP__Status                 # Final HTTP status
     final_content_type  : str                                    # Final content type
     final_body          : str                                    # Final response body
     final_headers       : Dict[str, str]                         # Final response headers

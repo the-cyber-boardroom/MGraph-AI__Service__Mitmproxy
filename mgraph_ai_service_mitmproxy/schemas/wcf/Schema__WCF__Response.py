@@ -1,10 +1,10 @@
 from osbot_utils.type_safe.Type_Safe                                                 import Type_Safe
-from mgraph_ai_service_mitmproxy.schemas.Safe_UInt__HTTP_Status                      import Safe_UInt__HTTP_Status
+from mgraph_ai_service_mitmproxy.schemas.Safe_UInt__HTTP__Status                     import Safe_UInt__HTTP__Status
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Content_Type               import Enum__WCF__Content_Type
 from typing                                                                          import Optional, Dict
 
 class Schema__WCF__Response(Type_Safe):                      # WCF service response data
-    status_code   : Safe_UInt__HTTP_Status                   # HTTP status code from WCF
+    status_code   : Safe_UInt__HTTP__Status                   # HTTP status code from WCF
     content_type  : Enum__WCF__Content_Type                  # Content type of response
     body          : str                                      # Response body content
     headers       : Dict[str, str]                           # Response headers

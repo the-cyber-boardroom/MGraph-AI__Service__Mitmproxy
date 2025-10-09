@@ -1,4 +1,4 @@
-from unittest                                                                    import TestCase
+from unittest                                                                   import TestCase
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Request__Service          import Proxy__Request__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service            import Proxy__Stats__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Content__Service          import Proxy__Content__Service
@@ -35,7 +35,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.request_service.process_request(request_data)
 
@@ -51,14 +51,14 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.request_service.process_request(request_data)
 
         assert type(modifications)                     is Schema__Proxy__Modifications
         assert modifications.cached_response           != {}  # Has cached response
         assert modifications.cached_response['status_code'] == 200
-        assert 'text/html'                             in modifications.cached_response['headers']['Content-Type']
+        assert 'text/html'                             in modifications.cached_response['headers']['content-type']
         assert 'Dashboard'                             in modifications.cached_response['body']
         assert self.stats_service.stats.total_requests == 0  # Stats NOT incremented for admin paths
 
@@ -69,7 +69,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                    ,
                                                     debug_params = {}                    ,
                                                     stats        = {}                    ,
-                                                    version      = '1.0.0'               )
+                                                    version      = 'v1.0.0'               )
 
         modifications = self.request_service.process_request(request_data)
 
@@ -84,7 +84,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.request_service.process_request(request_data)
 
@@ -101,7 +101,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                      headers      = {}                ,
                                                      debug_params = {}                ,
                                                      stats        = {}                ,
-                                                     version      = '1.0.0'           )
+                                                     version      = 'v1.0.0'           )
 
         self.request_service.process_request(admin_request)
 
@@ -115,7 +115,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                        headers      = {}                ,
                                                        debug_params = {}                ,
                                                        stats        = {}                ,
-                                                       version      = '1.0.0'           )
+                                                       version      = 'v1.0.0'           )
 
         self.request_service.process_request(regular_request)
 
@@ -132,7 +132,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
             },
             debug_params = {}                ,
             stats        = {}                ,
-            version      = '1.0.0'           )
+            version      = 'v1.0.0'           )
 
         modifications = self.request_service.process_request(request_data)
 
@@ -154,7 +154,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.request_service.process_request(request_data)
 
@@ -174,7 +174,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                         headers      = {}                ,
                                                         debug_params = {}                ,
                                                         stats        = {}                ,
-                                                        version      = '1.0.0'           )
+                                                        version      = 'v1.0.0'           )
 
             modifications = self.request_service.process_request(request_data)
 
@@ -193,7 +193,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
             },
             debug_params = {}                ,
             stats        = {}                ,
-            version      = '1.0.0'           )
+            version      = 'v1.0.0'           )
 
         modifications = self.request_service.process_request(request_data)
 
@@ -210,7 +210,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.request_service.process_request(request_data)
 
@@ -228,7 +228,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.request_service._handle_admin_request(request_data)
 
@@ -251,7 +251,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                         headers      = {}                ,
                                                         debug_params = {}                ,
                                                         stats        = {}                ,
-                                                        version      = '1.0.0'           )
+                                                        version      = 'v1.0.0'           )
 
             modifications = self.request_service.process_request(request_data)
 
@@ -267,7 +267,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                        headers      = {}                ,
                                                        debug_params = {}                ,
                                                        stats        = {}                ,
-                                                       version      = '1.0.0'           )
+                                                       version      = 'v1.0.0'           )
 
         regular_mods = self.request_service.process_request(regular_request)
 
@@ -281,7 +281,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                      headers      = {}                ,
                                                      debug_params = {}                ,
                                                      stats        = {}                ,
-                                                     version      = '1.0.0'           )
+                                                     version      = 'v1.0.0'           )
 
         admin_mods = self.request_service.process_request(admin_request)
 
@@ -295,7 +295,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                         headers      = {}                ,
                                                         debug_params = {}                ,
                                                         stats        = {}                ,
-                                                        version      = '1.0.0'           )
+                                                        version      = 'v1.0.0'           )
 
         regular_mods2 = self.request_service.process_request(regular_request2)
 
@@ -309,7 +309,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.request_service.process_request(request_data)
 
@@ -324,7 +324,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                      headers      = {}                ,
                                                      debug_params = {}                ,
                                                      stats        = {}                ,
-                                                     version      = '1.0.0'           )
+                                                     version      = 'v1.0.0'           )
 
         admin_mods = self.request_service.process_request(admin_request)
 
@@ -338,16 +338,16 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.request_service.process_request(request_data)
 
         headers = modifications.cached_response['headers']
 
-        assert 'Content-Type'    in headers
-        assert 'X-Admin-Page'    in headers
-        assert 'X-Generated-At'  in headers
-        assert headers['X-Admin-Page'] == 'index'
+        assert 'content-type'    in headers
+        assert 'x-admin-page'    in headers
+        assert 'x-generated-at'  in headers
+        assert headers['x-admin-page'] == 'index'
 
     def test__cookie_management_page_headers(self):                            # Test cookie page has correct headers
         request_data = Schema__Proxy__Request_Data(method       = 'GET'                 ,
@@ -356,11 +356,11 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     headers      = {}                    ,
                                                     debug_params = {}                    ,
                                                     stats        = {}                    ,
-                                                    version      = '1.0.0'               )
+                                                    version      = 'v1.0.0'               )
 
         modifications = self.request_service.process_request(request_data)
 
         headers = modifications.cached_response['headers']
 
-        assert headers['X-Admin-Page'] == 'cookies'
-        assert 'text/html'             in headers['Content-Type']
+        assert headers['x-admin-page'] == 'cookies'
+        assert 'text/html'             in headers['content-type']

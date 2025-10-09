@@ -49,15 +49,14 @@ class test_Proxy__Admin__Service(TestCase):
 
     def test__generate_dashboard_page__basic(self):                            # Test dashboard generation
         request_data = Schema__Proxy__Request_Data(method       = 'GET'             ,
-                                                    host         = 'test.example.com',
-                                                    path         = '/mitm-proxy/'    ,
-                                                    headers      = {}                ,
-                                                    debug_params = {}                ,
-                                                    stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                   host         = 'test.example.com',
+                                                   path         = '/mitm-proxy/'    ,
+                                                   headers      = {}                ,
+                                                   debug_params = {}                ,
+                                                   stats        = {}                ,
+                                                   version      = 'v1.0.0'          )
 
         html = self.admin_service.generate_dashboard_page(request_data)
-
         assert type(html)                is str
         assert len(html)                 > 0
         assert 'Dashboard'               in html
@@ -79,7 +78,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         html = self.admin_service.generate_dashboard_page(request_data)
 
@@ -92,12 +91,10 @@ class test_Proxy__Admin__Service(TestCase):
             method       = 'GET'             ,
             host         = 'example.com'     ,
             path         = '/mitm-proxy/'    ,
-            headers      = {
-                'Cookie': 'mitm-show=url-to-html-xxx; mitm-debug=true'
-            },
+            headers      = { 'Cookie': 'mitm-show=url-to-html-xxx; mitm-debug=true'},
             debug_params = {}                ,
             stats        = {}                ,
-            version      = '1.0.0'           )
+            version      = 'v1.0.0'           )
 
         html = self.admin_service.generate_dashboard_page(request_data)
 
@@ -113,7 +110,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         html = self.admin_service.generate_cookies_page(request_data)
 
@@ -137,7 +134,7 @@ class test_Proxy__Admin__Service(TestCase):
             },
             debug_params = {}                    ,
             stats        = {}                    ,
-            version      = '1.0.0'               )
+            version      = 'v1.0.0'               )
 
         html = self.admin_service.generate_cookies_page(request_data)
 
@@ -159,7 +156,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                    ,
                                                     debug_params = {}                    ,
                                                     stats        = {}                    ,
-                                                    version      = '1.0.0'               )
+                                                    version      = 'v1.0.0'               )
 
         html = self.admin_service.generate_cookies_page(request_data)
 
@@ -172,15 +169,15 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         result = self.admin_service.generate_404_page(request_data, 'invalid')
 
         assert type(result)                is dict
         assert result['status_code']       == 404
-        assert 'text/html'                 in result['headers']['Content-Type']
-        assert 'X-Admin-Page'              in result['headers']
-        assert result['headers']['X-Admin-Page'] == 'error-404'
+        assert 'text/html'                 in result['headers']['content-type']
+        assert 'x-admin-page'              in result['headers']
+        assert result['headers']['x-admin-page'] == 'error-404'
 
         body = result['body']
         assert '404'                       in body
@@ -195,14 +192,14 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         result = self.admin_service.generate_admin_page(request_data, 'index')
 
         assert type(result)                is dict
         assert result['status_code']       == 200
-        assert 'text/html'                 in result['headers']['Content-Type']
-        assert result['headers']['X-Admin-Page'] == 'index'
+        assert 'text/html'                 in result['headers']['content-type']
+        assert result['headers']['x-admin-page'] == 'index'
         assert 'Dashboard'                 in result['body']
 
     def test__generate_admin_page__cookies(self):                              # Test admin page routing to cookies
@@ -212,12 +209,12 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                    ,
                                                     debug_params = {}                    ,
                                                     stats        = {}                    ,
-                                                    version      = '1.0.0'               )
+                                                    version      = 'v1.0.0'               )
 
         result = self.admin_service.generate_admin_page(request_data, 'cookies')
 
         assert result['status_code']             == 200
-        assert result['headers']['X-Admin-Page'] == 'cookies'
+        assert result['headers']['x-admin-page'] == 'cookies'
         assert 'Cookie Management'               in result['body']
 
     def test__generate_admin_page__invalid_endpoint(self):                     # Test admin page with invalid endpoint
@@ -227,12 +224,12 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         result = self.admin_service.generate_admin_page(request_data, 'invalid')
 
         assert result['status_code']             == 404
-        assert result['headers']['X-Admin-Page'] == 'error-404'
+        assert result['headers']['x-admin-page'] == 'error-404'
         assert '404'                             in result['body']
 
     def test__format_cookie_list__empty(self):                                 # Test cookie list formatting with no cookies
@@ -288,7 +285,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         html = self.admin_service.generate_dashboard_page(request_data)
 
@@ -305,7 +302,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                    ,
                                                     debug_params = {}                    ,
                                                     stats        = {}                    ,
-                                                    version      = '1.0.0'               )
+                                                    version      = 'v1.0.0'               )
 
         html = self.admin_service.generate_cookies_page(request_data)
 
@@ -320,7 +317,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         html = self.admin_service.generate_dashboard_page(request_data)
 
@@ -345,7 +342,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         html = self.admin_service.generate_dashboard_page(request_data)
 
@@ -363,7 +360,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                    ,
                                                     debug_params = {}                    ,
                                                     stats        = {}                    ,
-                                                    version      = '1.0.0'               )
+                                                    version      = 'v1.0.0'               )
 
         html = self.admin_service.generate_cookies_page(request_data)
 
@@ -383,7 +380,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                         headers      = {}                ,
                                                         debug_params = {}                ,
                                                         stats        = {}                ,
-                                                        version      = '1.0.0'           )
+                                                        version      = 'v1.0.0'           )
 
             html = self.admin_service.generate_dashboard_page(request_data)
 
@@ -401,7 +398,7 @@ class test_Proxy__Admin__Service(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         self.admin_service.generate_dashboard_page(request_data)
 

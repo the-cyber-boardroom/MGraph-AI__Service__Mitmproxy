@@ -47,9 +47,9 @@ class Proxy__Admin__Service(Type_Safe):                          # Admin page ge
             "status_code": 200,
             "body": html_content,
             "headers": {
-                "Content-Type": "text/html; charset=utf-8",
-                "X-Admin-Page": endpoint,
-                "X-Generated-At": datetime.utcnow().isoformat()
+                "content-type": "text/html; charset=utf-8",
+                "x-admin-page": endpoint,
+                "x-generated-at": datetime.utcnow().isoformat()
             }
         }
 
@@ -696,8 +696,8 @@ class Proxy__Admin__Service(Type_Safe):                          # Admin page ge
             "status_code": 404,
             "body": html,
             "headers": {
-                "Content-Type": "text/html; charset=utf-8",
-                "X-Admin-Page": "error-404"
+                "content-type": "text/html; charset=utf-8",
+                "x-admin-page": "error-404"
             }
         }
 

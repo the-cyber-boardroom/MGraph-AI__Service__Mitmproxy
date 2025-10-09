@@ -68,7 +68,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         # Process request through main service
         modifications = self.proxy_service.process_request(request_data)
@@ -85,7 +85,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     headers      = {}                    ,
                                                     debug_params = {}                    ,
                                                     stats        = {}                    ,
-                                                    version      = '1.0.0'               )
+                                                    version      = 'v1.0.0'               )
 
         modifications = self.proxy_service.process_request(request_data)
 
@@ -102,7 +102,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
             },
             debug_params = {}                ,
             stats        = {}                ,
-            version      = '1.0.0'           )
+            version      = 'v1.0.0'           )
 
         modifications = self.proxy_service.process_request(request_data)
 
@@ -121,7 +121,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                        headers      = {}                ,
                                                        debug_params = {}                ,
                                                        stats        = {}                ,
-                                                       version      = '1.0.0'           )
+                                                       version      = 'v1.0.0'           )
 
         regular_mods = self.proxy_service.process_request(regular_request)
 
@@ -135,7 +135,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                      headers      = {}                ,
                                                      debug_params = {}                ,
                                                      stats        = {}                ,
-                                                     version      = '1.0.0'           )
+                                                     version      = 'v1.0.0'           )
 
         admin_mods = self.proxy_service.process_request(admin_request)
 
@@ -152,7 +152,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                         headers      = {}                ,
                                                         debug_params = {}                ,
                                                         stats        = {}                ,
-                                                        version      = '1.0.0'           )
+                                                        version      = 'v1.0.0'           )
 
             modifications = self.proxy_service.process_request(request_data)
 
@@ -175,7 +175,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                         headers      = {}                ,
                                                         debug_params = {}                ,
                                                         stats        = {}                ,
-                                                        version      = '1.0.0'           )
+                                                        version      = 'v1.0.0'           )
 
             self.proxy_service.process_request(request_data)
 
@@ -198,7 +198,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.proxy_service.process_request(request_data)
 
@@ -227,7 +227,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     headers      = {}                       ,
                                                     debug_params = {}                       ,
                                                     stats        = {}                       ,
-                                                    version      = '1.0.0'                  )
+                                                    version      = 'v1.0.0'                  )
 
         modifications = self.proxy_service.process_request(request_data)
 
@@ -254,7 +254,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                         headers      = {}                ,
                                                         debug_params = {}                ,
                                                         stats        = {}                ,
-                                                        version      = '1.0.0'           )
+                                                        version      = 'v1.0.0'           )
 
             modifications = self.proxy_service.process_request(request_data)
 
@@ -276,7 +276,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.proxy_service.process_request(request_data)
 
@@ -292,9 +292,9 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
 
         # Check headers
         headers = response['headers']
-        assert 'Content-Type'            in headers
-        assert 'X-Admin-Page'            in headers
-        assert 'X-Generated-At'          in headers
+        assert 'content-type'            in headers
+        assert 'x-admin-page'            in headers
+        assert 'x-generated-at'          in headers
 
     def test__e2e__cookie_service_integration(self):                           # Test cookie service works with admin pages
         # Set multiple cookies
@@ -307,7 +307,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
             },
             debug_params = {}                ,
             stats        = {}                ,
-            version      = '1.0.0'           )
+            version      = 'v1.0.0'           )
 
         modifications = self.proxy_service.process_request(request_data)
 
@@ -331,7 +331,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                            headers      = {}                ,
                                                            debug_params = {}                ,
                                                            stats        = {}                ,
-                                                           version      = '1.0.0'           )
+                                                           version      = 'v1.0.0'           )
 
             self.proxy_service.process_request(regular_request)
 
@@ -343,7 +343,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                          headers      = {}                ,
                                                          debug_params = {}                ,
                                                          stats        = {}                ,
-                                                         version      = '1.0.0'           )
+                                                         version      = 'v1.0.0'           )
 
             self.proxy_service.process_request(admin_request)
 
@@ -358,7 +358,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.proxy_service.process_request(request_data)
 
@@ -379,7 +379,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     headers      = {}                ,
                                                     debug_params = {}                ,
                                                     stats        = {}                ,
-                                                    version      = '1.0.0'           )
+                                                    version      = 'v1.0.0'           )
 
         modifications = self.proxy_service.process_request(request_data)
 
@@ -398,7 +398,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     headers      = {}                    ,
                                                     debug_params = {}                    ,
                                                     stats        = {}                    ,
-                                                    version      = '1.0.0'               )
+                                                    version      = 'v1.0.0'               )
 
         modifications = self.proxy_service.process_request(request_data)
 
