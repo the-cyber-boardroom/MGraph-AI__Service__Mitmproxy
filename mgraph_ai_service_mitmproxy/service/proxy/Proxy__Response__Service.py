@@ -1,3 +1,5 @@
+import uuid
+from typing                                                                          import Dict
 from osbot_utils.type_safe.Type_Safe                                                 import Type_Safe
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data          import Schema__Proxy__Response_Data
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications          import Schema__Proxy__Modifications
@@ -7,8 +9,8 @@ from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service            
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service                  import Proxy__CORS__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Headers__Service               import Proxy__Headers__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service                import Proxy__Cookie__Service
-from typing                                                                          import Dict
-import uuid
+
+
 
 class Proxy__Response__Service(Type_Safe):                       # Main response processing orchestrator
     debug_service   : Proxy__Debug__Service                      # Debug command processing
@@ -70,10 +72,9 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             modifications.headers_to_add.update(standard_headers)
 
             # Add cookie summary header if any proxy cookies present
-            print('has cookies', self.cookie_service.has_any_proxy_cookies(request_headers))
             if self.cookie_service.has_any_proxy_cookies(request_headers):
                 cookie_summary = self.cookie_service.get_cookie_summary(request_headers)
-                modifications.headers_to_add["X-Proxy-Cookie-Summary"] = str(cookie_summary)
+                modifications.headers_to_add["x-proxy-cookie-summary"] = str(cookie_summary)
 
             # Add debug headers if debug mode (from cookies or query params)
             if response_data.debug_params:
@@ -85,9 +86,9 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
 
             # Check if debug command overrode the response
             if modifications.override_response:
-                return self._finalize_overridden_response(response_data ,                # For overridden responses, finalize and return
-                                                          modifications ,
-                                                          request_id    )
+                return self.finalize_overridden_response(response_data,  # For overridden responses, finalize and return
+                                                         modifications,
+                                                         request_id)
 
             # Check if content was modified (but not overridden)
             if modifications.modified_body:
@@ -119,29 +120,24 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
                 str(e)
             )
 
-    def _finalize_overridden_response(self,                      # Finalize debug-overridden response
-                                     response_data  : Schema__Proxy__Response_Data,
-                                     modifications  : Schema__Proxy__Modifications,
-                                     request_id     : str
-                                     ) -> Schema__Response__Processing_Result:
-        """Finalize a response that was overridden by debug command"""
+    def finalize_overridden_response(self, response_data  : Schema__Proxy__Response_Data,
+                                           modifications  : Schema__Proxy__Modifications,
+                                           request_id     : str
+                                      ) -> Schema__Response__Processing_Result:             # Finalize a response that was overridden by debug command
         final_body = modifications.modified_body or ""
 
-        # Get final headers
-        final_headers = self.build_final_headers(
-            response_data,
-            modifications,
-            modifications.override_content_type,
-            len(final_body.encode('utf-8'))
-        )
+        final_headers = self.build_final_headers(response_data                      ,       # Get final headers
+                                                 modifications                      ,
+                                                 modifications.override_content_type,
+                                                 len(final_body.encode('utf-8'))    )
 
         return Schema__Response__Processing_Result(
             modifications        = modifications,
             final_status_code    = modifications.override_status,
             final_content_type   = modifications.override_content_type,
-            final_body          = final_body,
-            final_headers       = final_headers,
-            debug_mode_active   = bool(response_data.debug_params),
+            final_body           = final_body,
+            final_headers        = final_headers,
+            debug_mode_active    = bool(response_data.debug_params),
             content_was_modified = True,
             response_overridden  = True
         )
@@ -158,16 +154,14 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
 
         final_headers = modifications.headers_to_add.copy()
 
-        return Schema__Response__Processing_Result(
-            modifications        = modifications,
-            final_status_code    = 204,  # No Content for preflight
-            final_content_type   = "text/plain",
-            final_body          = "",
-            final_headers       = final_headers,
-            debug_mode_active   = False,
-            content_was_modified = False,
-            response_overridden  = False
-        )
+        return Schema__Response__Processing_Result(modifications        = modifications,
+                                                   final_status_code    = 204,  # No Content for preflight
+                                                   final_content_type   = "text/plain",
+                                                   final_body          = "",
+                                                   final_headers       = final_headers,
+                                                   debug_mode_active   = False,
+                                                   content_was_modified = False,
+                                                   response_overridden  = False)
 
     def _finalize_regular_response(self,                         # Finalize regular response
                                   response_data  : Schema__Proxy__Response_Data,
@@ -243,8 +237,8 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             final_content_type   = "text/plain",
             final_body          = error_body,
             final_headers       = {
-                "Content-Type": "text/plain",
-                "Content-Length": str(len(error_body)),
+                "content-type": "text/plain",
+                "content-length": str(len(error_body)),
                 "X-Processing-Error": "true"
             },
             debug_mode_active   = False,

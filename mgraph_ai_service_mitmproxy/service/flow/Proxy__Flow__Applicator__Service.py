@@ -127,8 +127,8 @@
 #
 #             # Apply error headers
 #             flow.response.headers.clear()
-#             flow.response.headers['Content-Type'] = 'text/plain'
-#             flow.response.headers['Content-Length'] = str(len(error_body))
+#             flow.response.headers['content-type'] = 'text/plain'
+#             flow.response.headers['content-length'] = str(len(error_body))
 #             flow.response.headers['X-Proxy-Error'] = 'true'
 #
 #             return Schema__Flow__Application_Result(

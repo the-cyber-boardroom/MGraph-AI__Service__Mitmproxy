@@ -46,7 +46,7 @@ class Proxy__Content__Service(Type_Safe):                            # Content p
                     "status_code": 200,
                     "body": cached_html,
                     "headers": {
-                        "Content-Type": "text/html; charset=utf-8",
+                        "content-type": "text/html; charset=utf-8",
                         "X-Cache-Source": "fastapi-test-cache",
                         "X-Cache-Timestamp": datetime.utcnow().isoformat()
                     }

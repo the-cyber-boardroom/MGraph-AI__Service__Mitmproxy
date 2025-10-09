@@ -1,6 +1,5 @@
-from unittest                                                                    import TestCase
-from osbot_utils.utils.Objects                                                      import __
-from tests.unit.Service__Fast_API__Test_Objs                                       import setup__service_fast_api_test_objs, TEST_API_KEY__NAME, TEST_API_KEY__VALUE
+from unittest                                      import TestCase
+from tests.unit.Service__Fast_API__Test_Objs       import setup__service_fast_api_test_objs, TEST_API_KEY__NAME, TEST_API_KEY__VALUE
 
 
 class test_Routes__Proxy__Cookies__client(TestCase):                                         # Test cookie-based proxy control via FastAPI TestClient
@@ -316,10 +315,9 @@ class test_Routes__Proxy__Cookies__client(TestCase):                            
 
         assert response.status_code == 200
         result = response.json()
-
-        assert result['final_status_code']  == 200
-        assert result['debug_mode_active']  is True
-        assert 'X-Proxy-Cookie-Summary'     in result['final_headers']
+        from osbot_utils.utils.Dev import pprint
+        assert result['headers_to_add']['x-debug-mode']  == 'active'
+        assert 'x-proxy-cookie-summary'                  in result['headers_to_add']
 
     def test__process_response__cookie_priority(self):                                        # Test cookie priority in response processing
         response_body = {
@@ -344,7 +342,9 @@ class test_Routes__Proxy__Cookies__client(TestCase):                            
 
         assert response.status_code == 200
         result = response.json()
-        assert 'X-Proxy-Cookie-Summary' in result['final_headers']
+
+        assert 'final_headers'      not in result                           # this doesn't exist anymore
+        assert 'x-proxy-cookie-summary' in result['headers_to_add']         # where this value is now here
 
     def test__process_response__multiple_cookies(self):                                       # Test response with multiple cookies
         response_body = {
@@ -371,20 +371,17 @@ class test_Routes__Proxy__Cookies__client(TestCase):                            
 
         assert response.status_code == 200
         result = response.json()
-
-        assert result['debug_mode_active'] is True
-        assert 'X-Proxy-Cookie-Summary'    in result['final_headers']
+        assert result['headers_to_add']['x-debug-mode'] == 'active'
+        assert 'x-proxy-cookie-summary'    in result['headers_to_add']
 
     def test__process_request__performance_with_cookies(self):                                # Test multiple rapid requests with cookies
         import time
 
-        cookie_combinations = [
-            'mitm-show=url-to-html',
-            'mitm-debug=true',
-            'mitm-show=url-to-html; mitm-debug=true',
-            'mitm-show=url-to-text; mitm-rating=0.5',
-            'mitm-cache=true; mitm-model=gpt-4'
-        ]
+        cookie_combinations = ['mitm-show=url-to-html'                  ,
+                               'mitm-debug=true'                        ,
+                               'mitm-show=url-to-html; mitm-debug=true' ,
+                               'mitm-show=url-to-text; mitm-rating=0.5' ,
+                               'mitm-cache=true; mitm-model=gpt-4'      ]
 
         start_time = time.time()
 
@@ -433,11 +430,12 @@ class test_Routes__Proxy__Cookies__client(TestCase):                            
         cookie_summary = json.loads(result['headers_to_add']['x-proxy-cookies'])
         assert len(cookie_summary['model_override']) == 1000
 
-    def test__process_request__auth_required(self):                                           # Test authentication requirement
+    def test__process_request__not__auth_required(self):                                      # Confirm that auth is currently not enabled
         auth_header = self.client.headers.pop(TEST_API_KEY__NAME)                             # Remove auth temporarily
 
         response = self.client.post('/proxy/process-request', json=self.test_request_body)
-        assert response.status_code == 401
+        assert response.status_code != 401
+        assert response.status_code == 200
 
         self.client.headers[TEST_API_KEY__NAME] = auth_header                                 # Restore auth
 

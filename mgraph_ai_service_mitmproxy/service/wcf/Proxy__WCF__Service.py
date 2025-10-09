@@ -1,9 +1,9 @@
 import requests
 import json
+from typing                                                                 import Optional
 from osbot_utils.type_safe.Type_Safe                                        import Type_Safe
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type      import Enum__WCF__Command_Type
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Content_Type      import Enum__WCF__Content_Type
-from typing                                                                 import Optional
 from mgraph_ai_service_mitmproxy.schemas.wcf.Schema__WCF__Request           import Schema__WCF__Request
 from mgraph_ai_service_mitmproxy.schemas.wcf.Schema__WCF__Response          import Schema__WCF__Response
 

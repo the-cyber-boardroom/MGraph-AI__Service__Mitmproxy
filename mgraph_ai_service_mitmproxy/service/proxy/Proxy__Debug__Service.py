@@ -1,6 +1,4 @@
 from osbot_utils.type_safe.Type_Safe                                                 import Type_Safe
-from osbot_utils.utils.Dev import pprint
-
 from mgraph_ai_service_mitmproxy.schemas.debug.Schema__Debug__Command                import Schema__Debug__Command
 from mgraph_ai_service_mitmproxy.schemas.debug.Schema__HTML__Injection               import Schema__HTML__Injection
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data          import Schema__Proxy__Response_Data
@@ -92,7 +90,7 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
         # Parse replace value (format: old:new)
         if ':' in command.command_value:
             old_text, new_text = command.command_value.split(':', 1)
-            return (old_text, new_text)
+            return old_text, new_text
 
         return None
 
@@ -147,7 +145,6 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
 
             # Check for inject commands
             for command in commands:
-                command.print()
                 if command.is_inject_command():
                     injection = self.process_inject_command(command, response_data)
                     if injection:

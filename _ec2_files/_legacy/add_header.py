@@ -7,7 +7,7 @@ def request(flow):
     This function is called for every request
     """
     # Add a custom header to all requests
-    flow.request.headers["X-Custom-Header"] = x_custom_header
+    flow.request.headers["x-custom-header"] = x_custom_header
 
     # You can add multiple headers
     flow.request.headers["X-Proxy-Time"] = "2025"

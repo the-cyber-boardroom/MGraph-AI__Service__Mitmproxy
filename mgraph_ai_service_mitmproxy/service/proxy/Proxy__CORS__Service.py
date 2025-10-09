@@ -48,7 +48,7 @@ class Proxy__CORS__Service(Type_Safe):                           # CORS header m
         headers = self.get_cors_headers_for_request(response_data)
 
         # Add additional preflight-specific headers if needed
-        headers["Content-Length"] = "0"
+        headers["content-length"] = "0"
 
         return headers
 

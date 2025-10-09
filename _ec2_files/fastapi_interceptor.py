@@ -40,7 +40,7 @@ def call_fastapi_sync(endpoint: str, data: dict) -> dict:
 
     try:
         json_data = json.dumps(data).encode('utf-8')
-        req = urllib.request.Request(url, data=json_data, headers={'Content-Type': 'application/json'})
+        req = urllib.request.Request(url, data=json_data, headers={'content-type': 'application/json'})
 
         with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
             if response.status == 200:
@@ -104,7 +104,7 @@ def apply_request_modifications(flow: http.HTTPFlow, modifications: Dict) -> boo
         flow.response = http.Response.make(
             modifications.get("block_status", 403),
             modifications.get("block_message", "Blocked by proxy").encode(),
-            {"Content-Type": "text/plain", "X-Blocked-By": "MGraph-Proxy"}
+            {"content-type": "text/plain", "x-blocked-by": "MGraph-Proxy"}
         )
         return True
 
@@ -132,7 +132,7 @@ async def request(flow: http.HTTPFlow) -> None:
             flow.response = http.Response.make(
                 cached.get("status_code", 200),
                 cached.get("body", "").encode('utf-8') if isinstance(cached.get("body"), str) else cached.get("body", b""),
-                cached.get("headers", {"Content-Type": "text/html"})
+                cached.get("headers", {"content-type": "text/html"})
             )
             flow.response.headers["x-proxy-status"] = "fastapi-cached"
             print(f"  ✓ Served from cache")
@@ -226,11 +226,11 @@ def apply_response_modifications(flow: http.HTTPFlow, modifications: Dict) -> No
             flow.response.status_code = modifications["override_status"]
 
         if modifications.get("override_content_type"):
-            flow.response.headers["Content-Type"] = modifications["override_content_type"]
+            flow.response.headers["content-type"] = modifications["override_content_type"]
 
         if modifications.get("modified_body"):
             flow.response.content = str(modifications["modified_body"]).encode('utf-8')
-            flow.response.headers["Content-Length"] = str(len(flow.response.content))
+            flow.response.headers["content-length"] = str(len(flow.response.content))
 
     # Apply header modifications
     if "headers_to_add" in modifications:

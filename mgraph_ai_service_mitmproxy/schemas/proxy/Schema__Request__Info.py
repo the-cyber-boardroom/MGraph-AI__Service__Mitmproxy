@@ -12,7 +12,7 @@ class Schema__Request__Info(Type_Safe):                          # Parsed reques
     scheme          : str                     = "https"          # http or https
     headers         : Dict[str, str]                             # Request headers
     query_params    : Dict[str, str]                             # Query string parameters
-    content_type    : Optional[str]           = None             # Content-Type header
+    content_type    : Optional[str]           = None             # content-type header
     user_agent      : Optional[str]           = None             # User-Agent header
     origin          : Optional[str]           = None             # Origin header (for CORS)
 

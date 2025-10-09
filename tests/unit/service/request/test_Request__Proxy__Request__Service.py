@@ -54,7 +54,7 @@ class test_Request__Proxy__Request__Service(TestCase):
             path    = '/data',
             scheme  = 'https',
             headers = {
-                'Content-Type': 'application/json',
+                'content-type': 'application/json',
                 'User-Agent': 'Mozilla/5.0',
                 'Origin': 'https://frontend.com'
             }

@@ -209,8 +209,8 @@
 #
 #             # Check if our custom header was added
 #             headers = response.json().get('headers', {})
-#             if 'X-Custom-Header' in headers:
-#                 print(f"✓ Proxy working! Custom header: {headers['X-Custom-Header']}")
+#             if 'x-custom-header' in headers:
+#                 print(f"✓ Proxy working! Custom header: {headers['x-custom-header']}")
 #                 return True
 #             else:
 #                 print("✗ Proxy responding but custom header not found")

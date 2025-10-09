@@ -271,7 +271,7 @@ CMD [{confdir_setting}"--listen-port", "8080", "--script", "/home/mitmproxy/{MIT
         headers = response.json().get('headers', {})
 
         # Check for custom header from {MITMPROXY__PYTHON_FILE}
-        if 'X-Custom-Header' in headers:
+        if 'x-custom-header' in headers:
             return True
 
         # Even without custom header, proxy is working

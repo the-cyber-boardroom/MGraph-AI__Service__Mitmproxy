@@ -1,6 +1,5 @@
 from unittest                                                                       import TestCase
-
-from osbot_utils.utils.Misc import list_set
+from osbot_utils.utils.Misc                                                         import list_set
 from osbot_utils.utils.Objects                                                      import base_classes, __
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Response__Service             import Proxy__Response__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service                import Proxy__Debug__Service
@@ -107,43 +106,43 @@ class test_Proxy__Response__Service(TestCase):
         with self.service as _:
             result = _.process_response(self.test_response_basic)
 
-            assert 'X-Proxy-Service' in result.final_headers
-            assert 'X-Proxy-Version' in result.final_headers
-            assert 'X-Request-ID'    in result.final_headers
-            assert 'X-Processed-At'  in result.final_headers
+            assert 'x-proxy-service' in result.final_headers
+            assert 'x-proxy-version' in result.final_headers
+            assert 'x-request-id'    in result.final_headers
+            assert 'x-processed-at'  in result.final_headers
 
     def test_process_response__with_cookies(self):                                            # Test processing with cookie-based debug params
         with self.service as _:
             result = _.process_response(self.test_response_with_cookies)
 
-            assert 'X-Proxy-Cookie-Summary' in result.final_headers                           # Cookie summary added
+            assert 'x-proxy-cookie-summary' in result.final_headers                           # Cookie summary added
             assert result.debug_mode_active is True                                            # Debug mode from cookie
 
     def test_process_response__cookie_to_debug_params(self):                                  # Test cookies converted to debug_params
         with self.service as _:
             result = _.process_response(self.test_response_with_cookies)
 
-            assert 'X-Debug-Mode' in result.final_headers                                     # Debug mode detected
+            assert 'x-debug-mode' in result.final_headers                                     # Debug mode detected
 
     def test_process_response__cors_headers(self):                                            # Test CORS headers added
         with self.service as _:
             result = _.process_response(self.test_response_basic)
 
-            assert 'Access-Control-Allow-Origin' in result.final_headers
+            assert 'access-control-allow-origin' in result.final_headers
 
-    def test_process_response__content_length_header(self):                                   # Test Content-Length header
+    def test_process_response__content_length_header(self):                                   # Test content-length header
         with self.service as _:
             result = _.process_response(self.test_response_basic)
 
-            assert 'Content-Length' in result.final_headers
-            assert int(result.final_headers['Content-Length']) == len(result.final_body.encode('utf-8'))
+            assert 'content-length' in result.final_headers
+            assert int(result.final_headers['content-length']) == len(result.final_body.encode('utf-8'))
 
-    def test_process_response__content_type_header(self):                                     # Test Content-Type header
+    def test_process_response__content_type_header(self):                                     # Test content-type header
         with self.service as _:
             result = _.process_response(self.test_response_basic)
 
-            assert 'Content-Type' in result.final_headers
-            assert result.final_headers['Content-Type'] == 'text/html'
+            assert 'content-type' in result.final_headers
+            assert result.final_headers['content-type'] == 'text/html'
 
     def test_process_response__original_headers_preserved(self):                              # Test original response headers preserved
         response_with_headers = Schema__Proxy__Response_Data(
@@ -153,7 +152,7 @@ class test_Proxy__Response__Service(TestCase):
                 'status_code'  : 200,
                 'content_type' : 'text/html',
                 'body'         : '<html></html>',
-                'headers'      : {'X-Custom-Header': 'custom-value', 'Server': 'nginx'}
+                'headers'      : {'x-custom-header': 'custom-value', 'Server': 'nginx'}
             },
             stats        = {},
             version      = 'v1.0.0'
@@ -162,8 +161,8 @@ class test_Proxy__Response__Service(TestCase):
         with self.service as _:
             result = _.process_response(response_with_headers)
 
-            assert 'X-Custom-Header' in result.final_headers
-            assert result.final_headers['X-Custom-Header'] == 'custom-value'
+            assert 'x-custom-header' in result.final_headers
+            assert result.final_headers['x-custom-header'] == 'custom-value'
 
     def test_process_response__no_cache_headers_for_debug(self):                              # Test no-cache headers in debug mode
         response_with_debug = Schema__Proxy__Response_Data(
@@ -177,42 +176,38 @@ class test_Proxy__Response__Service(TestCase):
         with self.service as _:
             result = _.process_response(response_with_debug)
 
-            assert 'Cache-Control' in result.final_headers
-            assert 'no-store' in result.final_headers['Cache-Control']
+            assert 'cache-control' in result.final_headers
+            assert 'no-store' in result.final_headers['cache-control']
 
     def test_build_final_headers(self):                                                       # Test final headers building
         from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications import Schema__Proxy__Modifications
 
-        modifications = Schema__Proxy__Modifications()
-        modifications.headers_to_add = {'X-Custom': 'value'}
-        modifications.headers_to_remove = ['X-Remove-This']
+        modifications                   = Schema__Proxy__Modifications()
+        modifications.headers_to_add    = {'x-custom': 'value'}
+        modifications.headers_to_remove = ['x-remove-this']
 
         response_data = Schema__Proxy__Response_Data(
             request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
             debug_params = {},
-            response     = {
-                'status_code'  : 200,
-                'content_type' : 'text/html',
-                'body'         : '<html></html>',
-                'headers'      : {'X-Remove-This': 'should-be-removed', 'X-Keep': 'keep-me'}
-            },
+            response     = { 'status_code'  : 200,
+                             'content_type' : 'text/html',
+                             'body'         : '<html></html>',
+                             'headers'      : {'x-remove-this': 'should-be-removed', 'x-keep': 'keep-me'}},
             stats        = {},
             version      = 'v1.0.0'
         )
 
         with self.service as _:
-            final_headers = _.build_final_headers(
-                response_data = response_data,
-                modifications = modifications,
-                content_type  = 'text/html',
-                content_length = 13
-            )
+            final_headers = _.build_final_headers(response_data  = response_data,
+                                                  modifications  = modifications,
+                                                  content_type   = 'text/html'  ,
+                                                  content_length = 13           )
 
-            assert 'X-Custom'      in final_headers
-            assert 'X-Keep'        in final_headers
-            assert 'X-Remove-This' not in final_headers                                       # Removed
-            assert 'Content-Type'   in final_headers
-            assert 'Content-Length' in final_headers
+            assert 'x-custom'      in final_headers
+            assert 'x-keep'        in final_headers
+            assert 'x-remove-this' not in final_headers                                       # Removed
+            assert 'content-type'   in final_headers
+            assert 'content-length' in final_headers
 
     def test__preflight_request_handling(self):                                                # Test CORS preflight OPTIONS request
         preflight_response = Schema__Proxy__Response_Data(
@@ -228,7 +223,7 @@ class test_Proxy__Response__Service(TestCase):
 
             assert result.final_status_code == 204                                             # No Content for preflight
             assert result.final_body == ''
-            assert 'Access-Control-Allow-Methods' in result.final_headers
+            assert 'access-control-allow-methods' in result.final_headers
 
     def test__error_result_creation(self):                                                     # Test error result creation
         response_data = self.test_response_basic
@@ -283,7 +278,7 @@ class test_Proxy__Response__Service(TestCase):
         with self.service as _:
             result = _.process_response(response_multi)
 
-            assert 'X-Proxy-Cookie-Summary' in result.final_headers                           # Cookie summary present
+            assert 'x-proxy-cookie-summary' in result.final_headers                           # Cookie summary present
             assert result.debug_mode_active is True                                            # Debug from cookie
 
     def test__empty_response_body(self):                                                       # Test processing empty response body
@@ -382,14 +377,14 @@ class test_Proxy__Response__Service(TestCase):
         with self.service as _:
             result = _.process_response(response_debug)
 
-            assert 'X-Debug-Mode' in result.final_headers
-            assert result.final_headers['X-Debug-Mode'] == 'active'
+            assert 'x-debug-mode' in result.final_headers
+            assert result.final_headers['x-debug-mode'] == 'active'
 
     def test__timestamp_in_headers(self):                                                      # Test timestamp format in headers
         with self.service as _:
             result = _.process_response(self.test_response_basic)
 
-            assert 'X-Processed-At' in result.final_headers
-            timestamp = result.final_headers['X-Processed-At']
+            assert 'x-processed-at' in result.final_headers
+            timestamp = result.final_headers['x-processed-at']
             assert 'T' in timestamp                                                            # ISO format
             assert timestamp.endswith('Z')                                                     # UTC indicator

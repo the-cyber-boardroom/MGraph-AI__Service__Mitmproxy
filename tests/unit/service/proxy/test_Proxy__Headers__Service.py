@@ -29,12 +29,12 @@ class test_Proxy__Headers__Service(TestCase):
                 request_id="test-123"
             )
 
-            assert headers["X-Proxy-Service"] == "mgraph-proxy"
-            assert headers["X-Proxy-Version"] == "1.0.0"
-            assert headers["X-Request-ID"] == "test-123"
-            assert "X-Processed-At" in headers
-            assert headers["X-Original-Host"] == "example.com"
-            assert headers["X-Original-Path"] == "/test/path"
+            assert headers["x-proxy-service"] == "mgraph-proxy"
+            assert headers["x-proxy-version"] == "1.0.0"
+            assert headers["x-request-id"] == "test-123"
+            assert "x-processed-at" in headers
+            assert headers["x-original-host"] == "example.com"
+            assert headers["x-original-path"] == "/test/path"
 
     def test_get_standard_headers__without_request_id(self):       # Test without request ID
         with Schema__Proxy__Response_Data() as response_data:
@@ -46,8 +46,8 @@ class test_Proxy__Headers__Service(TestCase):
 
             headers = self.service.get_standard_headers(response_data)
 
-            assert "X-Request-ID" not in headers
-            assert headers["X-Proxy-Service"] == "mgraph-proxy"
+            assert "x-request-id" not in headers
+            assert headers["x-proxy-service"] == "mgraph-proxy"
 
     def test_get_debug_headers(self):                              # Test debug header generation
         with Schema__Proxy__Response_Data() as response_data:
@@ -62,9 +62,9 @@ class test_Proxy__Headers__Service(TestCase):
 
             headers = self.service.get_debug_headers(response_data)
 
-            assert headers["X-Debug-Mode"] == "active"
-            assert "show=url-to-html" in headers["X-Debug-Params"]
-            assert "debug=true" in headers["X-Debug-Params"]
+            assert headers["x-debug-mode"] == "active"
+            assert "show=url-to-html" in headers["x-debug-params"]
+            assert "debug=true" in headers["x-debug-params"]
 
     def test_get_debug_headers__no_debug_params(self):             # Test without debug params
         with Schema__Proxy__Response_Data() as response_data:
@@ -81,11 +81,11 @@ class test_Proxy__Headers__Service(TestCase):
     def test_get_cache_headers__no_cache(self):                    # Test no-cache headers
         headers = self.service.get_cache_headers(no_cache=True)
 
-        assert "Cache-Control" in headers
-        assert "no-store" in headers["Cache-Control"]
-        assert "no-cache" in headers["Cache-Control"]
-        assert headers["Pragma"] == "no-cache"
-        assert headers["Expires"] == "0"
+        assert "cache-control" in headers
+        assert "no-store" in headers["cache-control"]
+        assert "no-cache" in headers["cache-control"]
+        assert headers["pragma" ] == "no-cache"
+        assert headers["expires"] == "0"
 
     def test_get_cache_headers__allow_cache(self):                 # Test allow cache
         headers = self.service.get_cache_headers(no_cache=False)
@@ -98,5 +98,5 @@ class test_Proxy__Headers__Service(TestCase):
             content_length=1234
         )
 
-        assert headers["Content-Type"] == "text/html; charset=utf-8"
-        assert headers["Content-Length"] == "1234"
+        assert headers["content-type"] == "text/html; charset=utf-8"
+        assert headers["content-length"] == "1234"

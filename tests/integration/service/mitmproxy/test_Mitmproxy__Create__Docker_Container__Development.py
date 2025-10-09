@@ -287,7 +287,7 @@ def request(flow: http.HTTPFlow) -> None:
         flow.response = http.Response.make(
             403,  # status code
             b"Blocked by development interceptor",  # content
-            {"Content-Type": "text/plain"}
+            {"content-type": "text/plain"}
         )
         print(f"  → Blocked request to {flow.request.path}")
     
@@ -326,13 +326,13 @@ def response(flow: http.HTTPFlow) -> None:
     
     # Example: Add CORS headers
     if "httpbin.org" in flow.request.pretty_host:
-        flow.response.headers["Access-Control-Allow-Origin"] = "*"
-        flow.response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        flow.response.headers["access-control-allow-origin"] = "*"
+        flow.response.headers["access-control-allow-methods"] = "GET, POST, OPTIONS"
         print(f"  → Added CORS headers")
     
     # Example: Cache control
     if flow.request.path.endswith((".jpg", ".png", ".gif")):
-        flow.response.headers["Cache-Control"] = "max-age=3600"
+        flow.response.headers["cache-control"] = "max-age=3600"
         print(f"  → Added cache control for image")
 
 

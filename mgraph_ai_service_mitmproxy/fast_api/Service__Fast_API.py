@@ -6,9 +6,7 @@ from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Proxy import Routes__Pr
 from mgraph_ai_service_mitmproxy.utils.Version                    import version__mgraph_ai_service_mitmproxy
 
 
-
 class Service__Fast_API(Serverless__Fast_API):
-
 
 
     def setup(self):

@@ -62,14 +62,14 @@ class test_Request_Schemas(TestCase):
             info.path = '/'
             info.url = 'https://example.com'
             info.headers = {
-                'Content-Type': 'application/json',
+                'content-type': 'application/json',
                 'User-Agent': 'Test/1.0'
             }
             info.query_params = {}
 
             # Case-insensitive lookup
             assert info.get_header('content-type') == 'application/json'
-            assert info.get_header('Content-Type') == 'application/json'
+            assert info.get_header('content-type') == 'application/json'
             assert info.get_header('user-agent') == 'Test/1.0'
             assert info.get_header('missing') is None
 

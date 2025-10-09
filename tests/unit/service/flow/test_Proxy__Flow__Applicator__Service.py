@@ -32,13 +32,13 @@
 #
 #         # Apply
 #         count = self.service.apply_headers(mock_flow, {
-#             'Content-Type': 'text/html',
-#             'X-Custom': 'value'
+#             'content-type': 'text/html',
+#             'x-custom': 'value'
 #         })
 #
 #         assert count == 2
-#         assert mock_flow.response.headers['Content-Type'] == 'text/html'
-#         assert mock_flow.response.headers['X-Custom'] == 'value'
+#         assert mock_flow.response.headers['content-type'] == 'text/html'
+#         assert mock_flow.response.headers['x-custom'] == 'value'
 #
 #     def test_apply_body(self):                                  # Test body application
 #         # Create mock flow
@@ -66,8 +66,8 @@
 #             result.final_content_type = 'text/html'
 #             result.final_body = '<html>Test</html>'
 #             result.final_headers = {
-#                 'Content-Type': 'text/html',
-#                 'Content-Length': '17'
+#                 'content-type': 'text/html',
+#                 'content-length': '17'
 #             }
 #             result.debug_mode_active = False
 #             result.content_was_modified = False
@@ -98,7 +98,7 @@
 #             result.final_status_code = 200
 #             result.final_content_type = 'application/json'
 #             result.final_body = '{"overridden": true}'
-#             result.final_headers = {'Content-Type': 'application/json'}
+#             result.final_headers = {'content-type': 'application/json'}
 #             result.response_overridden = True
 #
 #         # Apply

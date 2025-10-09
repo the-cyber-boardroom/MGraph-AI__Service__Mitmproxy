@@ -38,7 +38,7 @@ def call_fastapi_sync(endpoint: str, data: dict) -> dict:
 
     try:
         json_data = json.dumps(data).encode('utf-8')
-        req = urllib.request.Request(url, data=json_data, headers={'Content-Type': 'application/json'})
+        req = urllib.request.Request(url, data=json_data, headers={'content-type': 'application/json'})
 
         with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
             if response.status == 200:
@@ -102,7 +102,7 @@ async def request(flow: http.HTTPFlow) -> None:
             flow.response = http.Response.make(
                 modifications.get("block_status", 403),
                 modifications.get("block_message", "Blocked by proxy").encode(),
-                {"Content-Type": "text/plain"}
+                {"content-type": "text/plain"}
             )
             print(f"  ! Blocked request")
 

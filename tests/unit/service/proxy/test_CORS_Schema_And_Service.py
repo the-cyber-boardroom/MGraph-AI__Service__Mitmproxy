@@ -18,10 +18,10 @@ class test_CORS_Schema_And_Service(TestCase):
         with Schema__CORS__Config() as config:
             headers = config.get_cors_headers()
 
-            assert headers["Access-Control-Allow-Origin"] == "*"
-            assert "GET" in headers["Access-Control-Allow-Methods"]
-            assert headers["Access-Control-Allow-Credentials"] == "true"
-            assert "3600" in headers["Access-Control-Max-Age"]
+            assert headers["access-control-allow-origin"] == "*"
+            assert "GET" in headers["access-control-allow-methods"]
+            assert headers["access-control-allow-credentials"] == "true"
+            assert "3600" in headers["access-control-max-age"]
 
     def test_schema__cors__config__get_cors_headers_with_origin(self):  # Test with specific origin
         with Schema__CORS__Config() as config:
@@ -29,7 +29,7 @@ class test_CORS_Schema_And_Service(TestCase):
 
             headers = config.get_cors_headers(request_origin="https://example.com")
 
-            assert headers["Access-Control-Allow-Origin"] == "https://example.com"
+            assert headers["access-control-allow-origin"] == "https://example.com"
 
     def test_schema__cors__config__is_preflight_request(self):    # Test preflight detection
         with Schema__CORS__Config() as config:
@@ -79,8 +79,8 @@ class test_CORS_Schema_And_Service(TestCase):
 
             headers = service.get_cors_headers_for_request(response_data)
 
-            assert "Access-Control-Allow-Origin" in headers
-            assert "Access-Control-Allow-Methods" in headers
+            assert "access-control-allow-origin" in headers
+            assert "access-control-allow-methods" in headers
 
     def test_proxy__cors__service__is_preflight_request(self):    # Test preflight detection
         service = Proxy__CORS__Service()
@@ -117,5 +117,5 @@ class test_CORS_Schema_And_Service(TestCase):
 
             headers = service.handle_preflight_request(response_data)
 
-            assert "Access-Control-Allow-Origin" in headers
-            assert headers["Content-Length"] == "0"
+            assert "access-control-allow-origin" in headers
+            assert headers["content-length"] == "0"

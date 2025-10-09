@@ -283,7 +283,7 @@ class Routes__Proxy(Fast_API__Routes):                                    # Fast
                     "status_code": 200,
                     "body": cached_html,
                     "headers": {
-                        "Content-Type": "text/html; charset=utf-8",
+                        "content-type": "text/html; charset=utf-8",
                         "X-Cache-Source": "fastapi-test-cache",
                         "X-Cache-Timestamp": datetime.utcnow().isoformat()
                     }
