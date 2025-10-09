@@ -15,11 +15,13 @@ class Proxy__Service(Type_Safe):                                     # Main prox
     admin_service    : Proxy__Admin__Service                          # Admin page generation
 
     def process_request(self, request_data : Schema__Proxy__Request_Data  # Process incoming request
-                        ) -> Schema__Proxy__Modifications:
+                         ) -> Schema__Proxy__Modifications:
+        self.log_request(request_data)
         return self.request_service.process_request(request_data)
 
     def process_response(self, response_data : Schema__Proxy__Response_Data  # Process incoming response
                          ) -> Schema__Proxy__Modifications:
+        self.log_response(response_data)
         processing_result = self.response_service.process_response(response_data)           # Convert processing result to modifications
         return processing_result.modifications
 
@@ -28,3 +30,44 @@ class Proxy__Service(Type_Safe):                                     # Main prox
 
     def reset_stats(self) -> Dict[str, Any]:                         # Reset statistics
         return self.stats_service.reset_stats()
+
+
+    def log_request(self, request_data : Schema__Proxy__Request_Data   # Log incoming request
+                     ) -> None:                                        # No return value
+        is_admin     = request_data.path.startswith('/mitm-proxy')
+        admin_emoji  = '🔧 ' if is_admin else ''
+        host         = request_data.host
+        path         = request_data.path
+        method_emoji = self._get_method_emoji(request_data.method)
+
+        print(f"➡️ {admin_emoji:2} {method_emoji:2} {request_data.method:<6} {host:<30} {path}")
+
+
+
+    def log_response(self, response_data : Schema__Proxy__Response_Data  # Log outgoing response
+                      ) -> None:                                         # No return value
+        status       = response_data.response.get('status_code', 0)
+        host         = response_data.request.get('host', '')
+        path         = response_data.request.get('path', '')
+        status_emoji = self._get_status_emoji(status)
+        has_debug    = bool(response_data.debug_params)
+        debug_emoji  = '🐛 ' if has_debug else ''
+        print(f"⬅️ {debug_emoji:2} {status_emoji:2} ___{status:<} {host:<30} {path}")
+
+
+
+    def _get_method_emoji(self, method: str) -> str:                 # Get emoji for HTTP method
+        method_emojis = { 'GET'    : '📥' ,
+                          'POST'   : '📮' ,
+                          'PUT'    : '✏️' ,
+                          'DELETE' : '🗑️' ,
+                          'PATCH'  : '🔧' ,
+                          'OPTIONS': '❓' }
+        return method_emojis.get(method.upper(), '📨')
+
+    def _get_status_emoji(self, status: int) -> str:                 # Get emoji for status code
+        if   200 <= status < 300:   return '✅'
+        elif 300 <= status < 400:   return '↪️'
+        elif 400 <= status < 500:   return '⚠️'
+        elif 500 <= status < 600:   return '❌'
+        else:                       return '❔'

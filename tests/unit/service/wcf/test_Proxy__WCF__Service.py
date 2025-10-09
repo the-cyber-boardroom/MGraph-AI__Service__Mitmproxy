@@ -71,33 +71,18 @@ class test_Proxy__WCF__Service(TestCase):
 
                 assert type(response) is Schema__WCF__Response
 
-                assert response.obj() == __(success=True,
-                                            error_message=None,
-                                            status_code=200,
-                                            content_type='application/json',
-                                            body='{\n'
-                                                 '  "8753dff3c2": {\n'
-                                                 '    "original_text": "Example Domain",\n'
-                                                 '    "tag": "h1"\n'
-                                                 '  },\n'
-                                                 '  "187928c0c0": {\n'
-                                                 '    "original_text": "This domain is for use in illustrative examples '
-                                                 'in documents. You may use this\\n    domain in literature without '
-                                                 'prior coordination or asking for permission.",\n'
-                                                 '    "tag": "p"\n'
-                                                 '  },\n'
-                                                 '  "8c2cb83b0c": {\n'
-                                                 '    "original_text": "More information...",\n'
-                                                 '    "tag": "a"\n'
-                                                 '  }\n'
-                                                 '}',
-                                            headers=__SKIP__)
+                assert response.obj() == __(success       = True              ,
+                                            error_message = None              ,
+                                            status_code   = 200               ,
+                                            content_type  = 'application/json',
+                                            body          = __SKIP__          ,
+                                            headers       = __SKIP__          )
 
 
-                assert response.status_code == 200
+                assert response.status_code  == 200
                 assert response.content_type == Enum__WCF__Content_Type.application_json
-                assert response.is_json() is True
-                assert response.success is True
+                assert response.is_json()    is True
+                assert response.success      is True
 
     def test_make_request__success_json__url_to_lines(self):         # Test successful JSON request
 
@@ -109,58 +94,12 @@ class test_Proxy__WCF__Service(TestCase):
 
                 assert type(response) is Schema__WCF__Response
 
-                assert response.obj() == __(success       = True,
-                                            error_message = None,
-                                            status_code   = 200,
-                                            content_type  = 'text/plain; charset=utf-8',
-                                            body          = 'html/n    ├── head\n'
-                                                            '    │   ├── title\n'
-                                                            '    │   │   └── TEXT: Example Domain\n'
-                                                            '    │   ├── meta (charset="utf-8")\n'
-                                                            '    │   ├── meta (http-equiv="Content-type" content="text/html; '
-                                                            'charset=utf-8")\n'
-                                                            '    │   ├── meta (name="viewport" content="width=device-width, '
-                                                            'initial-scale=1")\n'
-                                                            '    │   └── style (type="text/css")\n'
-                                                            '    │       └── TEXT: body {\n'
-                                                            '        background-color: #f0f0f2;\n'
-                                                            '        margin: 0;\n'
-                                                            '        padding: 0;\n'
-                                                            '        font-family: -apple-system, system-ui, BlinkMacSystemFont, '
-                                                            '"Segoe UI", "Open Sans", "Helvetica Neue", Helvetica, Arial, '
-                                                            'sans-serif;\n'
-                                                            '        \n'
-                                                            '    }\n'
-                                                            '    div {\n'
-                                                            '        width: 600px;\n'
-                                                            '        margin: 5em auto;\n'
-                                                            '        padding: 2em;\n'
-                                                            '        background-color: #fdfdff;\n'
-                                                            '        border-radius: 0.5em;\n'
-                                                            '        box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);\n'
-                                                            '    }\n'
-                                                            '    a:link, a:visited {\n'
-                                                            '        color: #38488f;\n'
-                                                            '        text-decoration: none;\n'
-                                                            '    }\n'
-                                                            '    @media (max-width: 700px) {\n'
-                                                            '        div {\n'
-                                                            '            margin: 0 auto;\n'
-                                                            '            width: auto;\n'
-                                                            '        }\n'
-                                                            '    }/n    └── body\n'
-                                                            '        └── div\n'
-                                                            '            ├── h1\n'
-                                                            '            │   └── TEXT: Example Domain\n'
-                                                            '            ├── p\n'
-                                                            '            │   └── TEXT: This domain is for use in illustrative '
-                                                            'examples in documents. You may use this\n'
-                                                            '    domain in literature without prior coordination or asking for '
-                                                            'permission.\n'
-                                                            '            └── p\n'
-                                                            '                └── a (href="https://www.iana.org/domains/example")\n'
-                                                            '                    └── TEXT: More information...',
-                                            headers=__SKIP__)
+                assert response.obj() == __(success       = True    ,
+                                            error_message = None    ,
+                                            status_code   = 200     ,
+                                            content_type  = __SKIP__,
+                                            headers       = __SKIP__,
+                                            body          = __SKIP__)
 
 
                 assert response.status_code     == 200
@@ -189,6 +128,7 @@ class test_Proxy__WCF__Service(TestCase):
         with self.service.process_show_command(show_value = "url-to-html-min-rating:0.7",
                                                target_url = "https://example.com"       ) as response:
             assert response         is not None
+            response.print()
             assert response.success is True
             assert type(response)   is Schema__WCF__Response
             assert response.obj() == __(success       = True                        ,

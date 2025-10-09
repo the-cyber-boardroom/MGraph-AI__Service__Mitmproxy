@@ -29,17 +29,21 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
     COOKIE_MODEL   = "mitm-model"                                # WCF model override
     COOKIE_CACHE   = "mitm-cache"                                # Cache responses
 
-    def parse_cookies(self, headers: Dict[str, str]              # Parse cookies from headers
-                     ) -> Dict[str, str]:                        # Cookie name/value pairs
-        """Parse all cookies from request headers"""
+    def parse_cookies(self, headers: Dict[str, str]) -> Dict[str, str]: # Parse all cookies from request headers"""
         cookie_header = headers.get('cookie') or headers.get('Cookie')
         if not cookie_header:
             return {}
 
-        cookie = SimpleCookie()
-        cookie.load(cookie_header)                          # todo: figure out why this is not working for some sites
+        # Parse cookies manually instead of using SimpleCookie (which has issues with certain formats)
+        cookies = {}
 
-        return {key: morsel.value for key, morsel in cookie.items()}
+        for cookie_pair in cookie_header.split(';'):                # Split by semicolon and parse each cookie
+            cookie_pair = cookie_pair.strip()
+            if '=' in cookie_pair:
+                name, value = cookie_pair.split('=', 1)
+                cookies[name.strip()] = value.strip()
+
+        return cookies
 
     def get_proxy_cookies(self, headers: Dict[str, str]          # Get only proxy control cookies
                          ) -> Dict[str, str]:                    # Proxy cookie name/value pairs

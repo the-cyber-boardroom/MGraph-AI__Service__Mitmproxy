@@ -4,11 +4,13 @@ Minimal interceptor - just captures and forwards everything to FastAPI
 ALL logic happens in the FastAPI service
 Control via cookies only (mitm-* cookies)
 """
-from mitmproxy import http
 import json
 import asyncio
-from datetime import datetime
-from typing import Dict, Tuple, Optional
+from urllib.parse   import urlparse
+from pathlib        import Path
+from datetime       import datetime
+from typing         import Dict, Tuple, Optional
+from mitmproxy      import http
 
 # For HTTP calls
 import urllib.request
@@ -116,6 +118,10 @@ async def request(flow: http.HTTPFlow) -> None:
     global request_count, errors_count
     request_count += 1
 
+    if not should_process_request(flow):                # Check if we should process this request
+        #print(f"[REQUEST #{request_count}] ⏩ Skipping static asset: {flow.request.path}")
+        return
+
     print(f"[REQUEST #{request_count}] {flow.request.method} {flow.request.pretty_host}{flow.request.path}")
 
     # Add tracking header
@@ -129,12 +135,11 @@ async def request(flow: http.HTTPFlow) -> None:
         # Check for cached response
         if modifications.get("cached_response"):
             cached = modifications["cached_response"]
-            flow.response = http.Response.make(
-                cached.get("status_code", 200),
-                cached.get("body", "").encode('utf-8') if isinstance(cached.get("body"), str) else cached.get("body", b""),
-                cached.get("headers", {"content-type": "text/html"})
-            )
-            flow.response.headers["x-proxy-status"] = "fastapi-cached"
+            flow.response = http.Response.make(cached.get("status_code", 200),
+                                               cached.get("body", "").encode('utf-8') if isinstance(cached.get("body"), str) else cached.get("body", b""),
+                                               cached.get("headers", {"content-type": "text/html"}))
+            flow.response.headers["x-proxy-status"           ] = "fastapi-cached"
+            flow.response.headers["x-proxy-cached-in-request"] = "true"                     # provide a reference indicating that the request html has been replaced by the REQUEST_ENDPOINT
             print(f"  ✓ Served from cache")
             return
 
@@ -178,14 +183,12 @@ def prepare_response_data(flow: http.HTTPFlow) -> Dict:
     """
     content_type = flow.response.headers.get("content-type", "").lower()
 
-    response_data = {
-        "request": {
-            "method": flow.request.method,
-            "host": flow.request.pretty_host,
-            "path": flow.request.path,
-            "original_path": flow.request.path,  # No path modification
-            "url": flow.request.pretty_url,
-            "headers": dict(flow.request.headers),  # Includes Cookie header
+    response_data = { "request": { "method"       : flow.request.method      ,
+                                   "host"         : flow.request.pretty_host ,
+                                   "path"         : flow.request.path        ,
+                                   "original_path": flow.request.path        ,  # No path modification
+                                   "url"          : flow.request.pretty_url  ,
+                                   "headers"      : dict(flow.request.headers),  # Includes Cookie header
         },
         "debug_params": {},  # Empty - FastAPI will extract from cookies
         "response": {
@@ -261,10 +264,13 @@ def apply_response_modifications(flow: http.HTTPFlow, modifications: Dict) -> No
         flow.response.headers["x-proxy-stats"] = json.dumps(modifications.get("stats", {}))
 
 
-async def response(flow: http.HTTPFlow) -> None:
-    """Response handler - capture and forward to FastAPI"""
+async def response(flow: http.HTTPFlow) -> None:            # Response handler - capture and forward to FastAPI
     global response_count
     response_count += 1
+
+    if not should_process_response(flow):
+        #print(f"[RESPONSE #{response_count}] ⏩ Skipping - not processable content")
+        return
 
     print(f"[RESPONSE #{response_count}] {flow.response.status_code} from {flow.request.pretty_host}")
 
@@ -283,6 +289,45 @@ async def response(flow: http.HTTPFlow) -> None:
         flow.response.headers["x-proxy-status"] = "fastapi-unavailable"
         print(f"  ⚠ Fallback mode")
 
+
+# Define as a SET at module level for O(1) lookup
+STATIC_EXTENSIONS = { '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.ico',  # Images
+                      '.css', '.js', '.woff', '.woff2', '.ttf', '.eot',          # Fonts/styles
+                      '.mp4', '.webm', '.mp3', '.wav',                           # Media
+                      '.pdf', '.zip', '.tar', '.gz',                             # Documents/archives
+                    }
+
+
+# todo: see if there is a better way to do this, although we have an interesting issue here, since at this stage we don't have the response object
+def should_process_request(flow: http.HTTPFlow) -> bool:        # Check if request should be sent to FastAPI for processing
+    if flow.request.method.upper() != 'GET':
+        return False
+
+    # Strip query string first
+    url_path = urlparse(flow.request.path).path.lower()
+
+    # Extract extension safely
+    ext = Path(url_path).suffix
+
+    if not ext:   # no extension
+        return True
+
+    return ext not in STATIC_EXTENSIONS
+
+def should_process_response(flow: http.HTTPFlow) -> bool:                       # Check if response should be sent to FastAPI for processing
+    if flow.response.headers.get("x-proxy-cached-in-request") == "true":        # Skip if response was cached in request phase
+        #print(f"[RESPONSE #{response_count}] ⏩ Skipping - response was cached in request phase")
+        return False
+
+    content_type = flow.response.headers.get("content-type", "").lower()        # Only process HTML content (skip images, videos, etc.)
+
+    # List of content types to process
+    processable_types = [ "text/html",
+                          #"text/plain",
+                         # "application/json"
+                         ]
+
+    return any(t in content_type for t in processable_types)
 
 def done():
     """Cleanup"""
