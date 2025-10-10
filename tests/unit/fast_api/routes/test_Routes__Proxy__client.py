@@ -1,6 +1,8 @@
-from unittest                                                   import TestCase
-from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Proxy  import Schema__Proxy__Response_Data, Schema__Proxy__Modifications
-from tests.unit.Service__Fast_API__Test_Objs                    import setup__service_fast_api_test_objs, TEST_API_KEY__NAME, TEST_API_KEY__VALUE
+from unittest                                                           import TestCase
+from osbot_utils.testing.__                                             import __, __SKIP__
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict   import Type_Safe__Dict
+from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Proxy          import Schema__Proxy__Response_Data, Schema__Proxy__Modifications
+from tests.unit.Service__Fast_API__Test_Objs                            import setup__service_fast_api_test_objs, TEST_API_KEY__NAME, TEST_API_KEY__VALUE
 
 
 class test_Routes__Proxy__client(TestCase):
@@ -11,8 +13,8 @@ class test_Routes__Proxy__client(TestCase):
             cls.client.headers[TEST_API_KEY__NAME] = TEST_API_KEY__VALUE
 
     def test_process_response(self):
-        url = 'https://lite.cnn.com/aaa'  # 'https://www.bbc.co.uk/AAAA'
-        url = 'https://theintercept.com/'
+        url = 'https://docs.diniscruz.ai'
+
         show = 'url-to-ratings' # 'url-to-html-dict' , 'url-to-lines' 'url-to-html-xxx'
         #show = 'url-to-html-xxx'
         response_data = Schema__Proxy__Response_Data()
@@ -21,9 +23,19 @@ class test_Routes__Proxy__client(TestCase):
         response       = self.client.post('/proxy/process-response', json=response_data.json())
         response_data  = Schema__Proxy__Modifications.from_json(response.json())
 
-        #print(response_data)
-        #response_data.print()
-        # headers_to_add = response_data.headers_to_add
-        # assert type(headers_to_add)                          == Type_Safe__Dict
-        # assert headers_to_add['y-version-mitmproxy-service'] == version__mgraph_ai_service_mitmproxy
-        # assert headers_to_add['y-version-osbot-fast-api'   ] == version__osbot_fast_api
+        assert response_data.obj() == __(block_request=False,
+                                         block_status=403,
+                                         block_message='Blocked by proxy',
+                                         include_stats=False,
+                                         modified_body=None,
+                                         override_response=False,
+                                         override_status=None,
+                                         override_content_type=None,
+                                         headers_to_add=__SKIP__,
+                                         headers_to_remove=[],
+                                         cached_response=__(),
+                                         stats=__())
+        headers_to_add = response_data.headers_to_add
+        assert type(headers_to_add)                          == Type_Safe__Dict
+        assert headers_to_add['x-proxy-service'] == 'mgraph-proxy'
+        assert headers_to_add['x-wcf-skipped'  ] == 'non-html-content'

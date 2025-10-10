@@ -1,5 +1,5 @@
 from unittest                                                                   import TestCase
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Request__Service          import Proxy__Request__Service
+from mgraph_ai_service_mitmproxy.service.proxy.request.Proxy__Request__Service  import Proxy__Request__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service            import Proxy__Stats__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Content__Service          import Proxy__Content__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service           import Proxy__Cookie__Service

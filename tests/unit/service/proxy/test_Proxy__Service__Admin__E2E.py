@@ -1,20 +1,20 @@
 from unittest                                                                    import TestCase
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Service                   import Proxy__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Request__Service          import Proxy__Request__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Response__Service         import Proxy__Response__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service            import Proxy__Stats__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Content__Service          import Proxy__Content__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service           import Proxy__Cookie__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service            import Proxy__Debug__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service             import Proxy__CORS__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Headers__Service          import Proxy__Headers__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__HTML__Service             import Proxy__HTML__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__JSON__Service             import Proxy__JSON__Service
-from mgraph_ai_service_mitmproxy.service.admin.Proxy__Admin__Service            import Proxy__Admin__Service
-from mgraph_ai_service_mitmproxy.service.wcf.Proxy__WCF__Service                import Proxy__WCF__Service
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Stats             import Schema__Proxy__Stats
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Request_Data      import Schema__Proxy__Request_Data
-from mgraph_ai_service_mitmproxy.schemas.Schema__CORS__Config                   import Schema__CORS__Config
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Service                    import Proxy__Service
+from mgraph_ai_service_mitmproxy.service.proxy.request.Proxy__Request__Service   import Proxy__Request__Service
+from mgraph_ai_service_mitmproxy.service.proxy.response.Proxy__Response__Service import Proxy__Response__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service             import Proxy__Stats__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Content__Service           import Proxy__Content__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service            import Proxy__Cookie__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service             import Proxy__Debug__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service              import Proxy__CORS__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Headers__Service           import Proxy__Headers__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__HTML__Service              import Proxy__HTML__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__JSON__Service              import Proxy__JSON__Service
+from mgraph_ai_service_mitmproxy.service.admin.Proxy__Admin__Service             import Proxy__Admin__Service
+from mgraph_ai_service_mitmproxy.service.wcf.Proxy__WCF__Service                 import Proxy__WCF__Service
+from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Stats              import Schema__Proxy__Stats
+from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Request_Data       import Schema__Proxy__Request_Data
+from mgraph_ai_service_mitmproxy.schemas.Schema__CORS__Config                    import Schema__CORS__Config
 
 PATH__MITM_PROXY__COOKIES = '/mitm-proxy/v0/v0.1.0/cookies.html'
 PATH__MITM_PROXY__INDEX   = '/mitm-proxy/v0/v0.1.0/index.html'

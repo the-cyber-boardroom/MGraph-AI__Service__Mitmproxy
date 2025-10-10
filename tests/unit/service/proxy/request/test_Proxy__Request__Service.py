@@ -1,15 +1,14 @@
-from unittest                                                                    import TestCase
-
-from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict import Type_Safe__Dict
-from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__List import Type_Safe__List
-from osbot_utils.utils.Objects                                                      import base_classes, __
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Request__Service              import Proxy__Request__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service                import Proxy__Stats__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Content__Service              import Proxy__Content__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service               import Proxy__Cookie__Service
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Request_Data          import Schema__Proxy__Request_Data
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications         import Schema__Proxy__Modifications
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Stats                 import Schema__Proxy__Stats
+from unittest                                                                   import TestCase
+from osbot_utils.utils.Objects                                                  import base_classes, __
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict           import Type_Safe__Dict
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__List           import Type_Safe__List
+from mgraph_ai_service_mitmproxy.service.proxy.request.Proxy__Request__Service  import Proxy__Request__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service            import Proxy__Stats__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Content__Service          import Proxy__Content__Service
+from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service           import Proxy__Cookie__Service
+from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Request_Data      import Schema__Proxy__Request_Data
+from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications     import Schema__Proxy__Modifications
+from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Stats             import Schema__Proxy__Stats
 import json
 
 

@@ -67,7 +67,7 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
                                    ) -> Schema__Cookie_Parser__Result:           # Parsed cookies and errors
         """
         Parse HTTP Cookie header with support for:
-        - Malformed headers using commas instead of semicolons (BBC cookies)
+        - Malformed headers using commas instead of semicolons
         - JSON values containing braces and quotes
         - Escape sequences in quoted strings
         - Flag-like cookies without values
