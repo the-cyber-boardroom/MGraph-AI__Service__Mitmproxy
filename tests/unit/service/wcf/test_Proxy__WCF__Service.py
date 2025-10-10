@@ -1,6 +1,7 @@
 import pytest
 from unittest                                                           import TestCase
 from osbot_utils.testing.__                                             import __, __SKIP__
+from osbot_utils.utils.Env                                              import in_github_action
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type  import Enum__WCF__Command_Type
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Content_Type  import Enum__WCF__Content_Type
 from mgraph_ai_service_mitmproxy.schemas.wcf.Schema__WCF__Request       import Schema__WCF__Request
@@ -12,6 +13,8 @@ class test_Proxy__WCF__Service(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        if in_github_action():
+            pytest.skip("Skipping on github action because the server is not stopping and after all tests pass, the gh action hangs")
         cls.service = Proxy__WCF__Service()
         if Schema__WCF__Request().get_auth_headers() == {}:
             pytest.skip("Skipping theses tests because WCF__Request auth is not available")
