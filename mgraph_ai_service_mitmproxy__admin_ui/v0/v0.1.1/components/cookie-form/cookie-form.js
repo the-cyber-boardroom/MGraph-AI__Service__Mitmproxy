@@ -17,10 +17,10 @@ class CookieForm extends HTMLElement {
 
     async loadDependencies() {
         // Load all JavaScript dependencies
-        const scripts = [ './components/cookie-form/js/js/cookie-definitions.js',
-                          './components/cookie-form/js/js/form-builder.js'      ,
-                          './components/cookie-form/js/js/message-handler.js'   ,
-                          './components/cookie-form/js/js/event-handlers.js'    ];
+        const scripts = [ './components/cookie-form/js/cookie-definitions.js',
+                          './components/cookie-form/js/form-builder.js'      ,
+                          './components/cookie-form/js/message-handler.js'   ,
+                          './components/cookie-form/js/event-handlers.js'    ];
         
         for (const src of scripts) {
             await this.loadScript(src);
