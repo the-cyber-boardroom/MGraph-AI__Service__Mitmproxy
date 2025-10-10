@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Data - MITM Proxy</title>
+    <link rel="stylesheet" href="./css/common.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Top Navigation -->
+        <top-nav></top-nav>
+
+        <!-- Header -->
+        <header class="page-header">
+            <h1>📊 API Data Viewer</h1>
+            <p class="subtitle">Live data from <strong>/mitm-proxy/admin-ui.json</strong></p>
+        </header>
+
+        <!-- API Data Viewer -->
+        <api-data-viewer id="api-viewer"></api-data-viewer>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>MITM Proxy Admin Interface v0.1.1</p>
+        </footer>
+    </div>
+
+    <!-- Services -->
+    <script src="./js/services/api-client.js"></script>
+
+    <!-- Components -->
+    <script src="./components/top-nav/top-nav.js"></script>
+    <script src="./components/api-data-viewer/api-data-viewer.js"></script>
+
+
+</body>
+</html>

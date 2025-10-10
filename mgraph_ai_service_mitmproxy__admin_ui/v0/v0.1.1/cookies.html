@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Management - MITM Proxy</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/cookies.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Top Navigation -->
+        <top-nav></top-nav>
+
+        <!-- Header -->
+        <header class="page-header">
+            <h1>🍪 Cookie Management</h1>
+            <p class="subtitle">Control proxy behavior via cookies for: <strong id="host-name">Loading...</strong></p>
+        </header>
+        
+        <!-- Info Box -->
+        <div class="info-box">
+            <h3>💡 About Proxy Cookies</h3>
+            <p>These cookies control how the MITM proxy processes requests and responses. All changes take effect immediately without page reload.</p>
+            <ul>
+                <li><span class="code">mitm-show</span> - Control content display (url-to-html, url-to-html-xxx, url-to-ratings, response-data)</li>
+                <li><span class="code">mitm-inject</span> - Inject debug content (debug-panel, debug-banner)</li>
+                <li><span class="code">mitm-replace</span> - Replace text (format: old:new)</li>
+                <li><span class="code">mitm-debug</span> - Enable debug mode (true/false)</li>
+                <li><span class="code">mitm-rating</span> - Set minimum rating for filtering (e.g., 0.5)</li>
+                <li><span class="code">mitm-model</span> - Override WCF model to use</li>
+                <li><span class="code">mitm-cache</span> - Enable response caching (true/false)</li>
+            </ul>
+        </div>
+
+        <!-- Active Cookies Display -->
+        <div class="card">
+            <div class="card-title">Currently Active Proxy Cookies</div>
+            <cookie-table id="cookie-table"></cookie-table>
+        </div>
+        
+        <!-- Cookie Management Form -->
+        <div class="card">
+            <div class="card-title">Set New Proxy Cookie</div>
+            <cookie-form id="cookie-form"></cookie-form>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>MITM Proxy Admin Interface v0.1.1</p>
+        </footer>
+    </div>
+
+    <!-- Services -->
+    <script src="js/services/api-client.js"></script>
+
+    <!-- Components -->
+    <script src="./components/top-nav/top-nav.js"></script>
+    <script src="./components/cookie-table/cookie-table.js"></script>
+    <script src="./components/cookie-form/cookie-form.js"></script>
+    
+
+    <!-- Main App -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const hostName = document.getElementById('host-name');
+            const cookieTable = document.getElementById('cookie-table');
+
+            try {
+                // Fetch API data for host name
+                const apiData = await window.apiClient.fetchAPIData();
+                hostName.textContent = apiData.request.host;
+            } catch (error) {
+                console.error('Failed to load API data:', error);
+                hostName.textContent = window.location.hostname;
+            }
+
+            // Initialize cookie table with current cookies
+            const currentCookies = window.apiClient.getProxyCookies();
+            cookieTable.setData(currentCookies);
+        });
+    </script>
+</body>
+</html>
