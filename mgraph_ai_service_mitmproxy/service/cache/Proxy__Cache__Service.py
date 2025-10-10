@@ -11,6 +11,7 @@ from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Config    
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Page_Entry        import Schema__Cache__Page_Entry
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Stats             import Schema__Cache__Stats
 
+DEFAULT__TEXT__CACHE_NOT_FOUND = 'Not found'
 
 class Proxy__Cache__Service(Type_Safe):                         # Cache service for WCF transformations
     cache_client      : Service__Fast_API__Client               # Cache service client (Service__Fast_API__Client)
@@ -99,12 +100,11 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
 
         try:
             # Store with KEY_BASED strategy using semantic cache_key
-            result = self.cache_client.store().store__json__cache_key(
-                namespace = self.cache_config.namespace.value,
-                strategy  = Enum__Cache__Store__Strategy.KEY_BASED,
-                cache_key = cache_key,
-                file_id   = "page-entry",                       # Fixed file_id for page entries
-                body      = page_entry.json()
+            result = self.cache_client.store().store__json__cache_key(namespace = self.cache_config.namespace,
+                                                                      strategy  = Enum__Cache__Store__Strategy.KEY_BASED,
+                                                                      cache_key = cache_key,
+                                                                      file_id   = "page-entry",                       # Fixed file_id for page entries
+                                                                      body      = page_entry.json()
             )
 
             cache_id = result["cache_id"]
@@ -153,7 +153,7 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
             return None
 
         start_time = time.time()
-        cache_key  = self.url_to_cache_key(target_url)
+        cache_key  = self.url_to_cache_key(target_url)          # todo:  see why this is not being used
 
         # Get page cache_id (from mapping or by creating entry)
         try:
@@ -168,17 +168,19 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
         try:
             transformation = self.cache_client.data().retrieve().data__string__with__id_and_key(
                 cache_id     = cache_id,
-                namespace    = self.cache_config.namespace.value,
+                namespace    = self.cache_config.namespace,
                 data_key     = data_key,
                 data_file_id = self.cache_config.data_file_id
             )
-
+            if transformation == DEFAULT__TEXT__CACHE_NOT_FOUND:            # check if we got a Not found (aka 404) error
+                return None
             # Update stats
             duration_ms = (time.time() - start_time) * 1000
             self._update_cache_hit_stats(duration_ms)
 
             return transformation
         except Exception as e:
+            print(e)
             # Transformation not cached
             return None
 
@@ -210,7 +212,7 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
         # Store transformation content as child data
         self.cache_client.data_store().data__store_string__with__id_and_key(
             cache_id     = cache_id,
-            namespace    = self.cache_config.namespace.value,
+            namespace    = self.cache_config.namespace,
             data_key     = data_key,
             data_file_id = self.cache_config.data_file_id,
             body         = content
@@ -222,7 +224,7 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
 
             self.cache_client.data_store().data__store_json__with__id_and_key(
                 cache_id     = cache_id,
-                namespace    = self.cache_config.namespace.value,
+                namespace    = self.cache_config.namespace,
                 data_key     = metadata_key,
                 data_file_id = self.cache_config.data_file_id,
                 body         = metadata
@@ -233,11 +235,11 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
     def has_cached_transformation(self, target_url  : str       ,  # Check if transformation is cached
                                         wcf_command : str
                                    ) -> bool:                   # Is cached
-        """Check if transformation is cached"""
         if not self.cache_config.enabled:
             return False
 
         cached = self.get_cached_transformation(target_url, wcf_command)
+
         return cached is not None
 
     def increment_cache_hit(self):                              # Record cache hit

@@ -317,14 +317,14 @@ osbot-utils = "*"
 
 [[package]]
 name = "mgraph-ai-service-cache"
-version = "0.5.69"
+version = "0.5.70"
 description = "MGraph-AI__Service__Cache"
 optional = false
 python-versions = "<4.0,>=3.12"
 groups = ["main"]
 files = [
-    {file = "mgraph_ai_service_cache-0.5.69-py3-none-any.whl", hash = "sha256:3f76642b5573e0a08734ab639d99fbe22999d8979d56ff92009ab4187af657b7"},
-    {file = "mgraph_ai_service_cache-0.5.69.tar.gz", hash = "sha256:5e336516ef448ac003a4ef88e09d62b47cc22adceac06008803a0ad9c74a1427"},
+    {file = "mgraph_ai_service_cache-0.5.70-py3-none-any.whl", hash = "sha256:d96d7db6a3d3cd7a44c38262a573958bafc98e6491f6a4237f7d8a30f781a020"},
+    {file = "mgraph_ai_service_cache-0.5.70.tar.gz", hash = "sha256:670ea75dfc1b4a24d0e479b8c4a018ed87637bc06e4f60907908c69d9abdc23d"},
 ]
 
 [package.dependencies]

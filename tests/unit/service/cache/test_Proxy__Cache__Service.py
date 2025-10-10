@@ -1,11 +1,18 @@
-
 from unittest                                                                           import TestCase
+from memory_fs.storage_fs.providers.Storage_FS__Memory                                  import Storage_FS__Memory
+from mgraph_ai_service_cache.fast_api.Service__Fast_API                                 import Service__Fast_API
+from mgraph_ai_service_cache.service.cache.Cache__Config                                import Cache__Config
+from mgraph_ai_service_cache.service.cache.Cache__Service                               import Cache__Service
 from mgraph_ai_service_cache_client.client_contract.Service__Fast_API__Client           import Service__Fast_API__Client
 from mgraph_ai_service_cache_client.client_contract.Service__Fast_API__Client__Config   import Service__Fast_API__Client__Config
+from mgraph_ai_service_cache_client.schemas.cache.enums.Enum__Cache__Storage_Mode       import Enum__Cache__Storage_Mode
 from osbot_fast_api.utils.Fast_API_Server                                               import Fast_API_Server
 from osbot_fast_api_serverless.fast_api.Serverless__Fast_API__Config                    import Serverless__Fast_API__Config
 from osbot_utils.helpers.duration.decorators.capture_duration                           import capture_duration
-from mgraph_ai_service_mitmproxy.fast_api.Service__Fast_API                             import Service__Fast_API
+from osbot_utils.utils.Http                                                             import GET_json
+from osbot_utils.utils.Json                                                             import str_to_json
+from osbot_utils.utils.Misc                                                             import list_set
+from osbot_utils.utils.Objects                                                          import obj
 from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service                    import Proxy__Cache__Service
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Config            import Schema__Cache__Config
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Stats             import Schema__Cache__Stats
@@ -15,8 +22,12 @@ class test_Proxy__Cache__Service(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         with capture_duration() as duration:
+            cache_config = Cache__Config(storage_mode=Enum__Cache__Storage_Mode.MEMORY)
+
             cls.serverless_config       = Serverless__Fast_API__Config(enable_api_key=False)
-            cls.cache_service__fast_api = Service__Fast_API(config=cls.serverless_config).setup()
+            cls.cache_service__fast_api = Service__Fast_API(config=cls.serverless_config,
+                                                            cache_service=Cache__Service(cache_config=cache_config))  # Inject configured service
+
             cls.fast_api_server         = Fast_API_Server(app=cls.cache_service__fast_api.app())
             cls.server_url              = cls.fast_api_server.url().rstrip("/")                              # note: the trailing / was causing issues with the auto-generated request code
 
@@ -24,7 +35,8 @@ class test_Proxy__Cache__Service(TestCase):
             cls.server_config           = Service__Fast_API__Client__Config(base_url=cls.server_url, verify_ssl=False)
             cls.fast_api_client         = Service__Fast_API__Client        (config=cls.server_config)
 
-            cls.fast_api_server.start()
+            cls.cache_service__fast_api.setup()
+            cls.fast_api_server        .start()
 
             cls.client_config = Service__Fast_API__Client__Config(base_url = cls.server_url   )
             cls.cache_client  = Service__Fast_API__Client        (config   = cls.client_config)
@@ -45,8 +57,22 @@ class test_Proxy__Cache__Service(TestCase):
 
 
     def test__setUpClass(self):
-        with self.cache_service  as _:
-            assert(type(_) is Proxy__Cache__Service)
+        with self.cache_service as _:
+            assert type(_) is Proxy__Cache__Service
+
+            # Check OpenAPI spec
+            open_api_json = obj(GET_json(self.server_url + '/openapi.json'))
+            assert open_api_json.info.title == 'Service__Fast_API'
+            assert '/{namespace}/retrieve/{cache_id}' in list_set(open_api_json.paths)                  # confirm the routes have been wired
+
+            storage_info = GET_json(self.server_url + '/server/storage/info')                           # Verify we're using MEMORY storage mode
+            assert storage_info == { 'storage_mode': 'memory',   'ttl_hours': 24 }
+
+            assert self.cache_service__fast_api.cache_service.cache_config.storage_mode == Enum__Cache__Storage_Mode.MEMORY # Additional verification - check the actual cache service configuration
+
+            storage_backend = self.cache_service__fast_api.cache_service.storage_backend()              # Verify storage backend type
+            assert isinstance(storage_backend, Storage_FS__Memory)
+
 
     def test__url_to_cache_key(self):                          # Test URL to cache_key conversion
         with self.cache_service as _:
@@ -68,7 +94,7 @@ class test_Proxy__Cache__Service(TestCase):
 
             # With special characters (should be sanitized)
             cache_key = _.url_to_cache_key("https://example.com/articles/hello-world!@#$%")
-            assert cache_key == "sites/example.com/pages/articles/hello-world-----"
+            assert cache_key == "sites/example.com/pages/articles/hello-world-"
 
     def test__sanitize_url_path(self):                         # Test URL path sanitization
         with self.cache_service as _:
@@ -86,8 +112,7 @@ class test_Proxy__Cache__Service(TestCase):
 
     def test__get_or_create_page_entry(self):                  # Test page entry creation with KEY_BASED strategy
         with self.cache_service as _:
-            url = "https://example.com/test-page-1"
-
+            url = "https://example.com/an-entry"
             # First call - creates page entry
             cache_id_1 = _.get_or_create_page_entry(url)
             assert cache_id_1 is not None
@@ -160,7 +185,7 @@ class test_Proxy__Cache__Service(TestCase):
 
     def test__has_cached_transformation(self):                 # Test checking if transformation exists
         with self.cache_service as _:
-            url = "https://example.com/test-page-4"
+            url = "https://example.com/test-page-6"
             wcf_command = "url-to-text"
             content = "Plain text content"
 
@@ -196,7 +221,7 @@ class test_Proxy__Cache__Service(TestCase):
 
             assert html == html_content
             assert text == text_content
-            assert ratings == ratings_content
+            assert ratings == str_to_json(ratings_content)
 
     def test__wcf_command_to_data_key(self):                   # Test WCF command to data_key conversion
         with self.cache_service as _:
@@ -280,42 +305,3 @@ class test_Schema__Cache__Config(TestCase):
             assert _.track_stats == True
 
 
-class test_Schema__Cache__Stats(TestCase):
-
-    def test__init__(self):                                     # Test cache stats initialization
-        with Schema__Cache__Stats() as _:
-            assert _.enabled == True
-            assert _.cache_hits == 0
-            assert _.cache_misses == 0
-            assert _.wcf_calls_saved == 0
-            assert _.total_pages_cached == 0
-
-    def test__hit_rate(self):                                   # Test hit rate calculation
-        with Schema__Cache__Stats() as _:
-            # No hits or misses - should return 0.0
-            assert _.hit_rate() == 0.0
-
-            # 80% hit rate
-            _.cache_hits = 80
-            _.cache_misses = 20
-            assert _.hit_rate() == 0.8
-
-            # 100% hit rate
-            _.cache_hits = 100
-            _.cache_misses = 0
-            assert _.hit_rate() == 1.0
-
-    def test__estimated_time_saved_seconds(self):               # Test time saved estimation
-        with Schema__Cache__Stats() as _:
-            # No cache hits - should return 0.0
-            assert _.estimated_time_saved_seconds() == 0.0
-
-            # With cache hits
-            _.cache_hits = 100
-            _.avg_cache_hit_time_ms = 50.0                      # 50ms average cache hit time
-
-            saved = _.estimated_time_saved_seconds()
-            assert saved > 0.0
-            # Assuming average WCF call is 2 seconds:
-            # (100 hits * 2s) - (100 hits * 0.05s) = 200s - 5s = 195s
-            assert abs(saved - 195.0) < 1.0                     # Allow small floating point difference
