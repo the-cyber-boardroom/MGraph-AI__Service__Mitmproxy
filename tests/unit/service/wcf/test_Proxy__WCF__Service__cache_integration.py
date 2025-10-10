@@ -9,9 +9,7 @@ from mgraph_ai_service_cache_client.schemas.cache.enums.Enum__Cache__Storage_Mod
 from osbot_fast_api.utils.Fast_API_Server                                               import Fast_API_Server
 from osbot_fast_api_serverless.fast_api.Serverless__Fast_API__Config                    import Serverless__Fast_API__Config
 from osbot_utils.helpers.duration.decorators.capture_duration                           import capture_duration
-from osbot_utils.utils.Dev import pprint
-from osbot_utils.utils.Json import str_to_json
-
+from osbot_utils.utils.Json                                                             import str_to_json
 from mgraph_ai_service_mitmproxy.schemas.wcf.Schema__WCF__Request                       import Schema__WCF__Request
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type                  import Enum__WCF__Command_Type
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Content_Type                  import Enum__WCF__Content_Type
@@ -57,9 +55,9 @@ class test_Proxy__WCF__Service__cache_integration(TestCase):
             pytest.skip("Skipping tests because WCF__Request auth is not available")
 
     @classmethod
-    def tearDownClass(cls) -> None:                                                     # Cleanup cache service
-        if hasattr(cls, 'fast_api_server'):
-            cls.fast_api_server.stop()
+    def tearDownClass(cls) -> None:
+        cls.fast_api_server.stop()
+
 
     # ========================================
     # CACHE HIT/MISS FLOW TESTS

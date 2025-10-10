@@ -1,4 +1,4 @@
-from urllib.parse                                                       import quote
+from urllib.parse                                                        import quote
 from osbot_utils.decorators.methods.cache_on_self                        import cache_on_self
 from osbot_utils.type_safe.Type_Safe                                     import Type_Safe
 from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Url import Safe_Str__Url
