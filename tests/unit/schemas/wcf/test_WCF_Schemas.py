@@ -56,7 +56,7 @@ class test_WCF_Schemas(TestCase):
             url = request.construct_wcf_url()
 
             assert 'https://dev.web-content-filtering.mgraph.ai/html-graphs/url-to-html/' in url
-            assert 'url=https://example.com' in url
+            assert url == "https://dev.web-content-filtering.mgraph.ai/html-graphs/url-to-html/?url=https%3A%2F%2Fexample.com"
 
     def test_schema__wcf__request__construct_url_with_rating(self):  # Test URL with rating
         with Schema__WCF__Request() as request:
@@ -75,8 +75,7 @@ class test_WCF_Schemas(TestCase):
             request.model_to_use = "google/gemini-2.0-flash-lite-001"
 
             url = request.construct_wcf_url()
-
-            assert 'model_to_use=google/gemini-2.0-flash-lite-001' in url
+            assert url == "https://dev.web-content-filtering.mgraph.ai/html-graphs/url-to-ratings/?url=https%3A%2F%2Fexample.com&model_to_use=google%2Fgemini-2.0-flash-lite-001"
 
     def test_schema__wcf__request__get_auth_headers(self):     # Test auth headers
         with Schema__WCF__Request() as request:

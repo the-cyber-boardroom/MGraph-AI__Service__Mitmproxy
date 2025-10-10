@@ -1,3 +1,4 @@
+from urllib.parse                                                       import quote
 from osbot_utils.decorators.methods.cache_on_self                        import cache_on_self
 from osbot_utils.type_safe.Type_Safe                                     import Type_Safe
 from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Url import Safe_Str__Url
@@ -16,13 +17,13 @@ class Schema__WCF__Request(Type_Safe):                       # WCF service reque
     # auth_header_value: str            = ""                   # Auth header value from env
     wcf_base_url    : str             = "https://dev.web-content-filtering.mgraph.ai"  # WCF service base URL
 
-    def construct_wcf_url(self) -> str:                      # Build complete WCF URL
+    def construct_wcf_url(self) -> str:
         """Construct the complete WCF service URL"""
-        # Base path for html-graphs endpoint
         endpoint = f"{self.wcf_base_url}/html-graphs/{self.command_type.value}/"
 
-        # Add target URL as parameter
-        url = f"{endpoint}?url={self.target_url}"
+        # URL-encode the target URL to handle query params safely
+        encoded_target_url = quote(str(self.target_url), safe='')
+        url = f"{endpoint}?url={encoded_target_url}"
 
         # Add optional rating parameter
         if self.rating is not None:
@@ -30,7 +31,7 @@ class Schema__WCF__Request(Type_Safe):                       # WCF service reque
 
         # Add optional model parameter
         if self.model_to_use:
-            url += f"&model_to_use={self.model_to_use}"
+            url += f"&model_to_use={quote(self.model_to_use, safe='')}"
 
         return url
 
