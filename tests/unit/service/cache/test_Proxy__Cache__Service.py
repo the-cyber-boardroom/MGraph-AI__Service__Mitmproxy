@@ -30,7 +30,7 @@ class test_Proxy__Cache__Service(TestCase):
 
             cls.fast_api_server         = Fast_API_Server(app=cls.cache_service__fast_api.app())
             cls.server_url              = cls.fast_api_server.url().rstrip("/")                              # note: the trailing / was causing issues with the auto-generated request code
-
+            #cls.server_url              = "http://0.0.0.0:10017"                                            # note: to use a local server we need to also add the auth
 
             cls.server_config           = Service__Fast_API__Client__Config(base_url=cls.server_url, verify_ssl=False)
             cls.fast_api_client         = Service__Fast_API__Client        (config=cls.server_config)
@@ -39,11 +39,11 @@ class test_Proxy__Cache__Service(TestCase):
             cls.fast_api_server        .start()
 
             cls.client_config = Service__Fast_API__Client__Config(base_url = cls.server_url   )
-            cls.cache_client  = Service__Fast_API__Client        (config   = cls.client_config)
-            cls.cache_config = Schema__Cache__Config             (enabled  = True                ,
-                                                                  base_url  = cls.server_url     ,
-                                                                  namespace = "proxy-cache-tests",
-                                                                  timeout   = 30)
+            cls.cache_client  = Service__Fast_API__Client         (config   = cls.client_config)
+            cls.cache_config  = Schema__Cache__Config             (enabled  = True                ,
+                                                                   base_url  = cls.server_url     ,
+                                                                   namespace = "proxy-cache-tests",
+                                                                   timeout   = 30)
             # Create cache service instance
             cls.cache_service = Proxy__Cache__Service(cache_client = cls.cache_client,
                                                       cache_config = cls.cache_config,
@@ -186,7 +186,7 @@ class test_Proxy__Cache__Service(TestCase):
     def test__has_cached_transformation(self):                 # Test checking if transformation exists
         with self.cache_service as _:
             url = "https://example.com/test-page-6"
-            wcf_command = "url-to-text"
+            wcf_command = "url-to-lines"
             content = "Plain text content"
 
             # Before storing
@@ -208,7 +208,7 @@ class test_Proxy__Cache__Service(TestCase):
 
             # Store text transformation
             text_content = "Test heading"
-            _.store_transformation(url, "url-to-text", text_content, {})
+            _.store_transformation(url, "url-to-lines", text_content, {})
 
             # Store ratings transformation
             ratings_content = '{"rating": "safe", "score": 0.95}'
@@ -216,7 +216,7 @@ class test_Proxy__Cache__Service(TestCase):
 
             # Retrieve all transformations
             html = _.get_cached_transformation(url, "url-to-html")
-            text = _.get_cached_transformation(url, "url-to-text")
+            text = _.get_cached_transformation(url, "url-to-lines")
             ratings = _.get_cached_transformation(url, "url-to-ratings")
 
             assert html == html_content
@@ -226,7 +226,7 @@ class test_Proxy__Cache__Service(TestCase):
     def test__wcf_command_to_data_key(self):                   # Test WCF command to data_key conversion
         with self.cache_service as _:
             assert _._wcf_command_to_data_key("url-to-html") == "transformations/html"
-            assert _._wcf_command_to_data_key("url-to-text") == "transformations/text"
+            assert _._wcf_command_to_data_key("url-to-lines") == "transformations/text"
             assert _._wcf_command_to_data_key("url-to-ratings") == "transformations/ratings"
             assert _._wcf_command_to_data_key("url-to-html-min-rating") == "transformations/html-filtered"
 
