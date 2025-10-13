@@ -23,7 +23,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
         self.request_service = Proxy__Request__Service(stats_service   = self.stats_service  ,
                                                         content_service = self.content_service,
                                                         cookie_service  = self.cookie_service ,
-                                                        admin_service   = self.admin_service  )
+                                                        admin_service   = self.admin_service  ).setup()
 
     def test__init__(self):                                                     # Test service initialization
         assert type(self.request_service)                is Proxy__Request__Service

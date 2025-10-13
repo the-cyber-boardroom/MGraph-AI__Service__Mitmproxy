@@ -38,6 +38,6 @@ class test_Routes__Proxy__client(TestCase):
                                          cached_response       = __(),
                                          stats                 = __())
         headers_to_add = response_data.headers_to_add
-        assert type(headers_to_add)             == Type_Safe__Dict
+        assert type(headers_to_add)              == Type_Safe__Dict
         assert headers_to_add['x-proxy-service'] == 'mgraph-proxy'
         assert headers_to_add['x-wcf-skipped'  ] == 'non-html-content'

@@ -13,7 +13,11 @@ class Proxy__Request__Service(Type_Safe):                            # Request p
     stats_service   : Proxy__Stats__Service                          # Statistics tracking
     content_service : Proxy__Content__Service                        # Content processing
     cookie_service  : Proxy__Cookie__Service                         # Cookie-based control
-    admin_service   : Proxy__Admin__Service                          # Admin page generation
+    admin_service   : Proxy__Admin__Service      = None              # Admin page generation
+
+    def setup(self):
+        self.admin_service = Proxy__Admin__Service ().setup()
+        return self
 
     def process_request(self, request_data : Schema__Proxy__Request_Data  # Process incoming request
                         ) -> Schema__Proxy__Modifications:
@@ -28,13 +32,13 @@ class Proxy__Request__Service(Type_Safe):                            # Request p
         modifications = Schema__Proxy__Modifications()                              # Create response with modifications
 
         # Check for cached response using cookies
-        if self.cookie_service.is_cache_enabled(request_data.headers):
-            cached_response = self.content_service.check_cached_response(request_data   = request_data,
-                                                                         total_requests = self.stats_service.stats.total_requests)
-            if cached_response:
-                modifications.cached_response = cached_response
-                print(f"      🎯   Returning CACHED response (enabled via mitm-cache cookie)")
-                return modifications
+        #if self.cookie_service.is_cache_enabled(request_data.headers):
+        cached_response = self.content_service.check_cached_response(request_data   = request_data,
+                                                                     total_requests = self.stats_service.stats.total_requests)
+        if cached_response:
+            modifications.cached_response = cached_response
+            print(f"      🎯   Returning CACHED response (enabled via mitm-cache cookie)")
+            return modifications
 
         # Add custom headers
         modifications.headers_to_add = { "x-mgraph-proxy"          : "v1.0"                                          ,
@@ -45,13 +49,13 @@ class Proxy__Request__Service(Type_Safe):                            # Request p
                                          "y-version-service"       : version__mgraph_ai_service_mitmproxy            ,
                                          "y-version-interceptor"   : request_data.version                            }
 
-        debug_params_from_cookies = self.cookie_service.convert_to_debug_params(request_data.headers)           # Extract cookie-based debug params and merge with path-based params
+        debug_params = self.cookie_service.convert_to_debug_params(request_data.headers)           # Extract cookie-based debug params and merge with path-based params
 
         if self.cookie_service.has_any_proxy_cookies(request_data.headers):                                     # Add cookie summary to headers if any proxy cookies present
             cookie_summary = self.cookie_service.get_cookie_summary(request_data.headers)
             modifications.headers_to_add["x-proxy-cookies"] = json.dumps(cookie_summary)
 
-        modifications.headers_to_add["x-debug-params"] = json.dumps(debug_params_from_cookies)
+        modifications.headers_to_add["x-debug-params"] = json.dumps(debug_params)
 
         if "/blocked" in request_data.path:                                                             # Block certain paths
             modifications.block_request = True

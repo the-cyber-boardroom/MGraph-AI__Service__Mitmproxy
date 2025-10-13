@@ -33,7 +33,7 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         self.request_service = Proxy__Request__Service(stats_service   = self.stats_service  ,
                                                         content_service = self.content_service,
                                                         cookie_service  = self.cookie_service ,
-                                                        admin_service   = self.admin_service  )
+                                                        admin_service   = self.admin_service  ).setup()
 
         # Response service chain
         self.wcf_service     = Proxy__WCF__Service()

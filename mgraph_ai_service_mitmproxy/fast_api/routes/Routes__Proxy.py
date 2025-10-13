@@ -14,7 +14,11 @@ ROUTES_PATHS__PROXY                = [ f'/{TAG__ROUTES_PROXY}/process-request'  
 class Routes__Proxy(Fast_API__Routes):                               # FastAPI routes for proxy control
     tag : str = TAG__ROUTES_PROXY
 
-    proxy_service : Proxy__Service                                   # Main proxy service
+    proxy_service : Proxy__Service = None                                   # Main proxy service
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.proxy_service = Proxy__Service().setup()
 
     def process_request(self, request_data : Schema__Proxy__Request_Data  # Incoming request data
                        ) -> Schema__Proxy__Modifications:            # Modifications to apply

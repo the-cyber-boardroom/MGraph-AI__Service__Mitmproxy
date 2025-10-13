@@ -61,7 +61,7 @@ class test_Proxy__Response__Service(TestCase):
         self.stats_service.stats = Schema__Proxy__Stats()
 
     def test__init__(self):                                                                    # Test auto-initialization of Proxy__Response__Service
-        with Proxy__Response__Service() as _:
+        with Proxy__Response__Service().setup() as _:
             assert type(_)         is Proxy__Response__Service
             assert base_classes(_) == [Proxy__Response__Service.__bases__[0], object]
 

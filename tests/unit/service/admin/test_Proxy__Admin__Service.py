@@ -14,7 +14,7 @@ class test_Proxy__Admin__Service(TestCase):
         self.stats_service  = Proxy__Stats__Service(stats=Schema__Proxy__Stats())
         self.cookie_service = Proxy__Cookie__Service()
         self.admin_service  = Proxy__Admin__Service(cookie_service = self.cookie_service,
-                                                     stats_service  = self.stats_service )
+                                                     stats_service  = self.stats_service ).setup()
 
     def test__init__(self):                                                     # Test service initialization
         assert type(self.admin_service)                is Proxy__Admin__Service
@@ -98,15 +98,15 @@ class test_Proxy__Admin__Service(TestCase):
 
     def test__handle_admin_request__static_file(self):                          # Test static file path
         request_data = Schema__Proxy__Request_Data(method       = 'GET'                              ,
-                                                    host         = 'test.example.com'                ,
-                                                    path         = '/mitm-proxy/v0/v0.1.0/index.html',
-                                                    headers      = {}                                ,
-                                                    stats        = {}                                ,
-                                                    version      = 'v1.0.0'                          )
+                                                   host         = 'test.example.com'                ,
+                                                   path         = '/mitm-proxy/v0/v0.1.0/index.html',
+                                                   headers      = {}                                ,
+                                                   stats        = {}                                ,
+                                                   version      = 'v1.0.0'                          )
 
         result = self.admin_service.handle_admin_request(request_data)
 
-        assert result is not None
+        assert result                is not None
         assert result['status_code'] == 200
 
     def test__handle_admin_request__non_admin_path(self):                         # Test non-admin path returns None

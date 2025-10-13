@@ -13,11 +13,15 @@ from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service           
 
 
 class Proxy__Response__Service(Type_Safe):                       # Main response processing orchestrator
-    debug_service   : Proxy__Debug__Service                      # Debug command processing
+    debug_service   : Proxy__Debug__Service         = None       # Debug command processing
     stats_service   : Proxy__Stats__Service                      # Statistics tracking
     cors_service    : Proxy__CORS__Service                       # CORS header management
     headers_service : Proxy__Headers__Service                    # Standard headers
     cookie_service  : Proxy__Cookie__Service                     # Cookie-based control
+
+    def setup(self):
+        self.debug_service = Proxy__Debug__Service().setup()
+        return self
 
     def generate_request_id(self) -> str:                        # Generate unique request ID
         """Generate a unique request ID"""
@@ -40,7 +44,6 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             if self.cookie_service.has_any_proxy_cookies(request_headers):                          # Add cookie summary header if any proxy cookies present
                 cookie_summary = self.cookie_service.get_cookie_summary(request_headers)
                 modifications.headers_to_add["x-proxy-cookie-summary"] = str(cookie_summary)
-
             self.debug_service.process_debug_commands(debug_params  = debug_params ,                # Process debug commands (this may override response)
                                                       response_data = response_data,
                                                       modifications = modifications)
@@ -64,6 +67,9 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
                                                    request_id   )
 
         except Exception as e:
+            print('Error:' , e)
+            import traceback
+            traceback.print_exc()
             return self._create_error_result( response_data, str(e))        # Handle any processing errors
 
     def finalize_overridden_response(self, response_data  : Schema__Proxy__Response_Data,

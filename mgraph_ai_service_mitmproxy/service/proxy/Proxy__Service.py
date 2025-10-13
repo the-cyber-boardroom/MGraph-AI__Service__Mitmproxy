@@ -8,11 +8,17 @@ from mgraph_ai_service_mitmproxy.service.proxy.request.Proxy__Request__Service  
 from mgraph_ai_service_mitmproxy.service.admin.Proxy__Admin__Service                 import Proxy__Admin__Service
 from typing                                                                          import Dict, Any
 
-class Proxy__Service(Type_Safe):                                     # Main proxy service orchestration
+class Proxy__Service(Type_Safe):                                      # Main proxy service orchestration
     stats_service    : Proxy__Stats__Service                          # Statistics tracking
-    request_service  : Proxy__Request__Service                        # Request processing
-    response_service : Proxy__Response__Service                       # Response processing
-    admin_service    : Proxy__Admin__Service                          # Admin page generation
+    request_service  : Proxy__Request__Service      = None            # Request processing
+    response_service : Proxy__Response__Service     = None            # Response processing
+    admin_service    : Proxy__Admin__Service        = None            # Admin page generation
+
+    def setup(self):
+        self.admin_service    = Proxy__Admin__Service   ().setup()
+        self.response_service = Proxy__Response__Service().setup()
+        self.request_service  = Proxy__Request__Service ().setup()
+        return self
 
     def process_request(self, request_data : Schema__Proxy__Request_Data  # Process incoming request
                          ) -> Schema__Proxy__Modifications:

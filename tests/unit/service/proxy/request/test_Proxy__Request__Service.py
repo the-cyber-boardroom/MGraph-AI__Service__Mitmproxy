@@ -21,7 +21,7 @@ class test_Proxy__Request__Service(TestCase):
         cls.cookie_service  = Proxy__Cookie__Service()                                        # Cookie service
         cls.service         = Proxy__Request__Service(stats_service   = cls.stats_service  ,
                                                       content_service = cls.content_service,
-                                                      cookie_service  = cls.cookie_service )
+                                                      cookie_service  = cls.cookie_service ).setup()
 
         cls.test_request_basic = Schema__Proxy__Request_Data(                                # Basic request data
             method        = 'GET',
@@ -57,7 +57,7 @@ class test_Proxy__Request__Service(TestCase):
         self.stats_service.stats = Schema__Proxy__Stats()                                    # Fresh stats per test
 
     def test__init__(self):                                                                    # Test auto-initialization of Proxy__Request__Service
-        with Proxy__Request__Service() as _:
+        with Proxy__Request__Service().setup() as _:
             assert type(_)         is Proxy__Request__Service
             assert base_classes(_) == [Proxy__Request__Service.__bases__[0], object]
 

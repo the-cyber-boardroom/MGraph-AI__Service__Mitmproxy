@@ -17,9 +17,10 @@ class Proxy__Admin__Service(Type_Safe):                                         
     current_version : Safe_Str__Version = Safe_Str__Version("v0.1.1")                                                           # Latest version
     admin_ui_root   : Path
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+
+    def setup(self):
         self.admin_ui_root = Path(mgraph_ai_service_mitmproxy__admin_ui.path)
+        return self
 
     def is_admin_path(self, path: Safe_Str__File__Path) -> bool:                                          # Check if path is admin endpoint
         return str(path).startswith('/mitm-proxy')
