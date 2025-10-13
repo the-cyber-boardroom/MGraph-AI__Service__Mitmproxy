@@ -12,61 +12,44 @@ ROUTES_PATHS__CACHE = [f'/{TAG__ROUTES_CACHE}/stats',
                        f'/{TAG__ROUTES_CACHE}/health']
 
 class Routes__Cache(Fast_API__Routes):                               # FastAPI routes for cache introspection
+    tag           : str = TAG__ROUTES_CACHE
+    cache_service: Proxy__Cache__Service            = None           # Cache service instance
 
-    tag: str = TAG__ROUTES_CACHE
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.cache_service = Proxy__Cache__Service().setup()
 
-    cache_service: Proxy__Cache__Service                             # Cache service instance
+    def health(self) -> Dict[str, Any]:                                 # Test cache service connection
+        enabled = self.cache_service.cache_config.enabled
 
-    def health(self) -> Dict[str, Any]:                          # Get cache service health status
-        if not self.cache_service:
-            return {
-                "status": "disabled",
-                "message": "Cache service not configured"
-            }
-
-        try:
-            # Test cache service connection
-            enabled = self.cache_service.cache_config.enabled
-
-            return {
-                "status": "ok" if enabled else "disabled",
-                "enabled": enabled,
-                "base_url": str(self.cache_service.cache_config.base_url),
-                "namespace": str(self.cache_service.cache_config.namespace)
-            }
-        except Exception as e:
-            return {
-                "status": "error",
-                "error": str(e)
-            }
+        return { "status"   : "ok" if enabled else "disabled"               ,           # todo: refactor to Type_Safe class
+                 "enabled"  : enabled                                       ,
+                 "base_url" : str(self.cache_service.cache_config.base_url) ,
+                 "namespace": str(self.cache_service.cache_config.namespace)}
 
     def stats(self) -> Dict[str, Any]:                           # Retrieve current cache statistics
-        if not self.cache_service:
-            return {"error": "Cache service not available"}
-
-        return self.cache_service.get_cache_stats()
+        return self.cache_service.get_cache_stats()             # todo: refactor to Type_Safe class
 
     def config(self) -> Dict[str, Any]:                         # Retrieve current cache configuration (sanitized)
-        if not self.cache_service:
-            return {"error": "Cache service not available"}
-
         config = self.cache_service.cache_config
 
-        return {
-            "enabled": config.enabled,
-            "base_url": str(config.base_url),
-            "namespace": str(config.namespace),
-            "timeout": int(config.timeout),
-            "strategy": config.strategy.value,
-            "data_file_id": config.data_file_id,
-            "cache_metadata": config.cache_metadata,
-            "track_stats": config.track_stats,
-            # Note: api_key is NOT exposed for security
-        }
+        if config.api_key  and config.api_key_header:           # Note: api_key is NOT exposed for security
+            auth_configured = True                              # using this pattern to make sure we don't expose keys
+        else:
+            auth_configured = False
+        return {  "enabled"         : config.enabled          ,                         # todo: refactor to Type_Safe class
+                  "auth_configured" : auth_configured         ,
+                  "base_url"        : str(config.base_url)    ,
+                  "namespace"       : str(config.namespace)   ,
+                  "timeout"         : int(config.timeout)     ,
+                  "strategy"        : config.strategy.value   ,
+                  "data_file_id"    : config.data_file_id     ,
+                  "cache_metadata"  : config.cache_metadata   ,
+                  "track_stats"     : config.track_stats      }
 
-    def pages(self, limit: int = 20,                                   # Maximum number of pages to return
-                    offset: int = 0                                    # Offset for pagination
-                   ) -> Dict[str, Any]:                               # Get list of cached pages
+    def pages(self, limit: int = 20,                                                    # Maximum number of pages to return
+                    offset: int = 0                                                     # Offset for pagination
+               ) -> Dict[str, Any]:                                                     # Get list of cached pages
         """
         Get list of cached pages with pagination
 

@@ -214,19 +214,16 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
             self.stats.cache_misses += 1
 
     def get_cache_stats(self) -> dict:                          # Get cache statistics
-        """Get cache statistics"""
-        return {
-            "enabled"                      : self.cache_config.enabled,
-            "hit_rate"                     : self.stats.hit_rate(),
-            "cache_hits"                   : self.stats.cache_hits,
-            "cache_misses"                 : self.stats.cache_misses,
-            "wcf_calls_saved"              : self.stats.wcf_calls_saved,
-            "total_pages_cached"           : self.stats.total_pages_cached,
-            "avg_cache_hit_time_ms"        : self.stats.avg_cache_hit_time_ms,
-            "avg_cache_miss_time_ms"       : self.stats.avg_cache_miss_time_ms,
-            "avg_wcf_call_time_ms"         : self.stats.avg_wcf_call_time_ms,
-            "estimated_time_saved_seconds" : self.stats.estimated_time_saved_seconds()
-        }
+        return { "enabled"                      : self.cache_config.enabled,                        # todo: refactor to Type_Safe class
+                 "hit_rate"                     : self.stats.hit_rate(),
+                 "cache_hits"                   : self.stats.cache_hits,
+                 "cache_misses"                 : self.stats.cache_misses,
+                 "wcf_calls_saved"              : self.stats.wcf_calls_saved,
+                 "total_pages_cached"           : self.stats.total_pages_cached,
+                 "avg_cache_hit_time_ms"        : self.stats.avg_cache_hit_time_ms,
+                 "avg_cache_miss_time_ms"       : self.stats.avg_cache_miss_time_ms,
+                 "avg_wcf_call_time_ms"         : self.stats.avg_wcf_call_time_ms,
+                 "estimated_time_saved_seconds" : self.stats.estimated_time_saved_seconds() }
 
     def _wcf_command_to_data_key(self, wcf_command : str        # Convert WCF command to data_key path
                                    ) -> str:                    # data_key path
