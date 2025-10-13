@@ -1,8 +1,10 @@
 from enum import Enum
 
+# todo: refactor this with Enum__Cache__Transformation_Type since this is a duplicate of these mappings
 class Enum__WCF__Command_Type(Enum):
     """Types of WCF commands that can be executed"""
     url_to_html                  = 'url-to-html'
+    url_to_html_dict             = 'url-to-html-dict'
     url_to_html_xxx              = 'url-to-html-xxx'
     url_to_html_min_rating       = 'url-to-html-min-rating'
     url_to_html_hashes           = 'url-to-html-hashes'

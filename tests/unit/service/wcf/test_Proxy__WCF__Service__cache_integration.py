@@ -204,7 +204,6 @@ class test_Proxy__WCF__Service__cache_integration(TestCase):
         assert response             is not None
         assert response.success     is False
         assert response.status_code == 500
-        response.print()
         assert "Max retries exceeded with url" in response.body
         #assert response.error_message is not None                      # BUG, this value should be set for an error 500
 
@@ -251,7 +250,6 @@ class test_Proxy__WCF__Service__cache_integration(TestCase):
         assert response.success                       is True
         assert response.status_code                   == 200
         from osbot_utils.utils.Dev import pprint
-        response.print_obj()
         return
         assert str_to_json(response.body).get('args') == {'id': '123', 'ref': 'abc'}
 
@@ -321,8 +319,7 @@ class test_Proxy__WCF__Service__cache_integration(TestCase):
                                                                                     namespace    = self.cache_config.namespace,
                                                                                     data_key     = "transformations/html/metadata",
                                                                                     data_file_id = "latest")
-        from osbot_utils.utils.Dev import pprint
-        pprint(metadata)
+            
         assert metadata.get('detail').get('error_type') == "NOT_FOUND"                     # BUG: metadata not found
 
         # response_time = metadata['wcf_response_time_ms']                                # Verify response time is reasonable

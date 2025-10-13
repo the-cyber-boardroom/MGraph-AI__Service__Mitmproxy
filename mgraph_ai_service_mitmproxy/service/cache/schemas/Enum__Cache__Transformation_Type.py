@@ -1,8 +1,9 @@
 from enum import Enum
 
+# todo: refactor this with Enum__WCF__Command_Type since this is a duplicate of these mappings
 class Enum__Cache__Transformation_Type(str, Enum):              # WCF transformation command types
     URL_TO_HTML          = "url-to-html"                        # Convert URL to HTML
-    URL_TO_LINES          = "url-to-lines"                        # Extract text from URL
+    URL_TO_LINES         = "url-to-lines"                        # Extract text from URL
     URL_TO_RATINGS       = "url-to-ratings"                     # Get content ratings
     URL_TO_HTML_FILTERED = "url-to-html-min-rating"             # HTML with rating filter
 
@@ -13,7 +14,7 @@ class Enum__Cache__Transformation_Type(str, Enum):              # WCF transforma
     def to_data_key(self) -> str:                               # Convert to data_key path for child data storage
         """Convert to data_key path for child data storage"""
         mapping = { "url-to-html"           : "transformations/html"          ,
-                    "url-to-lines"           : "transformations/text"          ,
+                    "url-to-lines"          : "transformations/text"          ,
                     "url-to-ratings"        : "transformations/ratings"       ,
                     "url-to-html-min-rating": "transformations/html-filtered" }
         return mapping.get(self.value, f"transformations/{self.value.replace('-', '_')}")

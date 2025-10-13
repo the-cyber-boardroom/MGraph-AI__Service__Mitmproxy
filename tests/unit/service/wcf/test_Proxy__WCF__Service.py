@@ -134,7 +134,7 @@ class test_Proxy__WCF__Service(TestCase):
         with self.service.process_show_command(show_value = "url-to-html-min-rating:0.7",
                                                target_url = "https://example.com"       ) as response:
             assert response         is not None
-            response.print()
+
             assert response.success is True
             assert type(response)   is Schema__WCF__Response
             assert response.obj() == __(success       = True                        ,
