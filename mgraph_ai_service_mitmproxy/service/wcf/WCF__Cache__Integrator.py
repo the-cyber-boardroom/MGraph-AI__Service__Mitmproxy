@@ -7,7 +7,7 @@ from mgraph_ai_service_mitmproxy.schemas.wcf.Schema__WCF__Response          impo
 from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service        import Proxy__Cache__Service
 
 class WCF__Cache__Integrator(Type_Safe):                                    # Integrates cache with WCF request/response cycle
-    cache_service : Optional[Proxy__Cache__Service]                         # Cache service integration
+    cache_service : Proxy__Cache__Service                                  # Cache service integration
 
     def try_get_cached_response(self, target_url   : str,                        # Original target URL
                                       show_value   : str,                        # WCF command value
@@ -32,13 +32,13 @@ class WCF__Cache__Integrator(Type_Safe):                                    # In
             self.cache_service.increment_cache_miss()
             return None
 
-    def store_wcf_response(self,
-                          target_url       : str,                           # Original target URL
-                          show_value       : str,                           # WCF command value
-                          wcf_response     : Schema__WCF__Response,         # WCF response to cache
-                          call_duration_ms : float                          # Duration of WCF call in milliseconds
-                          ) -> None:                                        # Store successful response in cache
-        """Store WCF response in cache if successful"""
+    def store_wcf_response(self, target_url       : str,                           # Original target URL
+                                 show_value       : str,                           # WCF command value
+                                 wcf_response     : Schema__WCF__Response,         # WCF response to cache
+                                 call_duration_ms : float                          # Duration of WCF call in milliseconds
+                            ) -> None:                                             # Store WCF response in cache if successful
+
+
         if not wcf_response or not wcf_response.success or not self.cache_service:
             return
 
@@ -61,6 +61,7 @@ class WCF__Cache__Integrator(Type_Safe):                                    # In
 
         mapping = { Enum__WCF__Command_Type.url_to_html           : Enum__WCF__Content_Type.text_html        ,
                     Enum__WCF__Command_Type.url_to_html_xxx       : Enum__WCF__Content_Type.text_html        ,
+                    Enum__WCF__Command_Type.url_to_html_hashes    : Enum__WCF__Content_Type.text_html        ,
                     Enum__WCF__Command_Type.url_to_html_min_rating: Enum__WCF__Content_Type.text_html        ,
                     Enum__WCF__Command_Type.url_to_text           : Enum__WCF__Content_Type.text_plain       ,
                     Enum__WCF__Command_Type.url_to_text_nodes     : Enum__WCF__Content_Type.text_plain       ,

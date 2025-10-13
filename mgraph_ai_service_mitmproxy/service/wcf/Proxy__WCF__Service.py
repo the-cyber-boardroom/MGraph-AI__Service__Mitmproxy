@@ -19,14 +19,14 @@ class Proxy__WCF__Service(Type_Safe):                                          #
 
     request_handler  : WCF__Request__Handler                                   # Handles WCF requests
     command_processor: WCF__Command__Processor                                 # Processes show commands
-    cache_integrator : WCF__Cache__Integrator                                  # Integrates cache
+    cache_integrator : WCF__Cache__Integrator = None                           # Integrates cache
 
     def setup(self):
         self.request_handler   = WCF__Request__Handler(wcf_base_url = self.wcf_base_url,
                                                        timeout      = self.timeout     )
         self.command_processor = WCF__Command__Processor()
-        self.cache_integrator  = WCF__Cache__Integrator(cache_service = self.cache_service)
         self.cache_service     = Proxy__Cache__Service().setup()
+        self.cache_integrator  = WCF__Cache__Integrator(cache_service = self.cache_service)
         return self
 
     def create_request(self, command_type : Enum__WCF__Command_Type,              # Type of WCF command
@@ -46,8 +46,8 @@ class Proxy__WCF__Service(Type_Safe):                                          #
     def process_show_command(self, show_value : str,                               # WCF show command value
                                    target_url : str                                # Target URL to process
                               ) -> Optional[Schema__WCF__Response]:                # Process WCF show command with cache integration"""
-
         parsed = self.command_processor.parse_show_command(show_value)      # Parse command and extract parameters
+
         if not parsed:
             return None
 
@@ -71,12 +71,10 @@ class Proxy__WCF__Service(Type_Safe):                                          #
         wcf_response      = self.make_request(wcf_request)
         call_duration_ms  = (time.time() - start_time) * 1000
 
-        self.cache_integrator.store_wcf_response(                           # Store successful responses in cache
-            target_url       = target_url,
-            show_value       = show_value,
-            wcf_response     = wcf_response,
-            call_duration_ms = call_duration_ms
-        )
+        self.cache_integrator.store_wcf_response(target_url       = target_url      ,      # Store successful responses in cache
+                                                 show_value       = show_value      ,
+                                                 wcf_response     = wcf_response    ,
+                                                 call_duration_ms = call_duration_ms)
 
         return wcf_response
 

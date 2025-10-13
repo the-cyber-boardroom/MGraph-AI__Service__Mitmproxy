@@ -36,7 +36,6 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             request_headers  = response_data.request.get('headers', {})                              # Extract request headers (includes Cookie header)
             debug_params     = self.cookie_service.convert_to_debug_params(request_headers)             # Parse cookie-based debug params from request headers, The interceptor sends request headers in response_data.request['headers']
             standard_headers = self.headers_service.get_standard_headers(response_data,request_id)  # Add standard headers
-            #status_code = response_data.response.get("status_code", 200)                            # todo: review this value, since it is not currently used in this method
 
             self.stats_service.increment_response(bytes_processed = body_size)
             modifications.headers_to_add.update(standard_headers)
@@ -48,10 +47,10 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
                                                       response_data = response_data,
                                                       modifications = modifications)
 
-            if modifications.override_response:                                                     # Check if debug command overrode the response
-                return self.finalize_overridden_response(response_data=response_data ,                             # For overridden responses, finalize and return
-                                                         modifications=modifications )
 
+            if modifications.override_response:                                                     # Check if debug command overrode the response
+                return self.finalize_overridden_response(response_data=response_data ,              # For overridden responses, finalize and return
+                                                         modifications=modifications )
             if modifications.modified_body:                                                         # Check if content was modified (but not overridden)
                 self.stats_service.increment_content_modification()
 
@@ -59,8 +58,10 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             cors_headers = self.cors_service.get_cors_headers_for_request(response_data)            # Add CORS headers
             modifications.headers_to_add.update(cors_headers)
 
+
             if self.cors_service.is_preflight_request(response_data):                               # Handle CORS preflight requests
                 return self.finalize_preflight_response(response_data, modifications)
+
 
             return self._finalize_regular_response(response_data,                                   # Finalize regular response
                                                    modifications,

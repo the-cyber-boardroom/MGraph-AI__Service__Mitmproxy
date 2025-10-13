@@ -46,12 +46,17 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
         key_value = get_env(ENV_VAR__AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE)
 
         auth__kwargs = dict(base_url       = base_url   ,
-                            api_key        = key_name   ,
-                            api_key_header = key_value  )
+                            api_key        = key_value  ,
+                            api_key_header = key_name  )
+        if base_url and key_name and key_value:
+            enabled = True
+        else:
+            enabled = False
 
         cache_client__config = Service__Fast_API__Client__Config(**auth__kwargs)
-        self.cache_config    = Schema__Cache__Config            (**auth__kwargs)
+        self.cache_config    = Schema__Cache__Config            (**auth__kwargs, enabled=enabled)
         self.cache_client    = Service__Fast_API__Client        (config=cache_client__config)
+
         return self
 
 
@@ -92,7 +97,6 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
     def get_or_create_page_entry(self, target_url : Safe_Str__Url                           # Get existing page cache_id or create new page entry
                                   ) -> Schema__Cache__Page__Refs:                           # cache_id for the page
 
-        #print('>>>>> get_or_create_page_entry (target_url)', target_url)
         json_field_path = PAGE_ENTRY__JSON_FIELD_PATH
         cache_key       = self.url_to_cache_key(target_url)
         page_refs       = Schema__Cache__Page__Refs(cache_key       = cache_key      ,
