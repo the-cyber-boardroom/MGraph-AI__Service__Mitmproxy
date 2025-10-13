@@ -20,18 +20,28 @@ class test_Routes__Cache(TestCase):
 
     def test_health(self):             # /cache/health endpoint logic
         with self.routes_cache as _:
+            if in_github_action():
+                status = 'disabled'
+                enabled = False
+            else:
+                status = 'ok'
+                enabled = True
             result = _.health()
             assert type(result) is dict
-            assert obj(result) == __(status     = 'ok'                         ,
-                                     enabled    = True                         ,
+            assert obj(result) == __(status     = status                       ,
+                                     enabled    = enabled                      ,
                                      base_url   = 'https://cache.dev.mgraph.ai',
                                      namespace  = 'wcf-results'                )
 
     def test__stats(self):              # Test /cache/stats endpoint logic
         with self.routes_cache as _:
+            if in_github_action():
+                enabled = False
+            else:
+                enabled = True
             result = _.stats()
             assert type(result) is dict
-            assert obj(result)  == __(enabled                    = True  ,
+            assert obj(result)  == __(enabled                    = enabled,
                                      hit_rate                    = 0.0   ,
                                      cache_hits                  = 0     ,
                                      cache_misses                = 0     ,
@@ -46,10 +56,12 @@ class test_Routes__Cache(TestCase):
         with self.routes_cache as _:                                        # at the moment the auth is not configure in GH actions
             if in_github_action():
                 auth_configured = False
+                enabled         = False
             else:
                 auth_configured = True
+                enabled         = True
             result = _.config()
-            assert obj(result) == __(enabled         = True                          ,
+            assert obj(result) == __(enabled         = enabled                       ,
                                      auth_configured = auth_configured               ,
                                      base_url        = 'https://cache.dev.mgraph.ai' ,
                                      namespace       = 'wcf-results'                 ,
