@@ -18,67 +18,46 @@ class Proxy__Request__Service(Type_Safe):                            # Request p
     def process_request(self, request_data : Schema__Proxy__Request_Data  # Process incoming request
                         ) -> Schema__Proxy__Modifications:
 
-        # CHECK FOR ADMIN PATHS FIRST (before any other processing)
-        if self.admin_service.is_admin_path(request_data.path):
+        if self.admin_service.is_admin_path(request_data.path):             # CHECK FOR ADMIN PATHS FIRST (before any other processing)
             return self.handle_admin_request(request_data)
 
         # Update statistics
-        self.stats_service.increment_request(
-            host = request_data.host,
-            path = request_data.path
-        )
+        self.stats_service.increment_request(host = request_data.host,
+                                             path = request_data.path)
 
-        # Create response with modifications
-        modifications = Schema__Proxy__Modifications()
-
-        # Parse cookies from headers (interceptor sends them in headers dict)
-        # The cookie_service methods already work with headers dict
+        modifications = Schema__Proxy__Modifications()                              # Create response with modifications
 
         # Check for cached response using cookies
         if self.cookie_service.is_cache_enabled(request_data.headers):
-            cached_response = self.content_service.check_cached_response(
-                request_data   = request_data,
-                total_requests = self.stats_service.stats.total_requests
-            )
-
+            cached_response = self.content_service.check_cached_response(request_data   = request_data,
+                                                                         total_requests = self.stats_service.stats.total_requests)
             if cached_response:
                 modifications.cached_response = cached_response
                 print(f"      🎯   Returning CACHED response (enabled via mitm-cache cookie)")
                 return modifications
 
         # Add custom headers
-        modifications.headers_to_add = {
-            "x-mgraph-proxy"          : "v1.0"                                   ,
-            "x-request-id"            : f"req-{self.stats_service.stats.total_requests}",
-            "x-processed-by"          : "FastAPI-Proxy"                          ,
-            "x-processed-at"          : datetime.utcnow().isoformat()            ,
-            "x-stats-total-requests"  : str(self.stats_service.stats.total_requests),
-            "y-version-service"       : version__mgraph_ai_service_mitmproxy     ,
-            "y-version-interceptor"   : request_data.version                     ,
-        }
+        modifications.headers_to_add = { "x-mgraph-proxy"          : "v1.0"                                          ,
+                                         "x-request-id"            : f"req-{self.stats_service.stats.total_requests}",
+                                         "x-processed-by"          : "FastAPI-Proxy"                                 ,
+                                         "x-processed-at"          : datetime.utcnow().isoformat()                   ,
+                                         "x-stats-total-requests"  : str(self.stats_service.stats.total_requests)    ,
+                                         "y-version-service"       : version__mgraph_ai_service_mitmproxy            ,
+                                         "y-version-interceptor"   : request_data.version                            }
 
-        # Extract cookie-based debug params and merge with path-based params
-        # cookie_service.convert_to_debug_params() parses cookies from headers
-        debug_params_from_cookies = self.cookie_service.convert_to_debug_params(request_data.headers)
+        debug_params_from_cookies = self.cookie_service.convert_to_debug_params(request_data.headers)           # Extract cookie-based debug params and merge with path-based params
 
-        # Merge with any existing debug_params from query string (cookies take precedence)
-        combined_debug_params = {**request_data.debug_params, **debug_params_from_cookies}
-
-        # Add cookie summary to headers if any proxy cookies present
-        if self.cookie_service.has_any_proxy_cookies(request_data.headers):
+        if self.cookie_service.has_any_proxy_cookies(request_data.headers):                                     # Add cookie summary to headers if any proxy cookies present
             cookie_summary = self.cookie_service.get_cookie_summary(request_data.headers)
             modifications.headers_to_add["x-proxy-cookies"] = json.dumps(cookie_summary)
 
-        if combined_debug_params:
-            modifications.headers_to_add["x-debug-params"] = json.dumps(combined_debug_params)
+        modifications.headers_to_add["x-debug-params"] = json.dumps(debug_params_from_cookies)
 
-        # Block certain paths
-        if "/blocked" in request_data.path:
+        if "/blocked" in request_data.path:                                                             # Block certain paths
             modifications.block_request = True
             modifications.block_message = f"Path {request_data.path} is blocked by policy"
 
-        # Remove sensitive headers
-        for header in request_data.headers:
+        for header in request_data.headers:                                                             # Remove sensitive headers
             if any(sensitive in header for sensitive in ["Secret", "Private", "Token"]):
                 modifications.headers_to_remove.append(header)
 

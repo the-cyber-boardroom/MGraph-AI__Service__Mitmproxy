@@ -19,7 +19,6 @@ class test_Proxy__Headers__Service(TestCase):
                 'host': 'example.com',
                 'path': '/test/path'
             }
-            response_data.debug_params = {}
             response_data.response = {}
             response_data.stats = {}
             response_data.version = 'v1.0.0'
@@ -39,7 +38,6 @@ class test_Proxy__Headers__Service(TestCase):
     def test_get_standard_headers__without_request_id(self):       # Test without request ID
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'host': 'example.com'}
-            response_data.debug_params = {}
             response_data.response = {}
             response_data.stats = {}
             response_data.version = 'v1.0.0'
@@ -48,35 +46,6 @@ class test_Proxy__Headers__Service(TestCase):
 
             assert "x-request-id" not in headers
             assert headers["x-proxy-service"] == "mgraph-proxy"
-
-    def test_get_debug_headers(self):                              # Test debug header generation
-        with Schema__Proxy__Response_Data() as response_data:
-            response_data.request = {}
-            response_data.debug_params = {
-                'show': 'url-to-html',
-                'debug': 'true'
-            }
-            response_data.response = {}
-            response_data.stats = {}
-            response_data.version = 'v1.0.0'
-
-            headers = self.service.get_debug_headers(response_data)
-
-            assert headers["x-debug-mode"] == "active"
-            assert "show=url-to-html" in headers["x-debug-params"]
-            assert "debug=true" in headers["x-debug-params"]
-
-    def test_get_debug_headers__no_debug_params(self):             # Test without debug params
-        with Schema__Proxy__Response_Data() as response_data:
-            response_data.request = {}
-            response_data.debug_params = {}
-            response_data.response = {}
-            response_data.stats = {}
-            response_data.version = 'v1.0.0'
-
-            headers = self.service.get_debug_headers(response_data)
-
-            assert headers == {}
 
     def test_get_cache_headers__no_cache(self):                    # Test no-cache headers
         headers = self.service.get_cache_headers(no_cache=True)

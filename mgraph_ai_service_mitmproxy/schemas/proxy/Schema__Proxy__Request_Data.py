@@ -10,7 +10,6 @@ class Schema__Proxy__Request_Data(Type_Safe):                        # Incoming 
     host          : Safe_Str__HTTP__Host                             # Target host
     path          : str                                              # Request path     # todo: replaced with Safe_Str__*
     original_path : Optional[str] = None                             # Deprecated: kept for backward compatibility
-    debug_params  : Dict[str, str]                                   # Empty from interceptor - populated from cookies
     headers       : Dict[str, str]                                   # Request headers (includes Cookie header)
     stats         : Dict[str, Any]                                   # Request statistics
     version       : Safe_Str__Version                                # Interceptor version

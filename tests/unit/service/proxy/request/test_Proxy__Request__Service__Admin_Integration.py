@@ -35,7 +35,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     host         = 'example.com'     ,
                                                     path         = '/regular/path'   ,
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'           )
 
@@ -51,7 +50,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     host         = 'example.com'     ,
                                                     path         = PATH__MITM_PROXY__INDEX    ,
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'           )
 
@@ -69,7 +67,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     host         = 'example.com'     ,
                                                     path         = '/mitm-proxy/invalid',
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'           )
 
@@ -86,7 +83,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                      host         = 'example.com'     ,
                                                      path         = PATH__MITM_PROXY__INDEX    ,
                                                      headers      = {}                ,
-                                                     debug_params = {}                ,
                                                      stats        = {}                ,
                                                      version      = 'v1.0.0'           )
 
@@ -100,7 +96,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                        host         = 'example.com'     ,
                                                        path         = '/regular/path'   ,
                                                        headers      = {}                ,
-                                                       debug_params = {}                ,
                                                        stats        = {}                ,
                                                        version      = 'v1.0.0'           )
 
@@ -115,10 +110,7 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
             method       = 'GET'             ,
             host         = 'example.com'     ,
             path         = '/api/data'       ,
-            headers      = {
-                'Cookie': 'mitm-debug=true'
-            },
-            debug_params = {}                ,
+            headers      = { 'Cookie': 'mitm-debug=true' },
             stats        = {}                ,
             version      = 'v1.0.0'           )
 
@@ -135,7 +127,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     host         = 'example.com'     ,
                                                     path         = PATH__MITM_PROXY__INDEX    ,
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'           )
 
@@ -153,7 +144,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     host         = 'example.com'     ,
                                                     path         = PATH__MITM_PROXY__INDEX    ,
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'           )
 
@@ -169,7 +159,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                        host         = 'example.com'     ,
                                                        path         = '/api/endpoint'   ,
                                                        headers      = {}                ,
-                                                       debug_params = {}                ,
                                                        stats        = {}                ,
                                                        version      = 'v1.0.0'           )
 
@@ -183,7 +172,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                      host         = 'example.com'     ,
                                                      path         = PATH__MITM_PROXY__INDEX    ,
                                                      headers      = {}                ,
-                                                     debug_params = {}                ,
                                                      stats        = {}                ,
                                                      version      = 'v1.0.0'           )
 
@@ -197,7 +185,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                         host         = 'example.com'     ,
                                                         path         = '/another/path'   ,
                                                         headers      = {}                ,
-                                                        debug_params = {}                ,
                                                         stats        = {}                ,
                                                         version      = 'v1.0.0'           )
 
@@ -211,7 +198,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                     host         = 'example.com'     ,
                                                     path         = '/blocked/path'   ,
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'           )
 
@@ -226,7 +212,6 @@ class Test_Proxy__Request__Service__Admin_Integration(TestCase):
                                                      host         = 'example.com'     ,
                                                      path         = PATH__MITM_PROXY__INDEX    ,
                                                      headers      = {}                ,
-                                                     debug_params = {}                ,
                                                      stats        = {}                ,
                                                      version      = 'v1.0.0'           )
 

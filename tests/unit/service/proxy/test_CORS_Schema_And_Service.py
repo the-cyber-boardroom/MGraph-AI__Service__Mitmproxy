@@ -59,7 +59,6 @@ class test_CORS_Schema_And_Service(TestCase):
 
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'method': 'GET'}
-            response_data.debug_params = {}
             response_data.response = {}
             response_data.stats = {}
             response_data.version = 'v1.0.0'
@@ -72,7 +71,6 @@ class test_CORS_Schema_And_Service(TestCase):
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = { 'method': 'GET',
                                       'headers': {'origin': 'https://example.com'}  }
-            response_data.debug_params = {}
             response_data.response = {}
             response_data.stats = {}
             response_data.version = 'v1.0.0'
@@ -88,7 +86,6 @@ class test_CORS_Schema_And_Service(TestCase):
         # OPTIONS request
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'method': 'OPTIONS'}
-            response_data.debug_params = {}
             response_data.response = {}
             response_data.stats = {}
             response_data.version = 'v1.0.0'
@@ -98,7 +95,6 @@ class test_CORS_Schema_And_Service(TestCase):
         # GET request
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'method': 'GET'}
-            response_data.debug_params = {}
             response_data.response = {}
             response_data.stats = {}
             response_data.version = 'v1.0.0'
@@ -110,7 +106,6 @@ class test_CORS_Schema_And_Service(TestCase):
 
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'method': 'OPTIONS'}
-            response_data.debug_params = {}
             response_data.response = {}
             response_data.stats = {}
             response_data.version = 'v1.0.0'

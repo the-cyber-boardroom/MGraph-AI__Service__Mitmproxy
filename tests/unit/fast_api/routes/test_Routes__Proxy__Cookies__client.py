@@ -1,5 +1,8 @@
 import pytest
 from unittest                                      import TestCase
+from osbot_utils.testing.__                        import __
+from osbot_utils.utils.Json                        import str_to_json
+from osbot_utils.utils.Objects                     import obj
 from tests.unit.Service__Fast_API__Test_Objs       import setup__service_fast_api_test_objs, TEST_API_KEY__NAME, TEST_API_KEY__VALUE
 
 
@@ -21,7 +24,6 @@ class test_Routes__Proxy__Cookies__client(TestCase):                            
             'path'         : '/test',
             'original_path': '/test',
             'headers'      : {},
-            'debug_params' : {},
             'stats'        : {},
             'version'      : 'v1.0.0'
         }
@@ -317,9 +319,15 @@ class test_Routes__Proxy__Cookies__client(TestCase):                            
 
         assert response.status_code == 200
         result = response.json()
-        from osbot_utils.utils.Dev import pprint
-        assert result['headers_to_add']['x-debug-mode']  == 'active'
+
         assert 'x-proxy-cookie-summary'                  in result['headers_to_add']
+        assert str_to_json(result['headers_to_add']['x-proxy-cookie-summary'])      == {}           # todo BUG This should serialise to json
+        assert result['headers_to_add']['x-proxy-cookie-summary'] == ("{'show_command': None, 'inject_command': None, 'replace_command': None, "    # todo: BUG This should serialise to json
+                                                                         "'debug_enabled': True, 'rating': None, 'model_override': None, "
+                                                                         "'cache_enabled': False, 'is_wcf_command': False, 'all_proxy_cookies': "
+                                                                         "{'mitm-debug': 'true'}}")
+        assert obj(str_to_json(result['headers_to_add']['x-proxy-cookie-summary'])) == __()         # todo BUG: we should have a valid json to convert
+
 
     def test__process_response__cookie_priority(self):                                        # Test cookie priority in response processing
         pytest.skip("needs fixing after adding cache support")

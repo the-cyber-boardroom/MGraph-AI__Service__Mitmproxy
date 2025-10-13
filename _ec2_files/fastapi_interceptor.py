@@ -69,20 +69,15 @@ def prepare_request_data(flow: http.HTTPFlow) -> Dict:
 
     NOTE: headers dict includes Cookie header - FastAPI will parse it
     """
-    return {
-        "method": flow.request.method,
-        "host": flow.request.pretty_host,
-        "path": flow.request.path,
-        "original_path": flow.request.path,  # No path modification anymore
-        "debug_params": {},  # Empty - FastAPI will extract from cookies
-        "headers": dict(flow.request.headers),  # Includes Cookie header
-        "stats": {
-            "request_count": request_count,
-            "errors_count": errors_count,
-            "timestamp": datetime.utcnow().isoformat()
-        },
-        "version": VERSION__INTERCEPTOR
-    }
+    return { "method"       : flow.request.method,
+             "host"         : flow.request.pretty_host,
+             "path"         : flow.request.path,
+             "original_path": flow.request.path,
+             "headers"      : dict(flow.request.headers),                 # Includes Cookie header
+             "stats"        : { "request_count": request_count              ,
+                                "errors_count": errors_count                ,
+                                "timestamp": datetime.utcnow().isoformat()  },
+             "version"      : VERSION__INTERCEPTOR    }
 
 
 def apply_request_modifications(flow: http.HTTPFlow, modifications: Dict) -> bool:
@@ -190,7 +185,6 @@ def prepare_response_data(flow: http.HTTPFlow) -> Dict:
                                    "url"          : flow.request.pretty_url  ,
                                    "headers"      : dict(flow.request.headers),  # Includes Cookie header
         },
-        "debug_params": {},  # Empty - FastAPI will extract from cookies
         "response": {
             "status_code": flow.response.status_code,
             "headers": dict(flow.response.headers),

@@ -50,9 +50,7 @@ class Proxy__Service(Type_Safe):                                     # Main prox
         host         = response_data.request.get('host', '')
         path         = response_data.request.get('path', '')
         status_emoji = self._get_status_emoji(status)
-        has_debug    = bool(response_data.debug_params)
-        debug_emoji  = '🐛 ' if has_debug else ''
-        print(f"⬅️ {debug_emoji:2} {status_emoji:2} ___{status:<} {host:<30} {path}")
+        print(f"⬅️ {status_emoji:2} ___{status:<} {host:<30} {path}")
 
 
 

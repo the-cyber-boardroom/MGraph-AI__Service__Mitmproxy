@@ -1,12 +1,11 @@
 import json
-from osbot_utils.type_safe.Type_Safe                                                 import Type_Safe
-from datetime                                                                        import datetime
-from typing                                                                          import Dict, Optional
+from osbot_utils.type_safe.Type_Safe  import Type_Safe
+from datetime                         import datetime
+from typing                           import Dict, Optional
 
 class Proxy__JSON__Service(Type_Safe):                           # JSON content manipulation service
 
-    def inject_debug_fields(self,
-                           json_content  : str,                  # Original JSON content
+    def inject_debug_fields(self, json_content  : str,                  # Original JSON content
                            debug_params  : Dict[str, str]        # Debug parameters to inject
                            ) -> Optional[str]:                   # Modified JSON or None
         """Inject debug information into JSON content"""

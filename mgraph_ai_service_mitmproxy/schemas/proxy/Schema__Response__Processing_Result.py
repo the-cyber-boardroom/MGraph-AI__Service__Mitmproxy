@@ -9,7 +9,6 @@ class Schema__Response__Processing_Result(Type_Safe):            # Complete resp
     final_content_type  : str                                    # Final content type
     final_body          : str                                    # Final response body
     final_headers       : Dict[str, str]                         # Final response headers
-    debug_mode_active   : bool            = False                # Whether debug mode was active
     content_was_modified: bool            = False                # Whether content was modified
     response_overridden : bool            = False                # Whether response was overridden
     processing_error    : Optional[str]   = None                 # Error message if processing failed
@@ -20,13 +19,10 @@ class Schema__Response__Processing_Result(Type_Safe):            # Complete resp
 
     def get_summary(self) -> Dict:                               # Get processing summary
         """Get a summary of response processing"""
-        return {
-            'status_code': int(self.final_status_code),
-            'content_type': self.final_content_type,
-            'body_size': len(self.final_body),
-            'headers_added': len(self.modifications.headers_to_add),
-            'debug_mode': self.debug_mode_active,
-            'modified': self.content_was_modified,
-            'overridden': self.response_overridden,
-            'error': self.processing_error
-        }
+        return { 'status_code': int(self.final_status_code),
+                 'content_type': self.final_content_type,
+                 'body_size': len(self.final_body),
+                 'headers_added': len(self.modifications.headers_to_add),
+                 'modified': self.content_was_modified,
+                 'overridden': self.response_overridden,
+                 'error': self.processing_error}

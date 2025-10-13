@@ -1,14 +1,15 @@
-from unittest                                                                           import TestCase
-from osbot_utils.testing.__                                                             import __
-from osbot_utils.utils.Env                                                              import in_github_action
-from osbot_utils.utils.Objects                                                          import obj
-from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Cache import Routes__Cache
-from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service                    import Proxy__Cache__Service
+from unittest                                                          import TestCase
+from osbot_utils.testing.__                                            import __
+from osbot_utils.utils.Env                                             import in_github_action, load_dotenv
+from osbot_utils.utils.Objects                                         import obj
+from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Cache         import Routes__Cache
+from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service   import Proxy__Cache__Service
 
 class test_Routes__Cache(TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:                                                                # Setup cache service and test infrastructure
+        load_dotenv()
         cls.routes_cache = Routes__Cache()
 
     def test_setUpClass(self):

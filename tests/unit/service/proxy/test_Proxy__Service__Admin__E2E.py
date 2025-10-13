@@ -68,7 +68,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                    host         = 'example.com'          ,
                                                    path         = PATH__MITM_PROXY__INDEX,
                                                    headers      = {}                     ,
-                                                   debug_params = {}                     ,
                                                    stats        = {}                     ,
                                                    version      = 'v1.0.0'               )
 
@@ -85,7 +84,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     host         = 'example.com'             ,
                                                     path         = PATH__MITM_PROXY__COOKIES ,
                                                     headers      = {}                        ,
-                                                    debug_params = {}                        ,
                                                     stats        = {}                        ,
                                                     version      = 'v1.0.0'                  )
 
@@ -101,7 +99,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                        host         = 'example.com'     ,
                                                        path         = '/api/data'       ,
                                                        headers      = {}                ,
-                                                       debug_params = {}                ,
                                                        stats        = {}                ,
                                                        version      = 'v1.0.0'           )
 
@@ -115,7 +112,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                      host         = 'example.com'     ,
                                                      path         = PATH__MITM_PROXY__INDEX    ,
                                                      headers      = {}                ,
-                                                     debug_params = {}                ,
                                                      stats        = {}                ,
                                                      version      = 'v1.0.0'           )
 
@@ -131,7 +127,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                         host         = 'example.com'     ,
                                                         path         = PATH__MITM_PROXY__INDEX    ,
                                                         headers      = {}                ,
-                                                        debug_params = {}                ,
                                                         stats        = {}                ,
                                                         version      = 'v1.0.0'           )
 
@@ -149,7 +144,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     host         = 'example.com'            ,
                                                     path         = '/mitm-proxy/nonexistent',
                                                     headers      = {}                       ,
-                                                    debug_params = {}                       ,
                                                     stats        = {}                       ,
                                                     version      = 'v1.0.0'                  )
 
@@ -176,7 +170,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                         host         = 'example.com'     ,
                                                         path         = path              ,
                                                         headers      = {}                ,
-                                                        debug_params = {}                ,
                                                         stats        = {}                ,
                                                         version      = 'v1.0.0'           )
 
@@ -201,7 +194,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                            host         = 'example.com'     ,
                                                            path         = f'/api/data/{i}'  ,
                                                            headers      = {}                ,
-                                                           debug_params = {}                ,
                                                            stats        = {}                ,
                                                            version      = 'v1.0.0'           )
 
@@ -213,7 +205,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                          host         = 'example.com'     ,
                                                          path         = PATH__MITM_PROXY__INDEX    ,
                                                          headers      = {}                ,
-                                                         debug_params = {}                ,
                                                          stats        = {}                ,
                                                          version      = 'v1.0.0'           )
 
@@ -228,7 +219,6 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
                                                     host         = 'example.com'     ,
                                                     path         = PATH__MITM_PROXY__INDEX    ,
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'           )
 

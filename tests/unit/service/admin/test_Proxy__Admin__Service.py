@@ -1,4 +1,4 @@
-from unittest                                                                    import TestCase
+from unittest                                                                   import TestCase
 from mgraph_ai_service_mitmproxy.service.admin.Proxy__Admin__Service            import Proxy__Admin__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service           import Proxy__Cookie__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service            import Proxy__Stats__Service
@@ -52,7 +52,6 @@ class test_Proxy__Admin__Service(TestCase):
                                                     host         = 'test.example.com',
                                                     path         = '/mitm-proxy'     ,
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'          )
 
@@ -66,7 +65,6 @@ class test_Proxy__Admin__Service(TestCase):
                                                     host         = 'test.example.com',
                                                     path         = '/mitm-proxy/'    ,
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'          )
 
@@ -80,7 +78,6 @@ class test_Proxy__Admin__Service(TestCase):
                                                     host         = 'test.example.com'      ,
                                                     path         = '/mitm-proxy/admin-ui.json',
                                                     headers      = {}                      ,
-                                                    debug_params = {}                      ,
                                                     stats        = {}                      ,
                                                     version      = 'v1.0.0'                )
 
@@ -104,7 +101,6 @@ class test_Proxy__Admin__Service(TestCase):
                                                     host         = 'test.example.com'                ,
                                                     path         = '/mitm-proxy/v0/v0.1.0/index.html',
                                                     headers      = {}                                ,
-                                                    debug_params = {}                                ,
                                                     stats        = {}                                ,
                                                     version      = 'v1.0.0'                          )
 
@@ -118,7 +114,6 @@ class test_Proxy__Admin__Service(TestCase):
                                                     host         = 'test.example.com',
                                                     path         = '/api/data'       ,
                                                     headers      = {}                ,
-                                                    debug_params = {}                ,
                                                     stats        = {}                ,
                                                     version      = 'v1.0.0'          )
 
@@ -136,7 +131,6 @@ class test_Proxy__Admin__Service(TestCase):
             host         = 'example.com'           ,
             path         = '/mitm-proxy/admin-ui.json',
             headers      = { 'Cookie': 'mitm-show=url-to-html-xxx; mitm-debug=true'},
-            debug_params = {}                      ,
             stats        = {}                      ,
             version      = 'v1.0.0'                )
 
@@ -212,10 +206,7 @@ class test_Proxy__Admin__Service(TestCase):
             method       = 'GET'                   ,
             host         = 'example.com'           ,
             path         = '/mitm-proxy/admin-ui.json',
-            headers      = {
-                'Cookie': 'mitm-show=url-to-html-xxx; mitm-inject=debug-panel; mitm-rating=0.5'
-            },
-            debug_params = {}                      ,
+            headers      = { 'Cookie': 'mitm-show=url-to-html-xxx; mitm-inject=debug-panel; mitm-rating=0.5' },
             stats        = {}                      ,
             version      = 'v1.0.0'                )
 
@@ -232,7 +223,6 @@ class test_Proxy__Admin__Service(TestCase):
                                                     host         = 'example.com'           ,
                                                     path         = '/mitm-proxy/admin-ui.json',
                                                     headers      = {}                      ,
-                                                    debug_params = {}                      ,
                                                     stats        = {}                      ,
                                                     version      = 'v1.0.0'                )
 
@@ -252,7 +242,6 @@ class test_Proxy__Admin__Service(TestCase):
                                                     host         = 'example.com'           ,
                                                     path         = '/mitm-proxy/admin-ui.json',
                                                     headers      = {}                      ,
-                                                    debug_params = {}                      ,
                                                     stats        = {}                      ,
                                                     version      = 'v1.0.0'                )
 
@@ -269,7 +258,6 @@ class test_Proxy__Admin__Service(TestCase):
                                                     host         = 'example.com'           ,
                                                     path         = '/mitm-proxy/admin-ui.json',
                                                     headers      = {}                      ,
-                                                    debug_params = {}                      ,
                                                     stats        = {}                      ,
                                                     version      = 'v1.0.0'                )
 
@@ -291,7 +279,6 @@ class test_Proxy__Admin__Service(TestCase):
                                                     host         = 'example.com'           ,
                                                     path         = '/mitm-proxy/admin-ui.json',
                                                     headers      = {}                      ,
-                                                    debug_params = {}                      ,
                                                     stats        = {}                      ,
                                                     version      = 'v1.0.0'                )
 

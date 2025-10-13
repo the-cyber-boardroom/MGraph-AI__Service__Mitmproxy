@@ -18,9 +18,8 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
         self.wcf_service = Proxy__WCF__Service().setup()
         return self
 
-    def parse_debug_commands(self,
-                            debug_params : Dict[str, str]        # Debug parameters
-                            ) -> List[Schema__Debug__Command]:   # List of debug commands
+    def parse_debug_commands(self,debug_params : Dict[str, str]        # Debug parameters
+                             ) -> List[Schema__Debug__Command]:   # List of debug commands
         """Parse debug parameters into command objects"""
         return Schema__Debug__Command.from_debug_params(debug_params)
 
@@ -60,9 +59,9 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
 
         return None
 
-    def process_inject_command(self,
-                              command       : Schema__Debug__Command,  # Inject command
-                              response_data : Schema__Proxy__Response_Data  # Response data
+    def process_inject_command(self, command       : Schema__Debug__Command     ,  # Inject command
+                                     debug_params  : dict                       ,
+                                     response_data : Schema__Proxy__Response_Data  # Response data
                               ) -> Optional[Schema__HTML__Injection]:  # Injection config or None
         """Process an 'inject' debug command"""
         injection = Schema__HTML__Injection()
@@ -70,20 +69,19 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
         # Inject debug panel
         if command.command_value == 'debug-panel':
             injection.inject_panel = True
-            injection.panel_content = self.html_service.create_debug_panel(
-                request_info  = response_data.request,
-                response_info = response_data.response,
-                debug_params  = response_data.debug_params
-            )
+            injection.panel_content = self.html_service.create_debug_panel(debug_params  = debug_params          ,
+                                                                           request_info  = response_data.request ,
+                                                                           response_info = response_data.response)
             return injection
 
         return None
 
-    def process_debug_mode(self,  response_data : Schema__Proxy__Response_Data      # Process debug mode (inject banner)
+    def process_debug_mode(self,  debug_params  : Dict                        ,
+                                  response_data : Schema__Proxy__Response_Data      # Process debug mode (inject banner)
                              ) -> Optional[Schema__HTML__Injection]:
         injection = Schema__HTML__Injection()
         injection.inject_banner = True
-        injection.banner_content = self.html_service.create_debug_banner(debug_params = response_data.debug_params,
+        injection.banner_content = self.html_service.create_debug_banner(debug_params = debug_params                           ,
                                                                          request_path = response_data.request.get('path', '/') )
         return injection
 
@@ -98,14 +96,11 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
 
         return None
 
-    def process_debug_commands(self,
-                              response_data  : Schema__Proxy__Response_Data,  # Response data
-                              modifications  : Schema__Proxy__Modifications   # Modifications to update
-                              ) -> None:                         # Updates modifications in place
-        """Main entry point: process all debug commands"""
-        debug_params = response_data.debug_params
-        if not debug_params:
-            return
+    def process_debug_commands(self, debug_params   : Dict                        ,             # Main entry point: process all debug commands
+                                     response_data  : Schema__Proxy__Response_Data,             # the response data received from the proxy
+                                     modifications  : Schema__Proxy__Modifications,             # Modifications to update
+                                ) -> None:                                                        # Updates modifications are in the modifications object # todo: review this pattern
+
 
         # Parse commands
         commands = self.parse_debug_commands(debug_params)
@@ -114,13 +109,11 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
             if command.is_show_command():
 
 
-                if command.is_wcf_show_command():                                       #  Only process WCF commands for HTML responses
-                    content_type = response_data.response.get("content_type", "")       # todo: move this logic to a better place
+                if command.is_wcf_show_command():                                           #  Only process WCF commands for HTML responses
+                    content_type = response_data.response.get("content_type", "")           # todo: move this logic to a better place
 
-                    # Skip if not HTML content
-                    if not self.html_service.is_html_content(content_type):
-                        # Add header to indicate why it was skipped
-                        modifications.headers_to_add["x-wcf-skipped"] = "non-html-content"
+                    if not self.html_service.is_html_content(content_type):                 # Skip if not HTML content
+                        modifications.headers_to_add["x-wcf-skipped"] = "non-html-content"  # Add header to indicate why it was skipped
                         continue  # Skip this command
 
                 show_mods = self.process_show_command(command, response_data)
@@ -150,14 +143,16 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
             # Check for inject commands
             for command in commands:
                 if command.is_inject_command():
-                    injection = self.process_inject_command(command, response_data)
+                    injection = self.process_inject_command(command       = command      ,
+                                                            debug_params  = debug_params ,
+                                                            response_data = response_data)
                     if injection:
                         injections.append(injection)
 
             # Check for debug mode (inject_debug or debug params)
             if (debug_params.get('inject_debug') == 'true' or
                 debug_params.get('debug') == 'true'):
-                injection = self.process_debug_mode(response_data)
+                injection = self.process_debug_mode(debug_params=debug_params, response_data=response_data)
                 if injection:
                     injections.append(injection)
 
@@ -169,9 +164,9 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
 
                     # Add headers for tracking
                     if injection.inject_banner:
-                        modifications.headers_to_add["X-Debug-Banner-Injected"] = "true"
+                        modifications.headers_to_add["x-debug-banner-injected"] = "true"
                     if injection.inject_panel:
-                        modifications.headers_to_add["X-Debug-Panel-Injected"] = "true"
+                        modifications.headers_to_add["x-debug-panel-injected"] = "true"
 
             # Process replace commands
             for command in commands:

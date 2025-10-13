@@ -23,106 +23,51 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
         """Generate a unique request ID"""
         return f"req-{uuid.uuid4().hex[:12]}"
 
-    def process_response(self,                                   # Main entry point for response processing
-                        response_data : Schema__Proxy__Response_Data
-                        ) -> Schema__Response__Processing_Result:  # Complete processing result
-        """
-        Main entry point: Process a proxy response completely
-
-        This orchestrates all response processing:
-        1. Update statistics
-        2. Create modifications object
-        3. Add standard headers
-        4. Extract cookies from request headers and merge with debug_params
-        5. Process debug commands (may override)
-        6. Add CORS headers
-        7. Finalize response
-        """
+    def process_response(self, response_data : Schema__Proxy__Response_Data        # Main entry point for response processing
+                          ) -> Schema__Response__Processing_Result:           # Complete processing result
         try:
-            # Generate request ID
-            request_id = self.generate_request_id()
-
-            # Update statistics
-            body_size = len(response_data.response.get("body", ""))
-            status_code = response_data.response.get("status_code", 200)
+            request_id       = self.generate_request_id()                                                 # todo: review if we should not be setting this request id in get_standard_headers (since that is the only place this value is used)
+            body_size        = len(response_data.response.get("body", ""))                                 # Update statistics
+            modifications    = Schema__Proxy__Modifications()                                          # Create modifications object
+            request_headers  = response_data.request.get('headers', {})                              # Extract request headers (includes Cookie header)
+            debug_params     = self.cookie_service.convert_to_debug_params(request_headers)             # Parse cookie-based debug params from request headers, The interceptor sends request headers in response_data.request['headers']
+            standard_headers = self.headers_service.get_standard_headers(response_data,request_id)  # Add standard headers
+            #status_code = response_data.response.get("status_code", 200)                            # todo: review this value, since it is not currently used in this method
 
             self.stats_service.increment_response(bytes_processed = body_size)
-
-            # Create modifications object
-            modifications = Schema__Proxy__Modifications()
-
-            # Extract request headers (includes Cookie header)
-            request_headers = response_data.request.get('headers', {})
-
-            # Parse cookie-based debug params from request headers
-            # The interceptor sends request headers in response_data.request['headers']
-            cookie_debug_params = self.cookie_service.convert_to_debug_params(request_headers)
-
-            # Combine: cookies take precedence over query params
-            combined_debug_params = {**response_data.debug_params, **cookie_debug_params}
-
-            # Update response_data with combined debug params
-            response_data.debug_params = combined_debug_params
-
-            # Add standard headers
-            standard_headers = self.headers_service.get_standard_headers(
-                response_data,
-                request_id
-            )
             modifications.headers_to_add.update(standard_headers)
 
-            # Add cookie summary header if any proxy cookies present
-            if self.cookie_service.has_any_proxy_cookies(request_headers):
+            if self.cookie_service.has_any_proxy_cookies(request_headers):                          # Add cookie summary header if any proxy cookies present
                 cookie_summary = self.cookie_service.get_cookie_summary(request_headers)
                 modifications.headers_to_add["x-proxy-cookie-summary"] = str(cookie_summary)
 
-            # Add debug headers if debug mode (from cookies or query params)
-            if response_data.debug_params:
-                debug_headers = self.headers_service.get_debug_headers(response_data)
-                modifications.headers_to_add.update(debug_headers)
+            self.debug_service.process_debug_commands(debug_params  = debug_params ,                # Process debug commands (this may override response)
+                                                      response_data = response_data,
+                                                      modifications = modifications)
 
-            # Process debug commands (this may override response)
-            self.debug_service.process_debug_commands(response_data, modifications)
+            if modifications.override_response:                                                     # Check if debug command overrode the response
+                return self.finalize_overridden_response(response_data=response_data ,                             # For overridden responses, finalize and return
+                                                         modifications=modifications )
 
-            # Check if debug command overrode the response
-            if modifications.override_response:
-                return self.finalize_overridden_response(response_data,  # For overridden responses, finalize and return
-                                                         modifications,
-                                                         request_id)
-
-            # Check if content was modified (but not overridden)
-            if modifications.modified_body:
+            if modifications.modified_body:                                                         # Check if content was modified (but not overridden)
                 self.stats_service.increment_content_modification()
 
-            # Add CORS headers
-            cors_headers = self.cors_service.get_cors_headers_for_request(response_data)
+            # todo: review if we need to have this CORS capabilities in this part of the proxy workflow
+            cors_headers = self.cors_service.get_cors_headers_for_request(response_data)            # Add CORS headers
             modifications.headers_to_add.update(cors_headers)
 
-            # Handle CORS preflight requests
-            if self.cors_service.is_preflight_request(response_data):
-                return self._finalize_preflight_response(
-                    response_data,
-                    modifications,
-                    request_id
-                )
+            if self.cors_service.is_preflight_request(response_data):                               # Handle CORS preflight requests
+                return self.finalize_preflight_response(response_data, modifications)
 
-            # Finalize regular response
-            return self._finalize_regular_response(
-                response_data,
-                modifications,
-                request_id
-            )
+            return self._finalize_regular_response(response_data,                                   # Finalize regular response
+                                                   modifications,
+                                                   request_id   )
 
         except Exception as e:
-            # Handle any processing errors
-            return self._create_error_result(
-                response_data,
-                str(e)
-            )
+            return self._create_error_result( response_data, str(e))        # Handle any processing errors
 
     def finalize_overridden_response(self, response_data  : Schema__Proxy__Response_Data,
                                            modifications  : Schema__Proxy__Modifications,
-                                           request_id     : str
                                       ) -> Schema__Response__Processing_Result:             # Finalize a response that was overridden by debug command
         final_body = modifications.modified_body or ""
 
@@ -131,25 +76,19 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
                                                  modifications.override_content_type,
                                                  len(final_body.encode('utf-8'))    )
 
-        return Schema__Response__Processing_Result(
-            modifications        = modifications,
-            final_status_code    = modifications.override_status,
-            final_content_type   = modifications.override_content_type,
-            final_body           = final_body,
-            final_headers        = final_headers,
-            debug_mode_active    = bool(response_data.debug_params),
-            content_was_modified = True,
-            response_overridden  = True
-        )
+        return Schema__Response__Processing_Result( modifications        = modifications                      ,
+                                                    final_status_code    = modifications.override_status      ,
+                                                    final_content_type   = modifications.override_content_type,
+                                                    final_body           = final_body                         ,
+                                                    final_headers        = final_headers                      ,
+                                                    content_was_modified = True                               ,
+                                                    response_overridden  = True                               )
 
-    def _finalize_preflight_response(self,                       # Finalize CORS preflight response
-                                    response_data  : Schema__Proxy__Response_Data,
-                                    modifications  : Schema__Proxy__Modifications,
-                                    request_id     : str
-                                    ) -> Schema__Response__Processing_Result:
-        """Finalize a CORS preflight OPTIONS request"""
-        # Get preflight-specific headers
-        preflight_headers = self.cors_service.handle_preflight_request(response_data)
+    # todo: review this method and see if it should be called 'preflight'
+    def finalize_preflight_response(self, response_data  : Schema__Proxy__Response_Data,  # Finalize CORS preflight response
+                                          modifications  : Schema__Proxy__Modifications,
+                                     ) -> Schema__Response__Processing_Result:
+        preflight_headers = self.cors_service.handle_preflight_request(response_data)               # Get preflight-specific headers
         modifications.headers_to_add.update(preflight_headers)
 
         final_headers = modifications.headers_to_add.copy()
@@ -157,9 +96,8 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
         return Schema__Response__Processing_Result(modifications        = modifications,
                                                    final_status_code    = 204,  # No Content for preflight
                                                    final_content_type   = "text/plain",
-                                                   final_body          = "",
-                                                   final_headers       = final_headers,
-                                                   debug_mode_active   = False,
+                                                   final_body           = "",
+                                                   final_headers        = final_headers,
                                                    content_was_modified = False,
                                                    response_overridden  = False)
 
@@ -189,16 +127,13 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             len(final_body.encode('utf-8'))
         )
 
-        return Schema__Response__Processing_Result(
-            modifications        = modifications,
-            final_status_code    = final_status,
-            final_content_type   = final_content_type,
-            final_body          = final_body,
-            final_headers       = final_headers,
-            debug_mode_active   = bool(response_data.debug_params),
-            content_was_modified = bool(modifications.modified_body),
-            response_overridden  = False
-        )
+        return Schema__Response__Processing_Result( modifications        = modifications                    ,
+                                                    final_status_code    = final_status                     ,
+                                                    final_content_type   = final_content_type               ,
+                                                    final_body           = final_body                       ,
+                                                    final_headers        = final_headers                    ,
+                                                    content_was_modified = bool(modifications.modified_body),
+                                                    response_overridden  = False                            )
 
     def build_final_headers(self, response_data   : Schema__Proxy__Response_Data,  # Build the complete set of final headers
                                   modifications   : Schema__Proxy__Modifications,
@@ -209,11 +144,6 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
         final_headers   = response_data.response.get("headers", {}).copy()                            # Start with original response headers
         content_headers = self.headers_service.get_content_headers(content_type, content_length)    # Add content headers
         final_headers.update(content_headers)
-
-        # Add cache headers (no-cache for debug mode)
-        if response_data.debug_params:
-            cache_headers = self.headers_service.get_cache_headers(no_cache=True)
-            final_headers.update(cache_headers)
 
         # Add all headers from modifications (includes standard, debug, CORS)
         final_headers.update(modifications.headers_to_add)
@@ -236,12 +166,9 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             final_status_code    = 500,
             final_content_type   = "text/plain",
             final_body          = error_body,
-            final_headers       = {
-                "content-type": "text/plain",
-                "content-length": str(len(error_body)),
-                "X-Processing-Error": "true"
-            },
-            debug_mode_active   = False,
+            final_headers       = { "content-type": "text/plain"            ,
+                                    "content-length": str(len(error_body))  ,
+                                    "X-Processing-Error": "true"            },
             content_was_modified = False,
             response_overridden  = False,
             processing_error    = error_message

@@ -206,9 +206,8 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
         cookies = self.parse_cookies(headers)
         return cookies.get(self.COOKIE_MODEL)
 
-    def is_cache_enabled(self, headers: Dict[str, str]           # Check if cache enabled
+    def is_cache_enabled(self, headers: Dict[str, str]           # Check if response caching is enabled via mitm-cache cookie
                         ) -> bool:                               # Cache enabled
-        """Check if response caching is enabled via mitm-cache cookie"""
         cookies = self.parse_cookies(headers)
         cache_value = cookies.get(self.COOKIE_CACHE, '').lower()
         return cache_value in ('true', '1', 'yes', 'on')
@@ -231,15 +230,11 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
         return Enum__WCF__Command_Type.from_show_param(show_value)
 
     def convert_to_debug_params(self, headers: Dict[str, str]    # Convert cookies to debug params format
-                               ) -> Dict[str, str]:              # Debug params dict
-        """
-        Convert cookie-based controls to debug_params format
-        for backward compatibility with existing code
-        """
+                                 ) -> Dict[str, str]:           # Debug params dict
         debug_params = {}
 
         # Get show command
-        show_value = self.get_show_command(headers)
+        show_value = self.get_show_command(headers)                 # todo: review how this data is extracted, since we should be able to optimise this
         if show_value:
             debug_params['show'] = show_value
 
@@ -259,20 +254,17 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
 
         return debug_params
 
-    def get_cookie_summary(self, headers: Dict[str, str]         # Get summary of active cookies
-                          ) -> Dict[str, any]:                   # Cookie summary
-        """Get a summary of all active proxy control cookies"""
-        return {
-            'show_command'    : self.get_show_command(headers),
-            'inject_command'  : self.get_inject_command(headers),
-            'replace_command' : self.get_replace_command(headers),
-            'debug_enabled'   : self.is_debug_enabled(headers),
-            'rating'          : self.get_rating(headers),
-            'model_override'  : self.get_model_override(headers),
-            'cache_enabled'   : self.is_cache_enabled(headers),
-            'is_wcf_command'  : self.is_wcf_show_command(headers),
-            'all_proxy_cookies': self.get_proxy_cookies(headers)
-        }
+    def get_cookie_summary(self, headers: Dict[str, str]            # Get a summary of all active proxy control cookies
+                          ) -> Dict[str, any]:                      # Cookie summary
+        return { 'show_command'    : self.get_show_command(headers),            # todo: review if we actually need this data to be sent like this to the caller
+                 'inject_command'  : self.get_inject_command(headers),
+                 'replace_command' : self.get_replace_command(headers),
+                 'debug_enabled'   : self.is_debug_enabled(headers),
+                 'rating'          : self.get_rating(headers),
+                 'model_override'  : self.get_model_override(headers),
+                 'cache_enabled'   : self.is_cache_enabled(headers),
+                 'is_wcf_command'  : self.is_wcf_show_command(headers),
+                 'all_proxy_cookies': self.get_proxy_cookies(headers) }
 
     def has_any_proxy_cookies(self, headers: Dict[str, str]      # Check if any proxy cookies present
                              ) -> bool:                          # Has proxy cookies

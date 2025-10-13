@@ -1,5 +1,5 @@
-from osbot_utils.type_safe.Type_Safe                                                 import Type_Safe
-from typing                                                                          import List, Dict
+from osbot_utils.type_safe.Type_Safe     import Type_Safe
+from typing                              import List, Dict
 
 class Schema__CORS__Config(Type_Safe):                           # CORS configuration
     enabled            : bool         = True                     # Whether CORS is enabled

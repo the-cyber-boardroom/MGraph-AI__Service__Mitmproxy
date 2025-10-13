@@ -22,15 +22,14 @@ class Proxy__CORS__Service(Type_Safe):                           # CORS header m
         # In a real implementation, you'd check the Origin header
         return True
 
-    def get_cors_headers_for_request(self,                       # Get CORS headers for request
-                                    response_data: Schema__Proxy__Response_Data
-                                    ) -> Dict[str, str]:         # CORS headers
-        """Get CORS headers appropriate for this request"""
+    # todo: review if we need this feature (setting CORS) here in this part of the workflow
+    def get_cors_headers_for_request(self, response_data: Schema__Proxy__Response_Data     # Get CORS headers appropriate for this request
+                                      ) -> Dict[str, str]:         # CORS headers
+
         if not self.should_add_cors_headers(response_data):
             return {}
 
-        # Get origin from request headers if available
-        request_headers = response_data.request.get('headers', {})
+        request_headers = response_data.request.get('headers', {})                          # Get origin from request headers if available
         origin = request_headers.get('origin') or request_headers.get('Origin')
 
         return self.cors_config.get_cors_headers(request_origin=origin)

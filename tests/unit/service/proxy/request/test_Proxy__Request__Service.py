@@ -28,7 +28,6 @@ class test_Proxy__Request__Service(TestCase):
             host          = 'example.com',
             path          = '/test',
             original_path = '/test',
-            debug_params  = {},
             headers       = {},
             stats         = {},
             version       = 'v1.0.0'
@@ -39,7 +38,6 @@ class test_Proxy__Request__Service(TestCase):
             host          = 'example.com',
             path          = '/test',
             original_path = '/test',
-            debug_params  = {},
             headers       = {'cookie': 'mitm-show=url-to-html; mitm-debug=true'},
             stats         = {},
             version       = 'v1.0.0'
@@ -50,7 +48,6 @@ class test_Proxy__Request__Service(TestCase):
             host          = 'example.com',
             path          = '/test',
             original_path = '/test',
-            debug_params  = {},
             headers       = {'cookie': 'mitm-cache=true'},
             stats         = {},
             version       = 'v1.0.0'
@@ -115,7 +112,6 @@ class test_Proxy__Request__Service(TestCase):
             modifications = _.process_request(self.test_request_basic)
 
             assert 'x-proxy-cookies' not in modifications.headers_to_add                      # No cookie summary
-            assert 'x-debug-params'  not in modifications.headers_to_add                      # No debug params
 
     def test_process_request__cookie_priority_over_query(self):                               # Test cookies override query params
         request_with_both = Schema__Proxy__Request_Data(
@@ -123,7 +119,6 @@ class test_Proxy__Request__Service(TestCase):
             host          = 'example.com',
             path          = '/test',
             original_path = '/test',
-            debug_params  = {'show': 'url-to-text'},                                          # Query param
             headers       = {'cookie': 'mitm-show=url-to-html'},                             # Cookie param
             stats         = {},
             version       = 'v1.0.0'
@@ -141,7 +136,6 @@ class test_Proxy__Request__Service(TestCase):
             host          = 'example.com',
             path          = '/blocked/resource',
             original_path = '/blocked/resource',
-            debug_params  = {},
             headers       = {},
             stats         = {},
             version       = 'v1.0.0'
@@ -161,7 +155,6 @@ class test_Proxy__Request__Service(TestCase):
             host          = 'example.com',
             path          = '/test',
             original_path = '/test',
-            debug_params  = {},
             headers       = {
                 'X-Secret-Key'  : 'abc123',
                 'X-Private-Data': 'sensitive',
@@ -218,7 +211,6 @@ class test_Proxy__Request__Service(TestCase):
             host          = 'example.com',
             path          = '/test',
             original_path = '/test',
-            debug_params  = {},
             headers       = {
                 'cookie': 'mitm-show=url-to-html; mitm-inject=debug-panel; '
                          'mitm-debug=true; mitm-rating=0.5; mitm-cache=true'
@@ -248,7 +240,6 @@ class test_Proxy__Request__Service(TestCase):
             host          = 'example.com',
             path          = '/test',
             original_path = '/test',
-            debug_params  = {},
             headers       = {
                 'cookie': 'session=abc123; mitm-show=url-to-html; user=john; '
                          'mitm-debug=true; theme=dark'
@@ -275,7 +266,6 @@ class test_Proxy__Request__Service(TestCase):
             host          = 'example.com',
             path          = '/test',
             original_path = '/test',
-            debug_params  = {},
             headers       = {},
             stats         = {},
             version       = 'v1.0.0'
@@ -291,11 +281,11 @@ class test_Proxy__Request__Service(TestCase):
     def test__host_and_path_tracking(self):                                                    # Test host and path tracked in stats
         request1 = Schema__Proxy__Request_Data(
             method='GET', host='example.com', path='/path1',
-            original_path='/path1', debug_params={}, headers={}, stats={}, version='v1.0.0'
+            original_path='/path1', headers={}, stats={}, version='v1.0.0'
         )
         request2 = Schema__Proxy__Request_Data(
             method='GET', host='test.com', path='/path2',
-            original_path='/path2', debug_params={}, headers={}, stats={}, version='v1.0.0'
+            original_path='/path2', headers={}, stats={}, version='v1.0.0'
         )
 
         with self.service as _:

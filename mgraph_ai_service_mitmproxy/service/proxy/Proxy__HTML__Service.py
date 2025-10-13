@@ -7,10 +7,9 @@ from mgraph_ai_service_mitmproxy.schemas.debug.Schema__HTML__Injection import Sc
 
 class Proxy__HTML__Service(Type_Safe):                           # HTML content manipulation service
 
-    def create_debug_banner(self,
-                           debug_params : Dict[str, str],        # Debug parameters to display
-                           request_path : str                    # Request path
-                           ) -> str:                             # HTML for debug banner
+    def create_debug_banner(self, debug_params : Dict[str, str],        # Debug parameters to display
+                                  request_path : str                    # Request path
+                             ) -> str:                             # HTML for debug banner
         """Create HTML debug banner"""
         banner_html = f"""
         <div style="position:fixed;top:0;left:0;right:0;background:#ff0;color:#000;padding:10px;z-index:999999;font-family:monospace;border-bottom:2px solid #f00">
@@ -19,10 +18,9 @@ class Proxy__HTML__Service(Type_Safe):                           # HTML content 
         """
         return banner_html
 
-    def create_debug_panel(self,
-                          request_info  : Dict,                  # Request information
-                          response_info : Dict,                  # Response information
-                          debug_params  : Dict[str, str]         # Debug parameters
+    def create_debug_panel(self, request_info  : Dict,                  # Request information
+                                 response_info : Dict,                  # Response information
+                                 debug_params  : Dict[str, str]         # Debug parameters
                           ) -> str:                              # HTML for debug panel
         """Create HTML debug panel"""
         panel_html = f"""

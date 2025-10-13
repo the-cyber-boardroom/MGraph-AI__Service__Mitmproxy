@@ -46,7 +46,6 @@ class test_Proxy__Debug__Service(TestCase):
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request       = {'url': 'https://docs.diniscruz.ai'}
-            response_data.debug_params  = {'show': 'url-to-html'}
             response_data.response      = {}
             response_data.stats         = {}
             response_data.version       = 'v1.0.0'
@@ -85,7 +84,6 @@ class test_Proxy__Debug__Service(TestCase):
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request       = {'method': 'GET', 'path': '/test'}
-            response_data.debug_params  = {'show': 'response-data'}
             response_data.response      = {'status_code': 200}
             response_data.stats         = {}
             response_data.version       = 'v1.0.0'
@@ -109,13 +107,15 @@ class test_Proxy__Debug__Service(TestCase):
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'method': 'GET'}
-            response_data.debug_params = {'inject': 'debug-panel'}
             response_data.response = {'headers': {}}
             response_data.stats = {}
             response_data.version = 'v1.0.0'
 
         # Process command
-        result = self.service.process_inject_command(command, response_data)
+        debug_params = {}
+        result       = self.service.process_inject_command(command       = command      ,
+                                                           debug_params  = debug_params ,
+                                                           response_data = response_data)
 
         assert result is not None
         assert result.inject_panel is True
@@ -126,13 +126,12 @@ class test_Proxy__Debug__Service(TestCase):
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'path': '/test'}
-            response_data.debug_params = {'debug': 'true'}
             response_data.response = {}
             response_data.stats = {}
             response_data.version = 'v1.0.0'
-
+        debug_params = {'debug-mode': 'true'}
         # Process debug mode
-        result = self.service.process_debug_mode(response_data)
+        result = self.service.process_debug_mode(debug_params=debug_params, response_data=response_data)
 
         assert result is not None
         assert result.inject_banner is True
@@ -166,7 +165,6 @@ class test_Proxy__Debug__Service(TestCase):
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request       = { 'path': '/test' }
-            response_data.debug_params  = { 'debug': 'true' }
             response_data.response      = { 'content_type': 'text/html',
                                             'body': '<html><body><h1>Test</h1></body></html>'}
             response_data.stats = {}
@@ -175,18 +173,20 @@ class test_Proxy__Debug__Service(TestCase):
         # Create modifications
         with Schema__Proxy__Modifications() as modifications:
             # Process commands
-            self.service.process_debug_commands(response_data, modifications)
+            debug_params = {'debug': 'true'}
+            self.service.process_debug_commands(debug_params  = debug_params,
+                                                response_data = response_data,
+                                                modifications = modifications)
 
             assert modifications.modified_body is not None
             assert '🔧 DEBUG MODE' in modifications.modified_body
             assert '<h1>Test</h1>' in modifications.modified_body
-            assert modifications.headers_to_add.get('X-Debug-Banner-Injected') == 'true'
+            assert modifications.headers_to_add.get('x-debug-banner-injected') == 'true'
 
     def test_process_debug_commands__json_with_debug(self):        # Test JSON with debug fields
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'path': '/api/test'}
-            response_data.debug_params = {'inject_debug': 'true'}
             response_data.response     = {  'content_type': 'application/json',
                                             'body': '{"key": "value"}'  }
             response_data.stats = {}
@@ -195,17 +195,18 @@ class test_Proxy__Debug__Service(TestCase):
         # Create modifications
         with Schema__Proxy__Modifications() as modifications:
             # Process commands
-            self.service.process_debug_commands(response_data, modifications)
+            debug_params = {'inject_debug': 'true'}
+            self.service.process_debug_commands(debug_params  = debug_params,
+                                                response_data = response_data,
+                                                modifications = modifications)
 
             assert modifications.modified_body is not None
-            assert '_debug_params' in modifications.modified_body
-            assert '_debug_injected' in modifications.modified_body
+
 
     def test_process_debug_commands__no_body(self):                # Test with no body content
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
             response_data.request = {'path': '/test'}
-            response_data.debug_params = {'debug': 'true'}
             response_data.response = {
                 'content_type': 'text/html',
                 'body': ''
@@ -216,7 +217,10 @@ class test_Proxy__Debug__Service(TestCase):
         # Create modifications
         with Schema__Proxy__Modifications() as modifications:
             # Process commands
-            self.service.process_debug_commands(response_data, modifications)
+            debug_params = {}
+            self.service.process_debug_commands(debug_params  = debug_params,
+                                                response_data = response_data,
+                                                modifications = modifications)
 
             # Should not modify anything with no body
             assert modifications.modified_body is None

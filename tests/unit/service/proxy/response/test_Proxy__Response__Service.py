@@ -40,7 +40,6 @@ class test_Proxy__Response__Service(TestCase):
 
         cls.test_response_basic = Schema__Proxy__Response_Data(                              # Basic response
             request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
-            debug_params = {},
             response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
             stats        = {},
             version      = 'v1.0.0'
@@ -52,8 +51,7 @@ class test_Proxy__Response__Service(TestCase):
                 'host'    : 'example.com',
                 'path'    : '/test',
                 'headers' : {'cookie': 'mitm-show=response-data; mitm-debug=true'}
-            },
-            debug_params = {},                                                                 # Will be filled from cookies
+            },                                                            # Will be filled from cookies
             response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
             stats        = {},
             version      = 'v1.0.0'
@@ -91,7 +89,6 @@ class test_Proxy__Response__Service(TestCase):
             assert result.final_status_code    == 200
             assert result.final_content_type   == 'text/html'
             assert result.final_body          == '<html></html>'
-            assert result.debug_mode_active   is False
             assert result.content_was_modified is False
             assert result.response_overridden  is False
 
@@ -117,13 +114,6 @@ class test_Proxy__Response__Service(TestCase):
             result = _.process_response(self.test_response_with_cookies)
 
             assert 'x-proxy-cookie-summary' in result.final_headers                           # Cookie summary added
-            assert result.debug_mode_active is True                                            # Debug mode from cookie
-
-    def test_process_response__cookie_to_debug_params(self):                                  # Test cookies converted to debug_params
-        with self.service as _:
-            result = _.process_response(self.test_response_with_cookies)
-
-            assert 'x-debug-mode' in result.final_headers                                     # Debug mode detected
 
     def test_process_response__cors_headers(self):                                            # Test CORS headers added
         with self.service as _:
@@ -148,7 +138,6 @@ class test_Proxy__Response__Service(TestCase):
     def test_process_response__original_headers_preserved(self):                              # Test original response headers preserved
         response_with_headers = Schema__Proxy__Response_Data(
             request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
-            debug_params = {},
             response     = {
                 'status_code'  : 200,
                 'content_type' : 'text/html',
@@ -165,20 +154,6 @@ class test_Proxy__Response__Service(TestCase):
             assert 'x-custom-header' in result.final_headers
             assert result.final_headers['x-custom-header'] == 'custom-value'
 
-    def test_process_response__no_cache_headers_for_debug(self):                              # Test no-cache headers in debug mode
-        response_with_debug = Schema__Proxy__Response_Data(
-            request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
-            debug_params = {'debug': 'true'},                                                  # Debug mode
-            response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
-            stats        = {},
-            version      = 'v1.0.0'
-        )
-
-        with self.service as _:
-            result = _.process_response(response_with_debug)
-
-            assert 'cache-control' in result.final_headers
-            assert 'no-store' in result.final_headers['cache-control']
 
     def test_build_final_headers(self):                                                       # Test final headers building
         from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications import Schema__Proxy__Modifications
@@ -189,7 +164,6 @@ class test_Proxy__Response__Service(TestCase):
 
         response_data = Schema__Proxy__Response_Data(
             request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
-            debug_params = {},
             response     = { 'status_code'  : 200,
                              'content_type' : 'text/html',
                              'body'         : '<html></html>',
@@ -213,7 +187,6 @@ class test_Proxy__Response__Service(TestCase):
     def test__preflight_request_handling(self):                                                # Test CORS preflight OPTIONS request
         preflight_response = Schema__Proxy__Response_Data(
             request      = {'method': 'OPTIONS', 'host': 'example.com', 'path': '/test', 'headers': {}},
-            debug_params = {},
             response     = {'status_code': 200, 'content_type': 'text/plain', 'body': '', 'headers': {}},
             stats        = {},
             version      = 'v1.0.0'
@@ -239,26 +212,6 @@ class test_Proxy__Response__Service(TestCase):
             assert error_result.processing_error == "Test error message"
             assert 'X-Processing-Error' in error_result.final_headers
 
-    def test__cookie_priority_over_existing_debug_params(self):                                # Test cookies override existing debug_params
-        response_mixed = Schema__Proxy__Response_Data(
-            request      = {
-                'method'  : 'GET',
-                'host'    : 'example.com',
-                'path'    : '/test',
-                'headers' : {'cookie': 'mitm-show=url-to-html'}                               # Cookie value
-            },
-            debug_params = {'show': 'url-to-text'},                                           # Query param value
-            response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
-            stats        = {},
-            version      = 'v1.0.0'
-        )
-
-        with self.service as _:
-            result = _.process_response(response_mixed)
-
-            # After processing, response_data.debug_params should have cookie value
-            assert response_mixed.debug_params['show'] == 'url-to-html'                       # Cookie wins
-
     def test__multiple_cookies_processed(self):                                                # Test multiple proxy cookies processed together
         pytest.skip("needs fixing after adding cache support (also find a better side than example.com since that is not being very stable)")
         response_multi = Schema__Proxy__Response_Data(
@@ -271,7 +224,6 @@ class test_Proxy__Response__Service(TestCase):
                              'mitm-debug=true; mitm-rating=0.5'
                 }
             },
-            debug_params = {},
             response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
             stats        = {},
             version      = 'v1.0.0'
@@ -279,14 +231,11 @@ class test_Proxy__Response__Service(TestCase):
 
         with self.service as _:
             result = _.process_response(response_multi)
-
             assert 'x-proxy-cookie-summary' in result.final_headers                           # Cookie summary present
-            assert result.debug_mode_active is True                                            # Debug from cookie
 
     def test__empty_response_body(self):                                                       # Test processing empty response body
         response_empty = Schema__Proxy__Response_Data(
             request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
-            debug_params = {},
             response     = {'status_code': 204, 'content_type': 'text/plain', 'body': '', 'headers': {}},
             stats        = {},
             version      = 'v1.0.0'
@@ -316,7 +265,6 @@ class test_Proxy__Response__Service(TestCase):
         large_body = 'x' * 100000                                                              # 100KB body
         response_large = Schema__Proxy__Response_Data(
             request      = {'method': 'GET', 'host': 'example.com', 'path': '/test', 'headers': {}},
-            debug_params = {},
             response     = {'status_code': 200, 'content_type': 'text/plain', 'body': large_body, 'headers': {}},
             stats        = {},
             version      = 'v1.0.0'
@@ -332,7 +280,6 @@ class test_Proxy__Response__Service(TestCase):
     def test__json_response(self):                                                             # Test JSON response processing
         response_json = Schema__Proxy__Response_Data(
             request      = {'method': 'GET', 'host': 'api.example.com', 'path': '/data', 'headers': {}},
-            debug_params = {},
             response     = {
                 'status_code'  : 200,
                 'content_type' : 'application/json',
@@ -359,7 +306,6 @@ class test_Proxy__Response__Service(TestCase):
             assert 'content_type' in summary
             assert 'body_size'    in summary
             assert 'headers_added' in summary
-            assert 'debug_mode'   in summary
             assert 'modified'     in summary
             assert 'overridden'   in summary
             assert 'error'        in summary
@@ -370,7 +316,6 @@ class test_Proxy__Response__Service(TestCase):
                              'host'    : 'example.com',
                              'path'    : '/test',
                              'headers' : {'cookie': 'mitm-debug=true'} },
-            debug_params = {},
             response     = {'status_code': 200, 'content_type': 'text/html', 'body': '<html></html>', 'headers': {}},
             stats        = {},
             version      = 'v1.0.0'
@@ -379,8 +324,8 @@ class test_Proxy__Response__Service(TestCase):
         with self.service as _:
             result = _.process_response(response_debug)
 
-            assert 'x-debug-mode' in result.final_headers
-            assert result.final_headers['x-debug-mode'] == 'active'
+            assert 'x-debug-banner-injected' in result.final_headers
+            assert result.final_headers['x-debug-banner-injected'] == 'true'
 
     def test__timestamp_in_headers(self):                                                      # Test timestamp format in headers
         with self.service as _:
