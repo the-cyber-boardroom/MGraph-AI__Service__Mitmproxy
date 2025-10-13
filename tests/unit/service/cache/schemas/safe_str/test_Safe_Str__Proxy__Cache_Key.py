@@ -1,7 +1,6 @@
 import re
-from unittest                                                                                   import TestCase
-
 import pytest
+from unittest                                                                                   import TestCase
 from osbot_utils.testing.__                                                                     import __
 from osbot_utils.type_safe.Type_Safe                                                            import Type_Safe
 from osbot_utils.utils.Objects                                                                  import base_types
