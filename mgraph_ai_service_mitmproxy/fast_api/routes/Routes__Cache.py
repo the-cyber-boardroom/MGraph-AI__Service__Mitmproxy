@@ -1,15 +1,11 @@
-from osbot_fast_api.api.decorators.route_path import route_path
-from osbot_fast_api.api.routes.Fast_API__Routes                                      import Fast_API__Routes
-from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service                import Proxy__Cache__Service
-from typing                                                                          import Dict, Any
+from osbot_fast_api.api.routes.Fast_API__Routes                         import Fast_API__Routes
+from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service    import Proxy__Cache__Service
+from typing                                                             import Dict, Any
 
 TAG__ROUTES_CACHE = 'cache'
 ROUTES_PATHS__CACHE = [f'/{TAG__ROUTES_CACHE}/stats',
                        f'/{TAG__ROUTES_CACHE}/config',
-                       f'/{TAG__ROUTES_CACHE}/pages',
-                       f'/{TAG__ROUTES_CACHE}/pages/{{cache_key:path}}',
-                       f'/{TAG__ROUTES_CACHE}/transformations/{{cache_key:path}}',
-                       f'/{TAG__ROUTES_CACHE}/health']
+                       f'/{TAG__ROUTES_CACHE}/pages']
 
 class Routes__Cache(Fast_API__Routes):                               # FastAPI routes for cache introspection
     tag           : str = TAG__ROUTES_CACHE
@@ -47,156 +43,57 @@ class Routes__Cache(Fast_API__Routes):                               # FastAPI r
                   "cache_metadata"  : config.cache_metadata   ,
                   "track_stats"     : config.track_stats      }
 
-    def pages(self, limit: int = 20,                                                    # Maximum number of pages to return
-                    offset: int = 0                                                     # Offset for pagination
-               ) -> Dict[str, Any]:                                                     # Get list of cached pages
-        """
-        Get list of cached pages with pagination
+    # todo: add the pages capability to self.cache_service
+    # def pages(self, limit: int = 20,                                                    # Maximum number of pages to return
+    #                 offset: int = 0                                                     # Offset for pagination
+    #            ) -> Dict[str, Any]:                                                     # Get list of cached pages
+    #     """
+    #     Get list of cached pages with pagination
+    #
+    #     Note: This endpoint queries the cache service for all entries in the namespace
+    #     """
 
-        Note: This endpoint queries the cache service for all entries in the namespace
-        """
-        if not self.cache_service:
-            return {"error": "Cache service not available"}
+    # todo: refactor this to a 'Sites and Pages' service and endpoint
+    # @route_path("/pages/{cache_key:path}")
+    # def page__cache_key(self,cache_key: str                        # Cache key path (e.g., "sites/example.com/pages/article")
+    #                     ) -> dict:                                 # Get specific page entry and its transformations
+    #     """
+    #     Retrieve a specific page entry by cache_key
+    #
+    #     Returns page metadata and available transformations
+    #     """
+    #     if not self.cache_service:
+    #         return {"error": "Cache service not available"}
+    #
+    #     try:
+    #         # Get cache_id from cache_key
+    #         cache_id = self.cache_service.get_or_create_page_entry(
+    #             f"https://{cache_key.replace('sites/', '').replace('/pages', '')}"
+    #         )
+    #
+    #         # Try to retrieve page entry
+    #         result = self.cache_service.cache_client.retrieve().retrieve__cache_key(
+    #             namespace=self.cache_service.cache_config.namespace,
+    #             strategy=self.cache_service.cache_config.strategy,
+    #             cache_key=cache_key
+    #         )
+    #
+    #         return {
+    #             "cache_key": cache_key,
+    #             "cache_id": cache_id,
+    #             "page_data": result.get("body", {}),
+    #             "metadata": result.get("metadata", {})
+    #         }
+    #
+    #     except Exception as e:
+    #         return {
+    #             "error": str(e),
+    #             "cache_key": cache_key,
+    #             "message": "Page not found or error retrieving"
+    #         }
 
-        try:
-            # Query cache service for list of entries
-            # Note: This assumes the cache client has a list/query method
-            # You may need to adjust based on actual cache service API
 
-            result = {
-                "namespace": str(self.cache_service.cache_config.namespace),
-                "limit": limit,
-                "offset": offset,
-                "message": "Page listing requires cache service list API",
-                "hint": "Use /cache/pages/{cache_key} to retrieve specific page data"
-            }
-
-            return result
-
-        except Exception as e:
-            return {
-                "error": str(e),
-                "message": "Failed to retrieve page list"
-            }
-
-    @route_path("/pages/{cache_key:path}")
-    def page__cache_key(self,cache_key: str                        # Cache key path (e.g., "sites/example.com/pages/article")
-                        ) -> dict:                                 # Get specific page entry and its transformations
-        """
-        Retrieve a specific page entry by cache_key
-
-        Returns page metadata and available transformations
-        """
-        if not self.cache_service:
-            return {"error": "Cache service not available"}
-
-        try:
-            # Get cache_id from cache_key
-            cache_id = self.cache_service.get_or_create_page_entry(
-                f"https://{cache_key.replace('sites/', '').replace('/pages', '')}"
-            )
-
-            # Try to retrieve page entry
-            result = self.cache_service.cache_client.retrieve().retrieve__cache_key(
-                namespace=self.cache_service.cache_config.namespace,
-                strategy=self.cache_service.cache_config.strategy,
-                cache_key=cache_key
-            )
-
-            return {
-                "cache_key": cache_key,
-                "cache_id": cache_id,
-                "page_data": result.get("body", {}),
-                "metadata": result.get("metadata", {})
-            }
-
-        except Exception as e:
-            return {
-                "error": str(e),
-                "cache_key": cache_key,
-                "message": "Page not found or error retrieving"
-            }
-
-    @route_path("/transformations/{cache_key:path}")
-    def transformations(self, cache_key          : str,           # Cache key path
-                              transformation_type: str = None     # Optional filter by type
-                         ) -> dict:                               # Get transformations for a page
-        """
-        Get all transformations for a page, optionally filtered by type
-
-        transformation_type can be: html, text, ratings, html-filtered
-        """
-        if not self.cache_service:
-            return {"error": "Cache service not available"}
-
-        try:
-            # Construct URL from cache_key
-            # This is a reverse mapping - may not be perfect
-            url_parts = cache_key.replace('sites/', '').replace('/pages', '')
-            target_url = f"https://{url_parts}"
-
-            # Get cache_id
-            cache_id = self.cache_service.get_or_create_page_entry(target_url)
-
-            # Get transformations
-            transformations = {}
-
-            # Define transformation types to check
-            if transformation_type:
-                types_to_check = [transformation_type]
-            else:
-                types_to_check = ['html', 'text', 'ratings', 'html-filtered']
-
-            for trans_type in types_to_check:
-                data_key = f"transformations/{trans_type}"
-
-                try:
-                    content = self.cache_service.cache_client.data().retrieve().data__string__with__id_and_key(
-                        cache_id=cache_id,
-                        namespace=self.cache_service.cache_config.namespace,
-                        data_key=data_key,
-                        data_file_id=self.cache_service.cache_config.data_file_id
-                    )
-
-                    # Try to get metadata too
-                    try:
-                        metadata = self.cache_service.cache_client.data().retrieve().data__json__with__id_and_key(
-                            cache_id=cache_id,
-                            namespace=self.cache_service.cache_config.namespace,
-                            data_key=f"{data_key}/metadata",
-                            data_file_id=self.cache_service.cache_config.data_file_id
-                        )
-                    except:
-                        metadata = None
-
-                    transformations[trans_type] = {
-                        "content_length": len(content) if content else 0,
-                        "content_preview": content[:200] if content else None,
-                        "metadata": metadata
-                    }
-                except:
-                    # Transformation not available
-                    pass
-
-            return {
-                "cache_key": cache_key,
-                "cache_id": cache_id,
-                "target_url": target_url,
-                "transformations": transformations,
-                "available_types": list(transformations.keys())
-            }
-
-        except Exception as e:
-            return {
-                "error": str(e),
-                "cache_key": cache_key,
-                "message": "Failed to retrieve transformations"
-            }
-
-    def setup_routes(self):                                          # Configure FastAPI routes
+    def setup_routes(self):
         self.add_route_get(self.health              )
-        self.add_route_get(self.stats               )#, path="/cache/stats"              )
-        self.add_route_get(self.config              )#, path="/cache/config"             )
-        self.add_route_get(self.pages                )#, path="/cache/pages"                  )
-        self.add_route_get(self.page__cache_key      )#, path="/cache/pages/{cache_key:path}"     )
-        self.add_route_get(self.transformations  )#, path="/cache/transformations/{cache_key:path}")
+        self.add_route_get(self.stats               )
+        self.add_route_get(self.config              )

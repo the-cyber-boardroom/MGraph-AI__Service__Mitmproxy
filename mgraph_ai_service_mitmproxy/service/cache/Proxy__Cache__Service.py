@@ -119,7 +119,7 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
 
         result               = self.cache_client.store().store__json__cache_key(**store_kwargs)
         if result.get('status') == 'error':
-            raise Exception(f'Error in get_or_create_page_entry:  {result.get('message')}')     # todo: find a better way and location to catch these errors (which usually happen when the API key is not set)
+            raise Exception(f"Error in get_or_create_page_entry:  {result.get('message')}")     # todo: find a better way and location to catch these errors (which usually happen when the API key is not set)
         page_refs.cache_id   = result.get("cache_id")
         page_refs.cache_hash = result.get("cache_hash")
 

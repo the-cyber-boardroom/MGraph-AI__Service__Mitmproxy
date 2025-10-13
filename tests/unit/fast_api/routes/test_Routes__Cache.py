@@ -11,6 +11,7 @@ from osbot_fast_api_serverless.fast_api.Serverless__Fast_API__Config            
 from osbot_utils.helpers.duration.decorators.capture_duration                           import capture_duration
 from osbot_utils.testing.__                                                             import __
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                    import Safe_UInt
+from osbot_utils.utils.Dev import pprint
 from osbot_utils.utils.Env import in_github_action
 from osbot_utils.utils.Objects                                                          import obj
 
@@ -82,20 +83,6 @@ class test_Routes__Cache(TestCase):
             assert type(_.cache_service) is Proxy__Cache__Service
             assert _.tag                 == 'cache'
 
-
-    def test__routes_wired_to_fast_api(self):
-        #print(self.server_url)
-        #response = GET_json(self.server_url + '/cache/health')
-
-        #pprint(response)
-
-        #open_api = GET_json(self.server_url + '/openapi.json')
-        #pprint(list_set(open_api.get('paths')))
-        # todo: fix this test to use the mitmproxy service not the cache service
-        #assert 'status' in response
-        pass
-
-
     def test_health(self):             # /cache/health endpoint logic
         with self.routes_cache as _:
             result = _.health()
@@ -136,3 +123,4 @@ class test_Routes__Cache(TestCase):
                                      data_file_id    ='latest'                       ,
                                      cache_metadata  = True                          ,
                                      track_stats     = True                          )
+
