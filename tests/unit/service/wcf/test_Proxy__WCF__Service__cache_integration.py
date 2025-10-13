@@ -319,7 +319,7 @@ class test_Proxy__WCF__Service__cache_integration(TestCase):
                                                                                     namespace    = self.cache_config.namespace,
                                                                                     data_key     = "transformations/html/metadata",
                                                                                     data_file_id = "latest")
-            
+
         assert metadata.get('detail').get('error_type') == "NOT_FOUND"                     # BUG: metadata not found
 
         # response_time = metadata['wcf_response_time_ms']                                # Verify response time is reasonable

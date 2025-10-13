@@ -1,8 +1,7 @@
-from osbot_fast_api_serverless.deploy.Deploy__Serverless__Fast_API  import Deploy__Serverless__Fast_API
-
 import mgraph_ai_service_mitmproxy__admin_ui
-from mgraph_ai_service_mitmproxy.config                                  import SERVICE_NAME, LAMBDA_DEPENDENCIES__FAST_API_SERVERLESS
-from mgraph_ai_service_mitmproxy.fast_api.lambda_handler                 import run
+from osbot_fast_api_serverless.deploy.Deploy__Serverless__Fast_API  import Deploy__Serverless__Fast_API
+from mgraph_ai_service_mitmproxy.config                             import SERVICE_NAME, LAMBDA_DEPENDENCIES__FAST_API_SERVERLESS
+from mgraph_ai_service_mitmproxy.fast_api.lambda_handler            import run
 
 class Deploy__Service(Deploy__Serverless__Fast_API):
 
