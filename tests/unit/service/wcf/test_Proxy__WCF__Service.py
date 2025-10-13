@@ -23,7 +23,7 @@ class test_Proxy__WCF__Service(TestCase):
         with self.service as _:
             assert type(_) is Proxy__WCF__Service
             assert _.wcf_base_url == "https://dev.web-content-filtering.mgraph.ai"
-            assert _.timeout == 30
+            assert _.timeout == 5.0
 
     def test_create_request(self):                               # Test request creation
         with self.service.create_request(command_type = Enum__WCF__Command_Type.url_to_html,

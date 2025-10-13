@@ -5,7 +5,7 @@ from typing                                                             import D
 TAG__ROUTES_CACHE = 'cache'
 ROUTES_PATHS__CACHE = [f'/{TAG__ROUTES_CACHE}/stats',
                        f'/{TAG__ROUTES_CACHE}/config',
-                       f'/{TAG__ROUTES_CACHE}/pages']
+                       f'/{TAG__ROUTES_CACHE}/health']
 
 class Routes__Cache(Fast_API__Routes):                               # FastAPI routes for cache introspection
     tag           : str = TAG__ROUTES_CACHE

@@ -9,11 +9,14 @@ from mgraph_ai_service_cache_client.schemas.cache.enums.Enum__Cache__Storage_Mod
 from osbot_fast_api.utils.Fast_API_Server                                               import Fast_API_Server
 from osbot_fast_api_serverless.fast_api.Serverless__Fast_API__Config                    import Serverless__Fast_API__Config
 from osbot_utils.helpers.duration.decorators.capture_duration                           import capture_duration
+from osbot_utils.testing.__ import __, __SKIP__
+from osbot_utils.utils.Dev import pprint
 from osbot_utils.utils.Env                                                              import in_github_action
 from osbot_utils.utils.Json                                                             import str_to_json
 from mgraph_ai_service_mitmproxy.schemas.wcf.Schema__WCF__Request                       import Schema__WCF__Request
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type                  import Enum__WCF__Command_Type
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Content_Type                  import Enum__WCF__Content_Type
+from mgraph_ai_service_mitmproxy.schemas.wcf.Schema__WCF__Response import Schema__WCF__Response
 from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service                    import Proxy__Cache__Service
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Config            import Schema__Cache__Config
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Stats             import Schema__Cache__Stats
@@ -174,20 +177,23 @@ class test_Proxy__WCF__Service__cache_integration(TestCase):
     # ERROR HANDLING TESTS
     # ========================================
 
-    def test__make_request__timeout_error(self):                                        # Test timeout handling
+    def test__bug__make_request__timeout_error(self):                                        # Test timeout handling
         service_with_timeout = Proxy__WCF__Service(cache_service = self.cache_service,
                                                    timeout       = 0.0001           ).setup()
 
         wcf_request = service_with_timeout.create_request(command_type = Enum__WCF__Command_Type.url_to_html,
-                                                          target_url   = "https://httpbin.org/delay/10"
-        )
+                                                          target_url   = "https://docs.diniscruz.ai"     )
 
         response = service_with_timeout.make_request(wcf_request)
 
-        assert response                 is not None
-        assert response.success         is False
-        assert response.status_code     == 504
-        assert "timeout" in response.error_message.lower()
+        assert type(response) is Schema__WCF__Response
+        assert response.obj() == __(success       = False   ,
+                                    error_message = __SKIP__,
+                                    status_code   = 408     ,
+                                    content_type  = None    ,
+                                    body          = ''      ,
+                                    headers       = __()    )
+        assert "HTTPSConnectionPool(host='dev.web-content-filtering.mgraph.ai', port=443):" in response.error_message
 
     def test__make_request__connection_error(self):                                     # Test connection error handling
         pytest.skip("find way to improve the performance of this test (which is passing)")

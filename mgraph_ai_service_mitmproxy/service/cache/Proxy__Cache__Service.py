@@ -52,6 +52,7 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
         cache_client__config = Service__Fast_API__Client__Config(**auth__kwargs)
         self.cache_config    = Schema__Cache__Config            (**auth__kwargs)
         self.cache_client    = Service__Fast_API__Client        (config=cache_client__config)
+        return self
 
 
     def url_to_cache_key(self, target_url : str                                         # Convert URL to hierarchical cache_key
@@ -90,6 +91,8 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
     @type_safe
     def get_or_create_page_entry(self, target_url : Safe_Str__Url                           # Get existing page cache_id or create new page entry
                                   ) -> Schema__Cache__Page__Refs:                           # cache_id for the page
+
+        #print('>>>>> get_or_create_page_entry (target_url)', target_url)
         json_field_path = PAGE_ENTRY__JSON_FIELD_PATH
         cache_key       = self.url_to_cache_key(target_url)
         page_refs       = Schema__Cache__Page__Refs(cache_key       = cache_key      ,

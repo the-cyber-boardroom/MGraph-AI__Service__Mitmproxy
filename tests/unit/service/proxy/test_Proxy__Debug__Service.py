@@ -45,7 +45,7 @@ class test_Proxy__Debug__Service(TestCase):
 
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
-            response_data.request       = {'url': 'https://example.com'}
+            response_data.request       = {'url': 'https://docs.diniscruz.ai'}
             response_data.debug_params  = {'show': 'url-to-html'}
             response_data.response      = {}
             response_data.stats         = {}
@@ -71,7 +71,7 @@ class test_Proxy__Debug__Service(TestCase):
                                    stats                 = __())
         assert result is not None
         assert result.override_response is True
-        assert result.modified_body.index('<title>Example Domain</title>') > 30
+        assert result.modified_body.index('<title>Dinis Cruz - Research Hub</title>') > 30
 
     def test_process_show_command__response_data(self):            # Test response-data show command
         # Create command
