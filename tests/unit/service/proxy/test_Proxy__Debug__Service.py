@@ -1,7 +1,7 @@
 import pytest
 from unittest                                                               import TestCase
 from osbot_utils.testing.__                                                 import __, __SKIP__
-from osbot_utils.utils.Env                                                  import in_github_action
+from osbot_utils.utils.Env import in_github_action, load_dotenv
 from mgraph_ai_service_mitmproxy.schemas.debug.Enum__Debug__Command_Type    import Enum__Debug__Command_Type
 from mgraph_ai_service_mitmproxy.schemas.debug.Enum__Show__Command_Type     import Enum__Show__Command_Type
 from mgraph_ai_service_mitmproxy.schemas.debug.Schema__Debug__Command       import Schema__Debug__Command
@@ -14,7 +14,8 @@ class test_Proxy__Debug__Service(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.service = Proxy__Debug__Service()
+        load_dotenv()
+        cls.service = Proxy__Debug__Service().setup()
 
     def test__init__(self):                                        # Test initialization
         with self.service as _:
@@ -38,9 +39,9 @@ class test_Proxy__Debug__Service(TestCase):
             pytest.skip("Skipping in GH actions because WCF credentials are not setup there")
         # Create command
         with Schema__Debug__Command() as command:
-            command.command_type = Enum__Debug__Command_Type.show
-            command.command_value                 = 'url-to-html'
-            command.show_type                     = Enum__Show__Command_Type.wcf_command
+            command.command_type  = Enum__Debug__Command_Type.show
+            command.command_value = 'url-to-html'
+            command.show_type     = Enum__Show__Command_Type.wcf_command
 
         # Create response data
         with Schema__Proxy__Response_Data() as response_data:
@@ -51,6 +52,7 @@ class test_Proxy__Debug__Service(TestCase):
             response_data.version       = 'v1.0.0'
 
         # Process command
+
         result = self.service.process_show_command(command, response_data)
 
         assert type(result) is Schema__Proxy__Modifications

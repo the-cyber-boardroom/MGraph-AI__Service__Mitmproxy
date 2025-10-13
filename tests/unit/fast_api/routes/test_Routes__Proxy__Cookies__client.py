@@ -194,6 +194,7 @@ class test_Routes__Proxy__Cookies__client(TestCase):                            
         wcf_commands = [
             'url-to-html',
             'url-to-html-xxx',
+            'url-to-html-hashes'
             'url-to-html-min-rating',
             'url-to-ratings',
             'url-to-text-nodes',

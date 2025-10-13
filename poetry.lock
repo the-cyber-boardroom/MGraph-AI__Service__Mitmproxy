@@ -34,18 +34,18 @@ trio = ["trio (>=0.31.0)"]
 
 [[package]]
 name = "boto3"
-version = "1.40.49"
+version = "1.40.50"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "boto3-1.40.49-py3-none-any.whl", hash = "sha256:64eb7af5f66998b34ad629786ff4a7f81d74c2d4ef9e42f69d99499dbee46d07"},
-    {file = "boto3-1.40.49.tar.gz", hash = "sha256:ea37d133548fbae543092ada61aeb08bced8f9aecd2e96e803dc8237459a80a0"},
+    {file = "boto3-1.40.50-py3-none-any.whl", hash = "sha256:62901bc616c64236700001f530fc66b659ecd1acb4f541ddac6fcae3a1d37ea6"},
+    {file = "boto3-1.40.50.tar.gz", hash = "sha256:ae34363e8f34a49ab130d10c507a611926c1101d5d14d70be5598ca308e13266"},
 ]
 
 [package.dependencies]
-botocore = ">=1.40.49,<1.41.0"
+botocore = ">=1.40.50,<1.41.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.14.0,<0.15.0"
 
@@ -54,14 +54,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.40.49"
+version = "1.40.50"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "botocore-1.40.49-py3-none-any.whl", hash = "sha256:bf1089d0e77e4fc2e195d81c519b194ab62a4d4dd3e7113ee4e2bf903b0b75ab"},
-    {file = "botocore-1.40.49.tar.gz", hash = "sha256:fe8d4cbcc22de84c20190ae728c46b931bafeb40fce247010fb071c31b6532b5"},
+    {file = "botocore-1.40.50-py3-none-any.whl", hash = "sha256:53126c153fae0670dc54f03d01c89b1af144acedb1020199b133dedb309e434d"},
+    {file = "botocore-1.40.50.tar.gz", hash = "sha256:1d3d5b5759c9cb30202cd5ad231ec8afb1abe5be0c088a1707195c2cbae0e742"},
 ]
 
 [package.dependencies]
@@ -226,14 +226,14 @@ websockets = ["websocket-client (>=1.3.0)"]
 
 [[package]]
 name = "fastapi"
-version = "0.118.2"
+version = "0.119.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "fastapi-0.118.2-py3-none-any.whl", hash = "sha256:d1f842612e6a305f95abe784b7f8d3215477742e7c67a16fccd20bd79db68150"},
-    {file = "fastapi-0.118.2.tar.gz", hash = "sha256:d5388dbe76d97cb6ccd2c93b4dd981608062ebf6335280edfa9a11af82443e18"},
+    {file = "fastapi-0.119.0-py3-none-any.whl", hash = "sha256:90a2e49ed19515320abb864df570dd766be0662c5d577688f1600170f7f73cf2"},
+    {file = "fastapi-0.119.0.tar.gz", hash = "sha256:451082403a2c1f0b99c6bd57c09110ed5463856804c8078d38e5a1f1035dbbb7"},
 ]
 
 [package.dependencies]
@@ -260,14 +260,14 @@ files = [
 
 [[package]]
 name = "idna"
-version = "3.10"
+version = "3.11"
 description = "Internationalized Domain Names in Applications (IDNA)"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "idna-3.10-py3-none-any.whl", hash = "sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3"},
-    {file = "idna-3.10.tar.gz", hash = "sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9"},
+    {file = "idna-3.11-py3-none-any.whl", hash = "sha256:771a87f49d9defaf64091e6e6fe9c18d4833f140bd19464795bc32d966ca37ea"},
+    {file = "idna-3.11.tar.gz", hash = "sha256:795dafcc9c04ed0c1fb032c2aa73654d8e8c5023a7df64a53f39190ada629902"},
 ]
 
 [package.extras]
@@ -317,14 +317,14 @@ osbot-utils = "*"
 
 [[package]]
 name = "mgraph-ai-service-cache"
-version = "0.5.70"
+version = "0.5.74"
 description = "MGraph-AI__Service__Cache"
 optional = false
 python-versions = "<4.0,>=3.12"
 groups = ["main"]
 files = [
-    {file = "mgraph_ai_service_cache-0.5.70-py3-none-any.whl", hash = "sha256:d96d7db6a3d3cd7a44c38262a573958bafc98e6491f6a4237f7d8a30f781a020"},
-    {file = "mgraph_ai_service_cache-0.5.70.tar.gz", hash = "sha256:670ea75dfc1b4a24d0e479b8c4a018ed87637bc06e4f60907908c69d9abdc23d"},
+    {file = "mgraph_ai_service_cache-0.5.74-py3-none-any.whl", hash = "sha256:cf86b2826ce9ccfce14865599b464c3b2201e785185860d668a4cafdb26f558b"},
+    {file = "mgraph_ai_service_cache-0.5.74.tar.gz", hash = "sha256:6648b8b36c17f026af5c16e143477de51d0aaae8c737f7bc7ff24cae6f123ae6"},
 ]
 
 [package.dependencies]
@@ -334,14 +334,14 @@ osbot-fast-api-serverless = "*"
 
 [[package]]
 name = "mgraph-ai-service-cache-client"
-version = "0.3.0"
+version = "0.7.0"
 description = "MGraph-AI__Service__Cache__Client"
 optional = false
 python-versions = "<4.0,>=3.12"
 groups = ["main"]
 files = [
-    {file = "mgraph_ai_service_cache_client-0.3.0-py3-none-any.whl", hash = "sha256:b5ad2e3fab5ae65de49384a611f5ec1e83003b48487c83b3d2b267b308ddbe43"},
-    {file = "mgraph_ai_service_cache_client-0.3.0.tar.gz", hash = "sha256:184d05b98d9d0bf00b7080fa4ce63ae87f66ef9f41976a0d74fdbabad1660ea0"},
+    {file = "mgraph_ai_service_cache_client-0.7.0-py3-none-any.whl", hash = "sha256:63ecac8f59b2235da5cf3943161abbf2cbf74201da6cd8b198674ad53dca87e9"},
+    {file = "mgraph_ai_service_cache_client-0.7.0.tar.gz", hash = "sha256:fe827aa1eeba683a74d087b2e2b9f2f67de30607c2c30175c62d54801d2c0923"},
 ]
 
 [package.dependencies]
@@ -418,14 +418,14 @@ osbot-fast-api = "*"
 
 [[package]]
 name = "osbot-utils"
-version = "3.18.0"
+version = "3.19.0"
 description = "OWASP Security Bot - Utils"
 optional = false
 python-versions = "<4.0,>=3.7"
 groups = ["main"]
 files = [
-    {file = "osbot_utils-3.18.0-py3-none-any.whl", hash = "sha256:89855f560a83c3c14f3b24e30b0eb2ce9447e594dd288fc1efdb93c06ae753e3"},
-    {file = "osbot_utils-3.18.0.tar.gz", hash = "sha256:2b7f964c9742be79332a7afb5dc6fc5b5bd18231fcb31e5f40380e2dcebd5cbf"},
+    {file = "osbot_utils-3.19.0-py3-none-any.whl", hash = "sha256:f232181e1ce0e23b49cb62370cb1b773e96ca5dc7913c38df453a0ab37a37dfb"},
+    {file = "osbot_utils-3.19.0.tar.gz", hash = "sha256:1e79c294333c82adb1d2a0b8548e77347f99be2242c80b61dd70e9dba380aba8"},
 ]
 
 [[package]]

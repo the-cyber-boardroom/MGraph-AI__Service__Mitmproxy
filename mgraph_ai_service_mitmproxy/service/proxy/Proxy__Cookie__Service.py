@@ -162,9 +162,8 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
                 proxy_cookies[key] = value
         return proxy_cookies
 
-    def get_show_command(self, headers: Dict[str, str]           # Get show command from cookies
+    def get_show_command(self, headers: Dict[str, str]           # Get the 'show' command from mitm-show cookie
                         ) -> Optional[str]:                      # Show command value or None
-        """Get the 'show' command from mitm-show cookie"""
         cookies = self.parse_cookies(headers)
         return cookies.get(self.COOKIE_SHOW)
 
@@ -223,10 +222,9 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
 
         return Enum__WCF__Command_Type.is_wcf_command(show_value)
 
-    def get_wcf_command_type(self, headers: Dict[str, str]       # Get WCF command type from cookies
+    def get_wcf_command_type(self, headers: Dict[str, str]          # Get WCF command type from cookies
                             ) -> Optional[Enum__WCF__Command_Type]:  # Command type or None
-        """Parse WCF command type from mitm-show cookie"""
-        show_value = self.get_show_command(headers)
+        show_value = self.get_show_command(headers)                  #Parse WCF command type from mitm-show cookie"""
         if not show_value:
             return None
 

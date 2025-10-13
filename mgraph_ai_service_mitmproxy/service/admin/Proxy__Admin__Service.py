@@ -14,7 +14,7 @@ from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service            
 class Proxy__Admin__Service(Type_Safe):                                                                    # Admin UI static file server + JSON API
     cookie_service  : Proxy__Cookie__Service
     stats_service   : Proxy__Stats__Service
-    current_version : Safe_Str__Version = Safe_Str__Version("v0.1.0")                                                           # Latest version
+    current_version : Safe_Str__Version = Safe_Str__Version("v0.1.1")                                                           # Latest version
     admin_ui_root   : Path
 
     def __init__(self, **kwargs):

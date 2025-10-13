@@ -9,6 +9,7 @@ const COOKIE_DEFINITIONS = [
         type: 'select',
         options: [
             { value: 'url-to-html-xxx', label: 'URL to HTML XXX' },
+            { value: 'url-to-html-hashes', label: 'URL to HTML Hashes' },
             { value: 'url-to-html', label: 'URL to HTML (default)' },
             { value: 'url-to-ratings', label: 'URL to Ratings' },
             { value: 'response-data', label: 'Response Data (JSON)' }

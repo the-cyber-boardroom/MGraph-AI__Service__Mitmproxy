@@ -125,6 +125,7 @@ class WCF__Cache__Integrator(Type_Safe):                                    # In
                                       show_value   : str,                        # WCF command value
                                       command_type : Enum__WCF__Command_Type     # Parsed command type
                                  ) -> Optional[Schema__WCF__Response]:           # This will attempt to retrieve cached transformation response
+
         if not self.cache_service or not self.cache_service.cache_config.enabled:
             return None
 
@@ -183,18 +184,19 @@ class WCF__Cache__Integrator(Type_Safe):                                    # In
 class Proxy__WCF__Service(Type_Safe):                                          # WCF service integration with cache support
     wcf_base_url     : str   = "https://dev.web-content-filtering.mgraph.ai"   # WCF service base URL
     timeout          : float = 30.0                                            # Request timeout in seconds
-    cache_service    : Proxy__Cache__Service                                   # Cache integration
+    cache_service    : Proxy__Cache__Service  = None                           # Cache integration
 
     request_handler  : WCF__Request__Handler                                   # Handles WCF requests
     command_processor: WCF__Command__Processor                                 # Processes show commands
     cache_integrator : WCF__Cache__Integrator                                  # Integrates cache
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def setup(self):
         self.request_handler   = WCF__Request__Handler(wcf_base_url = self.wcf_base_url,
-                                                       timeout       = self.timeout)
+                                                       timeout      = self.timeout     )
         self.command_processor = WCF__Command__Processor()
         self.cache_integrator  = WCF__Cache__Integrator(cache_service = self.cache_service)
+        self.cache_service     = Proxy__Cache__Service().setup()
+        return self
 
     def create_request(self, command_type : Enum__WCF__Command_Type,              # Type of WCF command
                              target_url   : str,                                  # URL to process

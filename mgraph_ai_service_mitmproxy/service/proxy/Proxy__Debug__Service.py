@@ -10,9 +10,13 @@ from mgraph_ai_service_mitmproxy.service.wcf.Proxy__WCF__Service                
 
 
 class Proxy__Debug__Service(Type_Safe):                          # Debug command processing service
-    wcf_service  : Proxy__WCF__Service                           # WCF service integration
+    wcf_service  : Proxy__WCF__Service      = None               # WCF service integration
     html_service : Proxy__HTML__Service                          # HTML manipulation
     json_service : Proxy__JSON__Service                          # JSON manipulation
+
+    def setup(self):
+        self.wcf_service = Proxy__WCF__Service().setup()
+        return self
 
     def parse_debug_commands(self,
                             debug_params : Dict[str, str]        # Debug parameters

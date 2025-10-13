@@ -263,6 +263,7 @@ class test_Proxy__Cookie__Service(TestCase):
             test_cases = [
                 ('url-to-html',            Enum__WCF__Command_Type.url_to_html           ),
                 ('url-to-html-xxx',        Enum__WCF__Command_Type.url_to_html_xxx       ),
+                ('url-to-html-hashes',     Enum__WCF__Command_Type.url_to_html_hashes    ),
                 ('url-to-html-min-rating', Enum__WCF__Command_Type.url_to_html_min_rating),
                 ('url-to-ratings',         Enum__WCF__Command_Type.url_to_ratings        ),
                 ('url-to-text-nodes',      Enum__WCF__Command_Type.url_to_text_nodes     ),

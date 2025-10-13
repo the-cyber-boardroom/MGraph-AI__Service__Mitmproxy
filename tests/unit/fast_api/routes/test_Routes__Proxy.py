@@ -16,6 +16,8 @@ class test_Routes__Proxy(TestCase):
             assert _.proxy_service is not None
 
     def test_process_request(self):                                  # Test process_request route
+        # todo: fix the current (minor issue) that with this request we are getting on out test logs the console entry:
+        #       ➡️    📥  GET    example.com                    /api/test
         with Schema__Proxy__Request_Data() as request:
             request.method  = "GET"
             request.host    = "example.com"

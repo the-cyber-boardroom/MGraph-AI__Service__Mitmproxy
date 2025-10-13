@@ -20,7 +20,7 @@ class test_Proxy__Admin__Service(TestCase):
         assert type(self.admin_service)                is Proxy__Admin__Service
         assert type(self.admin_service.cookie_service) is Proxy__Cookie__Service
         assert type(self.admin_service.stats_service)  is Proxy__Stats__Service
-        assert self.admin_service.current_version       == "v0.1.0"
+        assert self.admin_service.current_version       == "v0.1.1"
         assert isinstance(self.admin_service.admin_ui_root, Path)
 
     def test__is_admin_path(self):                                              # Test admin path detection
