@@ -15,7 +15,7 @@ class test_Proxy__WCF__Service(TestCase):
     def setUpClass(cls):
         if in_github_action():
             pytest.skip("Skipping on github action because the server is not stopping and after all tests pass, the gh action hangs")
-        cls.service = Proxy__WCF__Service()
+        cls.service = Proxy__WCF__Service().setup()
         if Schema__WCF__Request().get_auth_headers() == {}:
             pytest.skip("Skipping theses tests because WCF__Request auth is not available")
 

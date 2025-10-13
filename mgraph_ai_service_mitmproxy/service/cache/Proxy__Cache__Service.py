@@ -117,12 +117,12 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
                                                   domain        = parsed.netloc,
                                                   path          = parsed.path,
                                                   access_count  = 1)
-        store_kwargs = dict(namespace       = self.cache_config.namespace           ,
-                           strategy         = Enum__Cache__Store__Strategy.KEY_BASED,
-                           cache_key        = cache_key                             ,
-                           file_id          = "page-entry"                          ,  # Fixed file_id for page entries
-                           body             = page_entry.json()                     ,
-                           json_field_path  = json_field_path                       )
+        store_kwargs = dict(namespace       = self.cache_config.namespace            ,
+                            strategy         = Enum__Cache__Store__Strategy.KEY_BASED,
+                            cache_key        = cache_key                             ,
+                            file_id          = "page-entry"                          ,  # Fixed file_id for page entries
+                            body             = page_entry.json()                     ,
+                            json_field_path  = json_field_path                       )
 
         result               = self.cache_client.store().store__json__cache_key(**store_kwargs)
         if result.get('status') == 'error':
