@@ -35,8 +35,12 @@ class test_Deploy__Service__base():     # Base class for deployment tests - over
         assert self.deploy_fast_api.invoke().get('errorMessage') == DEFAULT__ERROR_MESSAGE__WHEN_FAST_API_IS_OK
 
     def test_5__invoke__function_url(self):
-        version = {'version': version__mgraph_ai_service_mitmproxy}
-        assert self.deploy_fast_api.invoke__function_url('/info/health') == {'status': 'ok'}
+        with self.deploy_fast_api as _:
+            if _.api_key__name() and _.api_key__value():
+                #version = {'version': version__mgraph_ai_service_mitmproxy}
+                assert self.deploy_fast_api.invoke__function_url('/info/health') == {'status': 'ok'}
+            else:
+                pytest.skip("Can't invoke function_url, since no Auth info was found")
 
     # def test_6__delete(self):
     #     assert self.deploy_fast_api.delete() is True
