@@ -251,7 +251,6 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
         # Get debug mode
         if self.is_debug_enabled(headers):
             debug_params['debug'] = 'true'
-
         return debug_params
 
     def get_cookie_summary(self, headers: Dict[str, str]            # Get a summary of all active proxy control cookies

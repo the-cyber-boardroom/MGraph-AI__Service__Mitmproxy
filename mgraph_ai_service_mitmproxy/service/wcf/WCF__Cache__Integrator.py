@@ -1,5 +1,6 @@
 from typing                                                                 import Optional
 from osbot_utils.type_safe.Type_Safe                                        import Type_Safe
+from osbot_utils.utils.Json                                                 import json_to_str
 from osbot_utils.utils.Misc                                                 import date_time_now
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type      import Enum__WCF__Command_Type
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Content_Type      import Enum__WCF__Content_Type
@@ -17,12 +18,14 @@ class WCF__Cache__Integrator(Type_Safe):                                    # In
         if not self.cache_service or not self.cache_service.cache_config.enabled:
             return None
 
+
         cached_content = self.cache_service.get_cached_transformation(target_url  = target_url ,
                                                                       wcf_command = show_value )
-
         if cached_content:
             self.cache_service.increment_cache_hit()
             content_type = self.get_content_type_for_command(command_type)
+            if content_type is Enum__WCF__Content_Type.application_json:
+                cached_content = json_to_str(cached_content)
             return Schema__WCF__Response(status_code  = 200             ,
                                          content_type = content_type    ,
                                          body         = cached_content  ,
@@ -60,6 +63,7 @@ class WCF__Cache__Integrator(Type_Safe):                                    # In
                                       ) -> Enum__WCF__Content_Type:               # Map command type to content type
 
         mapping = { Enum__WCF__Command_Type.url_to_html           : Enum__WCF__Content_Type.text_html        ,
+                    Enum__WCF__Command_Type.url_to_html_dict      : Enum__WCF__Content_Type.application_json ,
                     Enum__WCF__Command_Type.url_to_html_xxx       : Enum__WCF__Content_Type.text_html        ,
                     Enum__WCF__Command_Type.url_to_html_hashes    : Enum__WCF__Content_Type.text_html        ,
                     Enum__WCF__Command_Type.url_to_html_min_rating: Enum__WCF__Content_Type.text_html        ,

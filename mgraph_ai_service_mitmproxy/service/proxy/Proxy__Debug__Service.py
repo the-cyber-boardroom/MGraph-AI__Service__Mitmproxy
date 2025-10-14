@@ -26,12 +26,10 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
     def process_show_command(self, command       : Schema__Debug__Command      ,    # Show command to process
                                    response_data : Schema__Proxy__Response_Data     # Response data
                               ) -> Optional[Schema__Proxy__Modifications]:          # Modifications or None
-
         if command.is_wcf_show_command():                                           # Handle WCF commands (url-to-*)
             target_url = response_data.request.get('url')
             wcf_response = self.wcf_service.process_show_command(show_value = command.command_value,
                                                                  target_url = target_url )
-
             if wcf_response and wcf_response.can_override_response():
                 modifications                                   = Schema__Proxy__Modifications()
                 modifications.override_response                 = True
@@ -102,10 +100,9 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
                                 ) -> None:                                                        # Updates modifications are in the modifications object # todo: review this pattern
 
 
-        # Parse commands
-        commands = self.parse_debug_commands(debug_params)
-        # Process show commands first (they override everything)
-        for command in commands:
+        commands = self.parse_debug_commands(debug_params)                                      # Parse commands
+
+        for command in commands:                                                                # Process show commands first (they override everything)
             if command.is_show_command():
 
 

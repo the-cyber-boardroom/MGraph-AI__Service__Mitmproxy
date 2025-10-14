@@ -56,7 +56,6 @@ class Proxy__WCF__Service(Type_Safe):                                          #
         cached_response = self.cache_integrator.try_get_cached_response(target_url   = target_url  , # Check cache first
                                                                         show_value   = show_value  ,
                                                                         command_type = command_type)
-
         if cached_response:
             return cached_response
 
