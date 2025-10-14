@@ -1,4 +1,5 @@
 import pytest
+from osbot_utils.utils.Env import in_github_action
 from osbot_utils.utils.Misc                                        import list_set
 from osbot_fast_api_serverless.deploy.Deploy__Serverless__Fast_API import DEFAULT__ERROR_MESSAGE__WHEN_FAST_API_IS_OK
 from mgraph_ai_service_mitmproxy.config                                 import LAMBDA_DEPENDENCIES__FAST_API_SERVERLESS
@@ -35,6 +36,8 @@ class test_Deploy__Service__base():     # Base class for deployment tests - over
         assert self.deploy_fast_api.invoke().get('errorMessage') == DEFAULT__ERROR_MESSAGE__WHEN_FAST_API_IS_OK
 
     def test_5__invoke__function_url(self):
+        if in_github_action():
+            pytest.skip("this check is not working on GitHub Actions (auth tokens are not correctly set)") # todo: figure out why they are not test
         with self.deploy_fast_api as _:
             if _.api_key__name() and _.api_key__value():
                 #version = {'version': version__mgraph_ai_service_mitmproxy}
