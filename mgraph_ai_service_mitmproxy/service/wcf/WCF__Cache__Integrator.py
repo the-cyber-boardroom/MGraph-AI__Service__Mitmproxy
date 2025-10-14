@@ -14,7 +14,7 @@ class WCF__Cache__Integrator(Type_Safe):                                    # In
                                       show_value   : str,                        # WCF command value
                                       command_type : Enum__WCF__Command_Type     # Parsed command type
                                  ) -> Optional[Schema__WCF__Response]:           # This will attempt to retrieve cached transformation response
-
+        print('command_type', command_type)
         if not self.cache_service or not self.cache_service.cache_config.enabled:
             return None
 
@@ -24,6 +24,8 @@ class WCF__Cache__Integrator(Type_Safe):                                    # In
         if cached_content:
             self.cache_service.increment_cache_hit()
             content_type = self.get_content_type_for_command(command_type)
+
+
             if content_type is Enum__WCF__Content_Type.application_json:
                 cached_content = json_to_str(cached_content)
             return Schema__WCF__Response(status_code  = 200             ,
@@ -66,6 +68,7 @@ class WCF__Cache__Integrator(Type_Safe):                                    # In
                     Enum__WCF__Command_Type.url_to_html_dict      : Enum__WCF__Content_Type.application_json ,
                     Enum__WCF__Command_Type.url_to_html_xxx       : Enum__WCF__Content_Type.text_html        ,
                     Enum__WCF__Command_Type.url_to_html_hashes    : Enum__WCF__Content_Type.text_html        ,
+                    Enum__WCF__Command_Type.url_to_html_ratings   : Enum__WCF__Content_Type.text_html        ,
                     Enum__WCF__Command_Type.url_to_html_min_rating: Enum__WCF__Content_Type.text_html        ,
                     Enum__WCF__Command_Type.url_to_text           : Enum__WCF__Content_Type.text_plain       ,
                     Enum__WCF__Command_Type.url_to_text_nodes     : Enum__WCF__Content_Type.text_plain       ,

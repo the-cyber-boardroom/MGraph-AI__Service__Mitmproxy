@@ -5,4 +5,4 @@ ENV_VAR__AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME  = "AUTH__TARGET_SERVER__C
 ENV_VAT__AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE = "AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE"
 
 
-DEFAULT__WCF__PROXY__TIMEOUT = 5.0                                          # max five seconds
+DEFAULT__WCF__PROXY__TIMEOUT = 90.0                                           # max 90 seconds (which match the current settings for the proxy)

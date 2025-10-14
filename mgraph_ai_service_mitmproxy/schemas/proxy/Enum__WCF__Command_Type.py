@@ -7,6 +7,7 @@ class Enum__WCF__Command_Type(Enum):            # Types of WCF commands that can
     url_to_html_xxx              = 'url-to-html-xxx'
     url_to_html_min_rating       = 'url-to-html-min-rating'
     url_to_html_hashes           = 'url-to-html-hashes'
+    url_to_html_ratings          = 'url-to-html-ratings'
     url_to_ratings               = 'url-to-ratings'
     url_to_text_nodes            = 'url-to-text-nodes'
     url_to_lines                 = 'url-to-lines'

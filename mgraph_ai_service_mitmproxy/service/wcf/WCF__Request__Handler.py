@@ -33,11 +33,13 @@ class WCF__Request__Handler(Type_Safe):                                     # Ha
             url     = wcf_request.construct_wcf_url()                       # Construct URL and headers
             headers = wcf_request.get_auth_headers()
 
+            print(f"    WCF: {url}")
             try:
                 response = requests.get(url     = url         ,                 # Make HTTP request
                                         headers = headers     ,
                                         timeout = self.timeout)
             except ConnectTimeout as error:
+                print(f"    WCF TIMEOUT on : {url}")
                 return Schema__WCF__Response(error_message = str(error.args[0]),
                                              status_code   = 408               ,  # HTTP: 408 Request Timeout
                                              success       = False             )
@@ -52,6 +54,8 @@ class WCF__Request__Handler(Type_Safe):                                     # Ha
                     body = response.content.decode('utf-8')
             else:
                 body = response.content.decode('utf-8')
+
+            print(f" WCF RESPONSE with size {len(body)}")
 
             return Schema__WCF__Response(status_code  = response.status_code       ,
                                          content_type = content_type               ,

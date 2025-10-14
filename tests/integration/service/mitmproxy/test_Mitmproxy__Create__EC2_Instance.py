@@ -11,7 +11,7 @@ class test_Mitmproxy__Create__EC2_Instance(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        pytest.skip("need manual execution")
+        #pytest.skip("need manual execution")
         load_dotenv()
         cls.create_ec2_instance = Mitmproxy__Create__EC2_Instance()
         cls.security_group_id   = get_env('EC2_TESTS__SECURITY_GROUP_ID'     )

@@ -7,11 +7,16 @@ const COOKIE_DEFINITIONS = [
         name: 'mitm-show',
         description: 'Control content display',
         type: 'select',
-        options: [ { value: 'url-to-html-xxx'   , label: 'URL to Html XXX'         },
-                   { value: 'url-to-html-hashes', label: 'URL to Html Hashes'      },
-                   { value: 'url-to-html-dict'  , label: 'URL to Html Dict (json)' },
-                   { value: 'url-to-ratings'    , label: 'URL to Ratings'          },
-                   { value: 'response-data'     , label: 'Response Data (json)'    }]
+        options: [ { value: 'url-to-html-min-rating' , label: 'Filter content (with min 0.5)' },
+                   { value: 'url-to-html-xxx'        , label: 'Url to Html XXX'         },
+                   { value: 'url-to-html-hashes'     , label: 'Url to Html Hashes'      },
+                   { value: 'url-to-html-dict'       , label: 'Url to Html Dict (json)' },
+                   { value: 'url-to-html-ratings'    , label: 'Url to Html Ratings'     },
+                   { value: 'url-to-html-min-rating' , label: 'Url to Html Min Rating'  },
+                   { value: 'url-to-lines'           , label: 'Url to Html Lines'       },
+                   { value: 'url-to-text-nodes'      , label: 'Url to Text Nodes (json)'},
+                   { value: 'url-to-ratings'         , label: 'Url to Ratings'          },
+                   { value: 'response-data'          , label: 'Response Data (json)'    }]
     },
     {
         name: 'mitm-inject',

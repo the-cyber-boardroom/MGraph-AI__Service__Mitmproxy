@@ -57,18 +57,21 @@ class Proxy__WCF__Service(Type_Safe):                                          #
                                                                         show_value   = show_value  ,
                                                                         command_type = command_type)
         if cached_response:
+            print(f"         >>> Cached response for: {target_url}")
             return cached_response
 
         start_time   = time.time()                                                      # Cache miss - call WCF service
-        modified_url = target_url + modified_url_suffix
+        #modified_url = target_url + modified_url_suffix                                # todo: fix this logic since modified_url_suffix is actually the extra params to send to the wcf server
 
         wcf_request = self.create_request(command_type = command_type,
-                                          target_url   = modified_url,
+                                          target_url   = target_url  ,
                                           rating       = rating,
                                           model_to_use = model_to_use)
 
         wcf_response      = self.make_request(wcf_request)
         call_duration_ms  = (time.time() - start_time) * 1000
+
+        print(f"       WCF took {call_duration_ms/1000:.2f} seconds for {target_url}")
 
         self.cache_integrator.store_wcf_response(target_url       = target_url      ,      # Store successful responses in cache
                                                  show_value       = show_value      ,
@@ -77,6 +80,7 @@ class Proxy__WCF__Service(Type_Safe):                                          #
 
         return wcf_response
 
+    # todo: review this method since at the moment it is only used by the tests
     def _get_content_type_for_command(self,
                                       command_type: Enum__WCF__Command_Type # Command type to map
                                       ) -> Enum__WCF__Content_Type:         # Corresponding content type
