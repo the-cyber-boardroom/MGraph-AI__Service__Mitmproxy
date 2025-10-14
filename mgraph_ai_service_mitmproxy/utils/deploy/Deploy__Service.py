@@ -14,6 +14,11 @@ class Deploy__Service(Deploy__Serverless__Fast_API):
             _.set_env_variable('AUTH__TARGET_SERVER__CACHE_SERVICE__BASE_URL' , get_env('AUTH__TARGET_SERVER__CACHE_SERVICE__BASE_URL' ))
             _.set_env_variable('AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME' , get_env('AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME'))
             _.set_env_variable('AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE', get_env('AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE' ))
+            _.set_env_variable('WCF_SERVICE__AUTH__API_KEY__NAME'             , get_env('WCF_SERVICE__AUTH__API_KEY__NAME'  ))
+            _.set_env_variable('WCF_SERVICE__AUTH__API_KEY__VALUE'            , get_env('WCF_SERVICE__AUTH__API_KEY__VALUE' ))
+
+
+
             _.add_folder(mgraph_ai_service_mitmproxy__admin_ui.path)
             return _
 
