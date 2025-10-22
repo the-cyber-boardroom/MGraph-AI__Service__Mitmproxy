@@ -6,6 +6,8 @@ from osbot_utils.type_safe.primitives.core.Safe_Str                             
 from osbot_utils.type_safe.primitives.core.enums.Enum__Safe_Str__Regex_Mode     import Enum__Safe_Str__Regex_Mode
 from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text    import Safe_Str__Text
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                  import type_safe
+
+from mgraph_ai_service_mitmproxy.schemas.html.Enum__HTML__Transformation_Mode import Enum__HTML__Transformation_Mode
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type          import Enum__WCF__Command_Type
 
 class Safe_Str__Cookie_Name(Safe_Str):                                          # Cookie names: alphanumeric, dots, underscores, hyphens
@@ -308,3 +310,39 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
         cookie[cookie_name]["samesite"] = "Lax"
 
         return cookie[cookie_name].OutputString()
+
+    def get_mitm_mode(self, headers: Dict[str, str]                                     # Request headers containing cookies
+                       ) -> Enum__HTML__Transformation_Mode:                             # Transformation mode from cookie
+        """Extract mitm-mode cookie value and convert to transformation mode"""
+        cookie_header = headers.get('Cookie', headers.get('cookie', ''))
+
+        if not cookie_header:
+            return Enum__HTML__Transformation_Mode.OFF
+
+        cookies = self._parse_cookie_header(cookie_header)                               # Parse cookie header
+        mitm_mode_value = cookies.get('mitm-mode', '')
+
+        return Enum__HTML__Transformation_Mode.from_cookie_value(mitm_mode_value)
+
+
+    def has_mitm_mode_cookie(self,                                                      # Check if mitm-mode cookie is present in headers
+                                  headers: Dict[str, str]                               # Request headers
+                             ) -> bool:                                                 # Whether mitm-mode cookie exists
+
+        mode = self.get_mitm_mode(headers)
+        return mode != Enum__HTML__Transformation_Mode.OFF
+
+    def _parse_cookie_header(self, cookie_header: str                        # Cookie header string
+                             ) -> Dict[str, str]:                            # Parsed cookies dict
+        """Parse Cookie header into dictionary"""
+        cookies = {}
+        if not cookie_header:
+            return cookies
+
+        for cookie_pair in cookie_header.split(';'):
+            cookie_pair = cookie_pair.strip()
+            if '=' in cookie_pair:
+                name, value = cookie_pair.split('=', 1)
+                cookies[name.strip()] = value.strip()
+
+        return cookies

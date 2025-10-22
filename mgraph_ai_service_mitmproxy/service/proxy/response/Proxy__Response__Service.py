@@ -4,6 +4,7 @@ from osbot_utils.type_safe.Type_Safe                                            
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data          import Schema__Proxy__Response_Data
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications          import Schema__Proxy__Modifications
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Response__Processing_Result   import Schema__Response__Processing_Result
+from mgraph_ai_service_mitmproxy.service.html.HTML__Transformation__Service import HTML__Transformation__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service                 import Proxy__Debug__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service                 import Proxy__Stats__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service                  import Proxy__CORS__Service
@@ -13,14 +14,16 @@ from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service           
 
 
 class Proxy__Response__Service(Type_Safe):                       # Main response processing orchestrator
-    debug_service   : Proxy__Debug__Service         = None       # Debug command processing
-    stats_service   : Proxy__Stats__Service                      # Statistics tracking
-    cors_service    : Proxy__CORS__Service                       # CORS header management
-    headers_service : Proxy__Headers__Service                    # Standard headers
-    cookie_service  : Proxy__Cookie__Service                     # Cookie-based control
+    debug_service               : Proxy__Debug__Service         = None       # Debug command processing
+    stats_service               : Proxy__Stats__Service                      # Statistics tracking
+    cors_service                : Proxy__CORS__Service                       # CORS header management
+    headers_service             : Proxy__Headers__Service                    # Standard headers
+    cookie_service              : Proxy__Cookie__Service                     # Cookie-based control
+    html_transformation_service : HTML__Transformation__Service = None
 
     def setup(self):
-        self.debug_service = Proxy__Debug__Service().setup()
+        self.debug_service               = Proxy__Debug__Service().setup()
+        self.html_transformation_service = HTML__Transformation__Service().setup()
         return self
 
     def generate_request_id(self) -> str:                        # Generate unique request ID
@@ -52,6 +55,15 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
                 return self.finalize_overridden_response(response_data=response_data ,              # For overridden responses, finalize and return
                                                          modifications=modifications )
             if modifications.modified_body:                                                         # Check if content was modified (but not overridden)
+                self.stats_service.increment_content_modification()
+
+            # Process HTML transformation based on mitm-mode cookie
+            transformed_html, transformation_headers = self.process_html_transformation(response_data   = response_data    ,
+                                                                                        request_headers = request_headers  )
+
+            if transformed_html:
+                modifications.modified_body = transformed_html
+                modifications.headers_to_add.update(transformation_headers)
                 self.stats_service.increment_content_modification()
 
             # todo: review if we need to have this CORS capabilities in this part of the proxy workflow
@@ -180,3 +192,56 @@ class Proxy__Response__Service(Type_Safe):                       # Main response
             response_overridden  = False,
             processing_error    = error_message
         )
+
+    # todo: refactor tuple with Type_Safe class
+    def process_html_transformation(self,                                                   # Process HTML transformation based on mitm-mode cookie
+                                          response_data  : Schema__Proxy__Response_Data,    # Response data with HTML
+                                          request_headers: Dict[str, str]                   # Request headers with cookies
+                                ) -> tuple:                                                 # (transformed_html, headers_to_add)
+        transformation_mode = self.cookie_service.get_mitm_mode(request_headers)        # Extract transformation mode from cookie
+
+        if not transformation_mode.is_active():                                          # No transformation needed
+            return (None, {})
+
+        response_body = response_data.response.get("body", "")                           # Extract HTML from response
+        target_url    = self._construct_target_url(response_data)
+
+        if not response_body:                                                            # No body to transform
+            return (None, {})
+
+        content_type = response_data.response.get("headers", {}).get("content-type", "")    # Only transform HTML content
+        if "text/html" not in content_type.lower():
+            print(f"         >>> Skipping transformation - not HTML: {content_type}")
+            return (None, {})
+
+        print(f"    🔄 Transforming HTML with mode: {transformation_mode.value}")
+
+        self.html_transformation_service.store_original_html(                            # Store original HTML for provenance
+            target_url    = target_url     ,
+            original_html = response_body
+        )
+
+        result = self.html_transformation_service.transform_html(                        # Perform transformation
+            source_html = response_body       ,
+            target_url  = target_url          ,
+            mode        = transformation_mode
+        )
+
+        headers_to_add = result.to_headers()                                             # Generate transformation headers
+
+        return (result.transformed_html, headers_to_add)
+
+
+    def _construct_target_url(self, response_data: 'Schema__Proxy__Response_Data'       # Response data
+                              ) -> str:                                                  # Constructed URL
+        """Construct the target URL from response data"""
+        request    = response_data.request
+        scheme     = request.get('scheme', 'https')
+        host       = request.get('host', '')
+        port       = request.get('port', 443)
+        path       = request.get('path', '/')
+
+        if (scheme == 'https' and port == 443) or (scheme == 'http' and port == 80):    # Standard ports - omit from URL
+            return f"{scheme}://{host}{path}"
+        else:
+            return f"{scheme}://{host}:{port}{path}"
