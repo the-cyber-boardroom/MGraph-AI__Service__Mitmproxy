@@ -7,7 +7,7 @@ from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Service__Request    
 from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Transformation__Result  import Schema__HTML__Transformation__Result
 from mgraph_ai_service_mitmproxy.service.html.HTML__Service__Client                 import HTML__Service__Client
 from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service                import Proxy__Cache__Service
-from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Url import Safe_Str__Url
+from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Url            import Safe_Str__Url
 
 
 class HTML__Transformation__Service(Type_Safe):                                              # Orchestrates HTML transformations with caching

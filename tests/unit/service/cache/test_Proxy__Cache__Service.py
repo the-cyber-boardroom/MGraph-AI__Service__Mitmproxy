@@ -65,17 +65,18 @@ class test_Proxy__Cache__Service(TestCase):
             assert type(_) is Proxy__Cache__Service
 
             # Check OpenAPI spec
-            open_api_json = obj(GET_json(self.server_url + '/openapi.json'))
-            assert open_api_json.info.title == 'Cache_Service__Fast_API'
-            assert '/{namespace}/retrieve/{cache_id}' in list_set(open_api_json.paths)                  # confirm the routes have been wired
 
-            storage_info = GET_json(self.server_url + '/server/storage/info')                           # Verify we're using MEMORY storage mode
-            assert storage_info == { 'storage_mode': 'memory',   'ttl_hours': 24 }
+            open_api_json       = GET_json(self.server_url + '/openapi.json')
+            open_api_json__obj  = obj(open_api_json)
+            paths_json          = open_api_json.get('paths')
+            storage_info        = GET_json(self.server_url + '/server/storage/info')                            # Verify we're using MEMORY storage mode
+            storage_backend     = self.cache_service__fast_api.cache_service.storage_backend()                  # Verify storage backend type
 
+            assert open_api_json__obj.info.title                                        == 'Cache_Service__Fast_API'
+            assert '/{namespace}/retrieve/{cache_id}'                                   in list_set(paths_json)                           # confirm the routes have been wired
             assert self.cache_service__fast_api.cache_service.cache_config.storage_mode == Enum__Cache__Storage_Mode.MEMORY # Additional verification - check the actual cache service configuration
-
-            storage_backend = self.cache_service__fast_api.cache_service.storage_backend()              # Verify storage backend type
-            assert isinstance(storage_backend, Storage_FS__Memory)
+            assert storage_info                                                         == { 'storage_mode': 'memory',   'ttl_hours': 24 }
+            assert type(storage_backend)                                                is Storage_FS__Memory
 
 
     def test__url_to_cache_key(self):                          # Test URL to cache_key conversion

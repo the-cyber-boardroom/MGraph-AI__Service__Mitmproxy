@@ -19,12 +19,9 @@ from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Page__Entr
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Page__Refs            import Schema__Cache__Page__Refs
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Stats                 import Schema__Cache__Stats
 from mgraph_ai_service_mitmproxy.service.cache.schemas.safe_str.Safe_Str__Proxy__Cache_Key  import Safe_Str__Proxy__Cache_Key
+from mgraph_ai_service_mitmproxy.service.consts.consts__proxy                               import ENV_VAR__AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME, ENV_VAR__AUTH__TARGET_SERVER__CACHE_SERVICE__BASE_URL
 
-from osbot_utils.utils.Dev import pprint
-
-from mgraph_ai_service_mitmproxy.service.consts.consts__proxy import ENV_VAR__AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME, ENV_VAR__AUTH__TARGET_SERVER__CACHE_SERVICE__BASE_URL
-
-DEFAULT__TEXT__CACHE_NOT_FOUND = 'Not found'
+DEFAULT__TEXT__CACHE_NOT_FOUND = ''                             # this used to be 'Not found' # todo see if we still need this DEFAULT__TEXT__CACHE_NOT_FOUND variable
 PAGE_ENTRY__JSON_FIELD_PATH    = 'cache_key'
 
 class Proxy__Cache__Service(Type_Safe):                         # Cache service for WCF transformations
