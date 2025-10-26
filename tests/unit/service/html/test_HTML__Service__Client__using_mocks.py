@@ -1,7 +1,7 @@
 from unittest                                                                      import TestCase
 from unittest.mock                                                                 import patch, Mock
 from osbot_utils.testing.__                                                        import __
-from osbot_utils.type_safe.Type_Safe import Type_Safe
+from osbot_utils.type_safe.Type_Safe                                               import Type_Safe
 from osbot_utils.utils.Objects                                                     import base_classes
 from osbot_utils.type_safe.primitives.core.Safe_Float                              import Safe_Float
 from mgraph_ai_service_mitmproxy.service.html.HTML__Service__Client                import HTML__Service__Client
