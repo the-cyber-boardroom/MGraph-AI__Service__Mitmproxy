@@ -12,7 +12,7 @@ class Schema__HTML__Transformation__Result(Type_Safe):                # Result o
     transformation_mode    : Enum__HTML__Transformation_Mode          # Mode that was applied
     content_type           : Safe_Str__Http__Content_Type             # Content type of result
     cache_hit              : bool                                     # Whether result came from cache
-    transformation_time_ms : Safe_Float                      = None    # Time taken for transformation (ms)
+    transformation_time_ms : Safe_Float                               # Time taken for transformation (ms)
 
     def was_cached(self) -> bool:                                                   # Check if result was from cache
         return self.cache_hit

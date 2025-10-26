@@ -1,5 +1,6 @@
 from unittest                                                                       import TestCase
-from osbot_utils.utils.Objects                                                      import base_classes, __
+from osbot_utils.testing.__                                                         import __
+from osbot_utils.utils.Objects                                                      import base_classes
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service               import Proxy__Cookie__Service
 from mgraph_ai_service_mitmproxy.schemas.proxy.Enum__WCF__Command_Type              import Enum__WCF__Command_Type
 
@@ -34,13 +35,13 @@ class test_Proxy__Cookie__Service(TestCase):
             assert base_classes(_) == [Proxy__Cookie__Service.__bases__[0], object]
 
             assert _.obj() == __(COOKIE_PREFIX = 'mitm-'             ,
-                                COOKIE_SHOW    = 'mitm-show'         ,
-                                COOKIE_INJECT  = 'mitm-inject'       ,
-                                COOKIE_REPLACE = 'mitm-replace'      ,
-                                COOKIE_DEBUG   = 'mitm-debug'        ,
-                                COOKIE_RATING  = 'mitm-rating'       ,
-                                COOKIE_MODEL   = 'mitm-model'        ,
-                                COOKIE_CACHE   = 'mitm-cache'        )
+                                 COOKIE_SHOW    = 'mitm-show'         ,
+                                 COOKIE_INJECT  = 'mitm-inject'       ,
+                                 COOKIE_REPLACE = 'mitm-replace'      ,
+                                 COOKIE_DEBUG   = 'mitm-debug'        ,
+                                 COOKIE_RATING  = 'mitm-rating'       ,
+                                 COOKIE_MODEL   = 'mitm-model'        ,
+                                 COOKIE_CACHE   = 'mitm-cache'        )
 
     def test_parse_cookies(self):                                                             # Test basic cookie parsing
         with self.cookie_service as _:

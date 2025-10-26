@@ -15,7 +15,7 @@ from osbot_utils.type_safe.primitives.core.Safe_UInt                            
 from osbot_utils.utils.Http                                                             import GET_json
 from osbot_utils.utils.Json                                                             import str_to_json
 from osbot_utils.utils.Misc                                                             import list_set, is_guid
-from osbot_utils.utils.Objects                                                          import obj
+from osbot_utils.testing.__helpers                                                      import obj
 from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service                    import Proxy__Cache__Service
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Config            import Schema__Cache__Config
 from mgraph_ai_service_mitmproxy.service.cache.schemas.Schema__Cache__Page__Refs        import Schema__Cache__Page__Refs

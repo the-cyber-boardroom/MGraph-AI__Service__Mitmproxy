@@ -87,9 +87,11 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
         return self.get_page_entry__via__cache_hash(cache_hash=cache_hash)
 
     def get_page_entry__via__cache_hash(self, cache_hash : Safe_Str__Cache_Hash                            # Get existing page cache_id
-                        ) -> Dict:
+                                         ) -> Dict:
         result = self.cache_client.retrieve().retrieve__hash__cache_hash(cache_hash = cache_hash                 ,
                                                                          namespace  = self.cache_config.namespace)
+
+        # todo: see if metadata is really the best place to get this page entry data
         metadata = result.get('metadata')                                   # todo: this metadata should be a Type_Safe object
         return metadata
 

@@ -1,7 +1,7 @@
 from unittest                                                          import TestCase
 from osbot_utils.testing.__                                            import __
+from osbot_utils.testing.__helpers                                     import obj
 from osbot_utils.utils.Env                                             import in_github_action, load_dotenv
-from osbot_utils.utils.Objects                                         import obj
 from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Cache         import Routes__Cache
 from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service   import Proxy__Cache__Service
 

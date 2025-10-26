@@ -1,9 +1,9 @@
 import pytest
-from unittest                                      import TestCase
-from osbot_utils.testing.__                        import __
-from osbot_utils.utils.Json                        import str_to_json
-from osbot_utils.utils.Objects                     import obj
-from tests.unit.Service__Fast_API__Test_Objs       import setup__service_fast_api_test_objs, TEST_API_KEY__NAME, TEST_API_KEY__VALUE
+from unittest                                          import TestCase
+from osbot_utils.testing.__                            import __
+from osbot_utils.testing.__helpers                     import obj
+from osbot_utils.utils.Json                            import str_to_json
+from tests.unit.Mitmproxy_Service__Fast_API__Test_Objs import setup__service_fast_api_test_objs, TEST_API_KEY__NAME, TEST_API_KEY__VALUE
 
 
 class test_Routes__Proxy__Cookies__client(TestCase):                                         # Test cookie-based proxy control via FastAPI TestClient

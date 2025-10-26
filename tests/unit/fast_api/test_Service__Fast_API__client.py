@@ -2,15 +2,15 @@ from unittest                                                           import T
 from fastapi                                                            import FastAPI
 from osbot_fast_api.api.Fast_API                                        import ENV_VAR__FAST_API__AUTH__API_KEY__NAME, ENV_VAR__FAST_API__AUTH__API_KEY__VALUE
 from osbot_fast_api.api.schemas.consts.consts__Fast_API                 import EXPECTED_ROUTES__SET_COOKIE
+from osbot_fast_api_serverless.fast_api.routes.Routes__Info             import ROUTES_PATHS__INFO, ROUTES_INFO__HEALTH__RETURN_VALUE
 from osbot_local_stack.local_stack.Local_Stack                          import Local_Stack
 from osbot_utils.utils.Env                                              import get_env
 from starlette.testclient                                               import TestClient
 from osbot_fast_api_serverless.utils.testing.skip_tests                 import skip__if_not__in_github_actions
 from mgraph_ai_service_mitmproxy.fast_api.Service__Fast_API             import Service__Fast_API
 from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Cache          import ROUTES_PATHS__CACHE
-from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Info           import ROUTES_PATHS__INFO, ROUTES_INFO__HEALTH__RETURN_VALUE
 from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Proxy          import ROUTES_PATHS__PROXY
-from tests.unit.Service__Fast_API__Test_Objs                            import setup__service_fast_api_test_objs, Service__Fast_API__Test_Objs, TEST_API_KEY__NAME
+from tests.unit.Mitmproxy_Service__Fast_API__Test_Objs                  import setup__service_fast_api_test_objs, Mitmproxy_Service__Fast_API__Test_Objs, TEST_API_KEY__NAME
 
 
 class test_Service__Fast_API__client(TestCase):
@@ -25,7 +25,7 @@ class test_Service__Fast_API__client(TestCase):
 
     def test__init__(self):
         with self.service_fast_api_test_objs as _:
-            assert type(_)                  is Service__Fast_API__Test_Objs
+            assert type(_) is Mitmproxy_Service__Fast_API__Test_Objs
             assert type(_.fast_api        ) is Service__Fast_API
             assert type(_.fast_api__app   ) is FastAPI
             assert type(_.fast_api__client) is TestClient

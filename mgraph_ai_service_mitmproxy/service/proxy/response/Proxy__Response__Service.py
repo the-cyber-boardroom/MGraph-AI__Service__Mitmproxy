@@ -4,7 +4,7 @@ from osbot_utils.type_safe.Type_Safe                                            
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data          import Schema__Proxy__Response_Data
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications          import Schema__Proxy__Modifications
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Response__Processing_Result   import Schema__Response__Processing_Result
-from mgraph_ai_service_mitmproxy.service.html.HTML__Transformation__Service import HTML__Transformation__Service
+from mgraph_ai_service_mitmproxy.service.html.HTML__Transformation__Service          import HTML__Transformation__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service                 import Proxy__Debug__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service                 import Proxy__Stats__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service                  import Proxy__CORS__Service

@@ -1,5 +1,3 @@
-# mgraph_ai_service_mitmproxy/schemas/html/Schema__HTML__Service__Response.py
-
 from typing                                                                              import Dict, Optional
 from osbot_utils.type_safe.Type_Safe                                                     import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                     import Safe_UInt

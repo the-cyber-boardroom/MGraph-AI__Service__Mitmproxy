@@ -1,6 +1,6 @@
 from typing                                         import Dict
 from osbot_utils.type_safe.primitives.core.Safe_Str import Safe_Str
-from osbot_utils.utils.Objects                      import obj
+from osbot_utils.testing.__helpers                  import obj
 
 
 def obj__dict(data : Dict):

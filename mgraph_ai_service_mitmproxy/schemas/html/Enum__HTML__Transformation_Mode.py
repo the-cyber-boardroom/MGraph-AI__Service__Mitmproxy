@@ -32,10 +32,9 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
         """Check if this transformation should be cached"""
         return self.is_active()                                                     # All active modes are cacheable
 
-    def to_endpoint_path(self) -> str:                                              # Get HTML Service endpoint path
-        """Convert mode to HTML Service endpoint path"""
+    def to_endpoint_path(self) -> str:                                              # Convert mode to HTML Service endpoint path"""
         mapping = {
-            Enum__HTML__Transformation_Mode.DICT      : "/html/to/tree/view"       ,
+            Enum__HTML__Transformation_Mode.DICT      : "/html/to/tree/view"       , # BUG this should be to html/to/dict and we should add new TREE_VIEW mode which would be the one that points to /html/to/tree/view
             Enum__HTML__Transformation_Mode.XXX       : "/html/to/html/xxx"        ,
             Enum__HTML__Transformation_Mode.HASHES    : "/html/to/html/hashes"     ,
             Enum__HTML__Transformation_Mode.ROUNDTRIP : "/html/to/html"

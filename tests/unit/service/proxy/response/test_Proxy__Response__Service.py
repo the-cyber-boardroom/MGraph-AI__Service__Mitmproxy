@@ -1,7 +1,7 @@
 import pytest
 from unittest                                                                       import TestCase
 from osbot_utils.utils.Misc                                                         import list_set
-from osbot_utils.utils.Objects                                                      import base_classes, __
+from osbot_utils.utils.Objects                                                      import base_classes
 from mgraph_ai_service_mitmproxy.service.proxy.response.Proxy__Response__Service    import Proxy__Response__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service                import Proxy__Debug__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service                import Proxy__Stats__Service

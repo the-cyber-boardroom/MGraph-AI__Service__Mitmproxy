@@ -1,7 +1,4 @@
-# mgraph_ai_service_mitmproxy/schemas/html/Schema__HTML__Service__Request.py
-
 from osbot_utils.type_safe.Type_Safe                                                      import Type_Safe
-from osbot_utils.type_safe.primitives.core.Safe_Str                                       import Safe_Str
 from mgraph_ai_service_mitmproxy.schemas.html.Enum__HTML__Transformation_Mode              import Enum__HTML__Transformation_Mode
 
 class Schema__HTML__Service__Request(Type_Safe):                                    # HTML Service API request

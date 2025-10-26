@@ -1,6 +1,6 @@
 from unittest                                                                          import TestCase
 from osbot_utils.testing.__                                                            import __
-from osbot_utils.utils.Objects                                                         import obj
+from osbot_utils.testing.__helpers                                                     import obj
 from mgraph_ai_service_mitmproxy.utils.testing.Testing__Cache_Service__With__Test_Data import setup__testing__cache_service__with__test_data
 
 
