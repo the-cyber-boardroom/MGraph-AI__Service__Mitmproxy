@@ -91,7 +91,7 @@ class test_HTML__Transformation__Service(TestCase):
             source_html = "<html><body><p>Test content</p></body></html>"
 
             result = _.transform_html(source_html = source_html                              ,
-                                      target_url  = "https://example.com/test"               ,
+                                      target_url  = "https://example.com/test_in_bug"               ,
                                       mode        = Enum__HTML__Transformation_Mode.HASHES   )
 
 
@@ -117,7 +117,7 @@ class test_HTML__Transformation__Service(TestCase):
             source_html = "<html><body><p>Secret text</p></body></html>"
 
             result = _.transform_html(source_html = source_html                              ,
-                                      target_url  = "https://example.com/secret"             ,
+                                      target_url  = "https://example.com/secret_with_xxx"             ,
                                       mode        = Enum__HTML__Transformation_Mode.XXX      )
 
             assert type(result)               is Schema__HTML__Transformation__Result
