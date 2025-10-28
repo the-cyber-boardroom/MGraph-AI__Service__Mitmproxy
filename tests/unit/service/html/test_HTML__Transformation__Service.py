@@ -51,6 +51,7 @@ class test_HTML__Transformation__Service(TestCase):
             assert type(_              ) is HTML__Transformation__Service
             assert type(_.cache_service) is Proxy__Cache__Service
 
+
     def test__init__(self):                                                         # Test auto-initialization
         with HTML__Transformation__Service() as _:
             assert type(_)         is HTML__Transformation__Service
