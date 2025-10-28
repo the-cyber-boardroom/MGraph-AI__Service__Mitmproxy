@@ -50,6 +50,12 @@ class test_Routes__Proxy__HTML_Transformation__client(TestCase):               #
                                   'stats'        : {}           ,
                                   'version'      : 'v1.0.0'     }
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.html_service_server.stop()
+        cls.cache_service_server.stop()
+        cls.temp_env_vars.remove()
+
     def test__health_check(self):                                               # Verify API is accessible
         response = self.client.get('/info/health')
         assert response.status_code == 200

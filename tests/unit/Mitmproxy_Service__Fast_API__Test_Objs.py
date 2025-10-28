@@ -10,6 +10,7 @@ from osbot_local_stack.local_stack.Local_Stack                          import L
 from osbot_utils.type_safe.Type_Safe                                    import Type_Safe
 from osbot_utils.type_safe.primitives.domains.identifiers.Random_Guid   import Random_Guid
 from osbot_utils.utils.Env                                              import set_env
+from osbot_utils.utils.Misc import random_port
 from starlette.testclient                                               import TestClient
 from mgraph_ai_service_mitmproxy.fast_api.Service__Fast_API             import Service__Fast_API
 
@@ -124,3 +125,17 @@ class Cache_Service__Fast_API__Singleton(Base__FastAPI__Service__Singleton[Cache
 def get__cache_service__fast_api_server() -> Cache_Service__Fast_API__Test_Objs:
     set_env(ENV_VAR__CACHE__SERVICE__STORAGE_MODE, 'memory')                            # configure the cache service to use an in-memory db (instead of trying to use S3)
     return Cache_Service__Fast_API__Singleton.get_instance()
+
+# -------------------------------------------------------------------------------
+# Mitmproxy Service Singleton
+# -------------------------------------------------------------------------------
+class Mitmproxy_Service__Fast_API__Test_Objs(FastAPI__Service__Test_Objs):     # Cache FastAPI service configuration
+    pass
+
+class Mitmproxy_Service__Fast_API__Singleton(Base__FastAPI__Service__Singleton[Cache_Service__Fast_API__Test_Objs]):
+    service_cls  = Service__Fast_API
+    test_obj_cls = Mitmproxy_Service__Fast_API__Test_Objs
+
+def get__mitmproxy_service__fast_api_server() -> Cache_Service__Fast_API__Test_Objs:
+    set_env(ENV_VAR__CACHE__SERVICE__STORAGE_MODE, 'memory')                            # configure the cache service to use an in-memory db (instead of trying to use S3)
+    return Mitmproxy_Service__Fast_API__Singleton.get_instance()
