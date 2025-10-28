@@ -1,18 +1,12 @@
-from unittest                                                                        import TestCase
-
 import pytest
+from unittest                                                                        import TestCase
 from osbot_utils.testing.__                                                          import __, __SKIP__
-from osbot_utils.helpers.duration.decorators.print_duration                          import print_duration
 from osbot_utils.testing.Temp_Env_Vars                                               import Temp_Env_Vars
 from osbot_utils.utils.Http                                                          import GET_json
-from osbot_utils.utils.Misc import list_set
-
+from osbot_utils.utils.Misc                                                          import list_set
 from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Proxy                       import Routes__Proxy
-from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Request_Data           import Schema__Proxy__Request_Data
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data          import Schema__Proxy__Response_Data
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Modifications          import Schema__Proxy__Modifications
-from mgraph_ai_service_mitmproxy.schemas.html.Enum__HTML__Transformation_Mode        import Enum__HTML__Transformation_Mode
-
 from tests.unit.Mitmproxy_Service__Fast_API__Test_Objs                               import (get__cache_service__fast_api_server,
                                                                                               get__html_service__fast_api_server  )
 
