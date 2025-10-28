@@ -9,6 +9,7 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
     XXX_RANDOM    = "xxx-random"
     HASHES        = "hashes"                                                           # Hash display mode
     HASHES_RANDOM = "hashes-random"                                                 # Random hash display (50% text → hash)
+    ABCDE_BY_SIZE = "abcde-by-size"
     ROUNDTRIP     = "roundtrip"                                                        # Validation test (html→dict→html)
 
     @classmethod
@@ -31,8 +32,9 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
         return self != Enum__HTML__Transformation_Mode.OFF
 
     def is_local_transformation(self) -> bool:                                      # Check if this transformation is processed locally (not via HTML Service)
-        return self in (Enum__HTML__Transformation_Mode.XXX_RANDOM,
-                Enum__HTML__Transformation_Mode.HASHES_RANDOM)
+        return self in (Enum__HTML__Transformation_Mode.XXX_RANDOM    ,
+                        Enum__HTML__Transformation_Mode.HASHES_RANDOM ,
+                        Enum__HTML__Transformation_Mode.ABCDE_BY_SIZE )
 
     def requires_caching(self) -> bool:                                             # Check if mode should be cached
         """Check if this transformation should be cached"""
@@ -45,6 +47,7 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
             Enum__HTML__Transformation_Mode.XXX_RANDOM    : ""                         ,  # Empty = local processing
             Enum__HTML__Transformation_Mode.HASHES        : "/html/to/html/hashes"     ,
             Enum__HTML__Transformation_Mode.HASHES_RANDOM : ""                         , # Empty = local processing
+            Enum__HTML__Transformation_Mode.ABCDE_BY_SIZE : ""                         ,
             Enum__HTML__Transformation_Mode.ROUNDTRIP     : "/html/to/html"
         }
         return mapping.get(self, "")
@@ -59,11 +62,12 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
     def to_cache_data_key(self) -> str:                                             # Get cache storage key
         """Get cache data key for this transformation mode"""
         mapping = {
-            Enum__HTML__Transformation_Mode.DICT       : "transformations/html-dict"    ,
-            Enum__HTML__Transformation_Mode.XXX        : "transformations/html-xxx"     ,
-            Enum__HTML__Transformation_Mode.XXX_RANDOM : ""                             ,   # Not cached
-            Enum__HTML__Transformation_Mode.HASHES     : "transformations/html-hashes"  ,
-            Enum__HTML__Transformation_Mode.ROUNDTRIP  : "transformations/html-roundtrip"
+            Enum__HTML__Transformation_Mode.DICT          : "transformations/html-dict"    ,
+            Enum__HTML__Transformation_Mode.XXX           : "transformations/html-xxx"     ,
+            Enum__HTML__Transformation_Mode.XXX_RANDOM    : ""                             ,   # Not cached
+            Enum__HTML__Transformation_Mode.HASHES        : "transformations/html-hashes"  ,
+            Enum__HTML__Transformation_Mode.ABCDE_BY_SIZE : ""                             ,
+            Enum__HTML__Transformation_Mode.ROUNDTRIP     : "transformations/html-roundtrip"
         }
         return mapping.get(self, "")
 

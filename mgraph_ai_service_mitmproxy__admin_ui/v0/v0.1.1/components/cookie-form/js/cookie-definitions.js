@@ -11,6 +11,7 @@ const COOKIE_DEFINITIONS = [
                    { value: 'xxx-random'    , label: 'Html to XXX (Random)'     },
                    { value: 'hashes'        , label: 'Html to Hashes'           },
                    { value: 'hashes-random' , label: 'Html to Hashes (Random)'  },
+                   { value: 'abcde-by-size' , label: 'Html to ABCDE (by size)'  },
                    { value: 'roundtrip'     , label: 'Html to Html (roundtrip)' }],
         },
      {

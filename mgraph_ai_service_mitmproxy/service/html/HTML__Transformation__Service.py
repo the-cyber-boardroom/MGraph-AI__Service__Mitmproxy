@@ -33,6 +33,7 @@ class HTML__Transformation__Service(Type_Safe):                                 
                                                         content_type           = "text/html"       ,
                                                         cache_hit              = False             ,
                                                         transformation_time_ms = Safe_Float(0.0)   )
+
         if mode.is_local_transformation():
             return self._transform_locally(source_html, mode)
 
@@ -165,16 +166,18 @@ class HTML__Transformation__Service(Type_Safe):                                 
         Supports:
         - xxx-random: Randomly mask 50% of text with 'x'
         - hashes-random: Randomly replace 50% of text with hash values
+        - abcde-by-size: Group by text length and replace with letters (a, b, c, d, e)
         """
         import time
         start_time = time.time()
 
         try:
-            # Both xxx-random and hashes-random use the same flow
+            # All local transformations use the same flow
             if mode in (Enum__HTML__Transformation_Mode.XXX_RANDOM,
-                        Enum__HTML__Transformation_Mode.HASHES_RANDOM):
+                        Enum__HTML__Transformation_Mode.HASHES_RANDOM,
+                        Enum__HTML__Transformation_Mode.ABCDE_BY_SIZE):
 
-                mode_name = "xxx-random" if mode == Enum__HTML__Transformation_Mode.XXX_RANDOM else "hashes-random"
+                mode_name = mode.value
                 print(f"    🎲 {mode_name}: Getting hash mapping from HTML Service...")
 
                 # Step 1: Get hash mapping from HTML Service
@@ -198,7 +201,6 @@ class HTML__Transformation__Service(Type_Safe):                                 
                         html_dict,
                         hash_mapping
                     )
-                    # Count masked nodes
                     masked_count = sum(1 for k, v in modified_mapping.items()
                                      if 'x' in v and hash_mapping.get(k, '') != v)
                     print(f"    🎲 xxx-random: Masked {masked_count}/{len(hash_mapping)} text nodes")
@@ -209,10 +211,20 @@ class HTML__Transformation__Service(Type_Safe):                                 
                         html_dict,
                         hash_mapping
                     )
-                    # Count nodes showing hashes
                     hash_count = sum(1 for k, v in modified_mapping.items()
                                    if v == str(k))
                     print(f"    🎲 hashes-random: Showing {hash_count}/{len(hash_mapping)} text nodes as hashes")
+
+                elif mode == Enum__HTML__Transformation_Mode.ABCDE_BY_SIZE:
+                    print(f"    🎲 abcde-by-size: Grouping by text length...")
+                    modified_mapping = self.local_transformation_svc.transform_abcde_by_size_via_hashes(
+                        html_dict,
+                        hash_mapping
+                    )
+                    # Count how many in each group
+                    from collections import Counter
+                    group_counts = Counter(modified_mapping.values())
+                    print(f"    🎲 abcde-by-size: Groups created - {dict(group_counts)}")
 
                 else:
                     # Shouldn't reach here but handle gracefully

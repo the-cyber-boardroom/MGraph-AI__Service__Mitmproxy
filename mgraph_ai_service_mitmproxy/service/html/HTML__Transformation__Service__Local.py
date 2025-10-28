@@ -2,6 +2,9 @@ import random
 from typing import Dict
 from osbot_utils.type_safe.Type_Safe import Type_Safe
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash import Safe_Str__Hash
+from osbot_utils.utils.Dev import pprint
+
+from mgraph_ai_service_mitmproxy.service.html.Text__Grouping__Service import Text__Grouping__Service
 
 
 class HTML__Transformation__Service__Local(Type_Safe):
@@ -82,6 +85,10 @@ class HTML__Transformation__Service__Local(Type_Safe):
         if not hash_mapping:
             return hash_mapping
 
+        # for key,value, in hash_mapping.items():
+        #     print(f'{key:20} : {value}')
+
+
         # Get all hashes and randomly select which to show as hashes
         selected_hashes = self._randomly_select_hashes(hash_mapping)
 
@@ -142,3 +149,28 @@ class HTML__Transformation__Service__Local(Type_Safe):
                 result.append(char)  # Keep punctuation for readability
 
         return ''.join(result)
+
+    def transform_abcde_by_size_via_hashes(self,html_dict: dict,
+                                                hash_mapping: Dict[Safe_Str__Hash, str]
+                                              ) -> Dict[Safe_Str__Hash, str]:
+            if not hash_mapping:
+                return hash_mapping
+
+            # Create grouping service
+            grouping_service = Text__Grouping__Service(num_groups=5)
+
+            # Group hashes by text length
+            groups = grouping_service.group_by_length(hash_mapping)
+
+            # Create modified mapping with group letters
+            modified_mapping = {}
+
+            for group_index, hashes in groups.items():
+                # Get letter for this group (0='a', 1='b', etc.)
+                group_letter = grouping_service.get_group_letter(group_index)
+
+                # Replace all texts in this group with the letter
+                for hash_key in hashes:
+                    modified_mapping[hash_key] = group_letter
+
+            return modified_mapping
