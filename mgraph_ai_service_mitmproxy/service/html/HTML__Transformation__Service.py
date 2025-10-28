@@ -1,17 +1,16 @@
 import time
-from typing                                                                         import Optional
-
-from mgraph_ai_service_html.html__fast_api.schemas.html.Schema__Html__To__Dict__Hashes__Request import Schema__Html__To__Dict__Hashes__Request
-from osbot_utils.type_safe.Type_Safe                                                import Type_Safe
-from osbot_utils.type_safe.primitives.core.Safe_Float                               import Safe_Float
-from mgraph_ai_service_mitmproxy.schemas.html.Enum__HTML__Transformation_Mode       import Enum__HTML__Transformation_Mode
-from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Service__Request        import Schema__HTML__Service__Request
-from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Transformation__Result  import Schema__HTML__Transformation__Result
-from mgraph_ai_service_mitmproxy.schemas.html.Schema__Hashes__To__Html__Request import Schema__Hashes__To__Html__Request
-from mgraph_ai_service_mitmproxy.service.html.HTML__Service__Client                 import HTML__Service__Client
-from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service                import Proxy__Cache__Service
-from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Url            import Safe_Str__Url
-from mgraph_ai_service_mitmproxy.service.html.HTML__Transformation__Service__Local  import HTML__Transformation__Service__Local
+from typing                                                                             import Optional
+from osbot_utils.type_safe.Type_Safe                                                    import Type_Safe
+from osbot_utils.type_safe.primitives.core.Safe_Float                                   import Safe_Float
+from mgraph_ai_service_mitmproxy.schemas.html.Enum__HTML__Transformation_Mode           import Enum__HTML__Transformation_Mode
+from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Service__Request            import Schema__HTML__Service__Request
+from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Transformation__Result      import Schema__HTML__Transformation__Result
+from mgraph_ai_service_mitmproxy.schemas.html.Schema__Hashes__To__Html__Request         import Schema__Hashes__To__Html__Request
+from mgraph_ai_service_mitmproxy.schemas.html.Schema__Html__To__Dict__Hashes__Request   import Schema__Html__To__Dict__Hashes__Request
+from mgraph_ai_service_mitmproxy.service.html.HTML__Service__Client                     import HTML__Service__Client
+from mgraph_ai_service_mitmproxy.service.cache.Proxy__Cache__Service                    import Proxy__Cache__Service
+from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Url                import Safe_Str__Url
+from mgraph_ai_service_mitmproxy.service.html.HTML__Transformation__Service__Local      import HTML__Transformation__Service__Local
 
 
 class HTML__Transformation__Service(Type_Safe):                                              # Orchestrates HTML transformations with caching
