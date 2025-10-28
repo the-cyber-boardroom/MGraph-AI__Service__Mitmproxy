@@ -3,12 +3,13 @@ from enum import Enum
 # todo: move the logic/code below into a helper class
 # todo: renamed HTML to Html
 class Enum__HTML__Transformation_Mode(str, Enum):                                  # HTML transformation mode types
-    OFF        = "off"                                                              # No transformation (passthrough)
-    DICT       = "dict"                                                             # Tree structure view
-    XXX        = "xxx"                                                              # Privacy mask (all text → 'x')
-    XXX_RANDOM = "xxx-random"
-    HASHES     = "hashes"                                                           # Hash display mode
-    ROUNDTRIP  = "roundtrip"                                                        # Validation test (html→dict→html)
+    OFF           = "off"                                                              # No transformation (passthrough)
+    DICT          = "dict"                                                             # Tree structure view
+    XXX           = "xxx"                                                              # Privacy mask (all text → 'x')
+    XXX_RANDOM    = "xxx-random"
+    HASHES        = "hashes"                                                           # Hash display mode
+    HASHES_RANDOM = "hashes-random"                                                 # Random hash display (50% text → hash)
+    ROUNDTRIP     = "roundtrip"                                                        # Validation test (html→dict→html)
 
     @classmethod
     def from_cookie_value(cls, cookie_value: str                                    # Parse cookie value to mode
@@ -30,7 +31,8 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
         return self != Enum__HTML__Transformation_Mode.OFF
 
     def is_local_transformation(self) -> bool:                                      # Check if this transformation is processed locally (not via HTML Service)
-        return self == Enum__HTML__Transformation_Mode.XXX_RANDOM
+        return self in (Enum__HTML__Transformation_Mode.XXX_RANDOM,
+                Enum__HTML__Transformation_Mode.HASHES_RANDOM)
 
     def requires_caching(self) -> bool:                                             # Check if mode should be cached
         """Check if this transformation should be cached"""
@@ -38,11 +40,12 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
 
     def to_endpoint_path(self) -> str:                                              # Convert mode to HTML Service endpoint path"""
         mapping = {
-            Enum__HTML__Transformation_Mode.DICT       : "/html/to/tree/view"       , # BUG this should be to html/to/dict and we should add new TREE_VIEW mode which would be the one that points to /html/to/tree/view
-            Enum__HTML__Transformation_Mode.XXX        : "/html/to/html/xxx"        ,
-            Enum__HTML__Transformation_Mode.XXX_RANDOM : ""                         ,  # Empty = local processing
-            Enum__HTML__Transformation_Mode.HASHES     : "/html/to/html/hashes"     ,
-            Enum__HTML__Transformation_Mode.ROUNDTRIP  : "/html/to/html"
+            Enum__HTML__Transformation_Mode.DICT          : "/html/to/tree/view"       , # BUG this should be to html/to/dict and we should add new TREE_VIEW mode which would be the one that points to /html/to/tree/view
+            Enum__HTML__Transformation_Mode.XXX           : "/html/to/html/xxx"        ,
+            Enum__HTML__Transformation_Mode.XXX_RANDOM    : ""                         ,  # Empty = local processing
+            Enum__HTML__Transformation_Mode.HASHES        : "/html/to/html/hashes"     ,
+            Enum__HTML__Transformation_Mode.HASHES_RANDOM : ""                         , # Empty = local processing
+            Enum__HTML__Transformation_Mode.ROUNDTRIP     : "/html/to/html"
         }
         return mapping.get(self, "")
 

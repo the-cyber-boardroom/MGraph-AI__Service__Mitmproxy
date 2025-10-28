@@ -156,53 +156,104 @@ class HTML__Transformation__Service(Type_Safe):                                 
     def namespace(self):                                                                  # Return cache namespace
         return self.cache_service.cache_config.namespace
 
-    def _transform_locally(self, source_html : str,
-                                  mode        : Enum__HTML__Transformation_Mode
-                      ) -> Schema__HTML__Transformation__Result:
-        """Process transformations locally without calling HTML Service"""
+    def _transform_locally(self,
+                          source_html : str,
+                          mode        : Enum__HTML__Transformation_Mode
+                         ) -> Schema__HTML__Transformation__Result:
+        """
+        Process transformations locally using hash-based system.
+
+        Supports:
+        - xxx-random: Randomly mask 50% of text with 'x'
+        - hashes-random: Randomly replace 50% of text with hash values
+        """
         import time
         start_time = time.time()
 
-        if mode == Enum__HTML__Transformation_Mode.XXX_RANDOM:
-            # Step 1: Get hash mapping from HTML Service
-            dict_hashes_request = Schema__Html__To__Dict__Hashes__Request(html=source_html)
-            dict_hashes_response = self.html_service_client.get_dict_hashes(dict_hashes_request)
+        try:
+            # Both xxx-random and hashes-random use the same flow
+            if mode in (Enum__HTML__Transformation_Mode.XXX_RANDOM,
+                        Enum__HTML__Transformation_Mode.HASHES_RANDOM):
 
-            if not dict_hashes_response.is_successful():
-                return None
-                #return self._error_result(source_html, mode)
+                mode_name = "xxx-random" if mode == Enum__HTML__Transformation_Mode.XXX_RANDOM else "hashes-random"
+                print(f"    🎲 {mode_name}: Getting hash mapping from HTML Service...")
 
-            # Extract html_dict and hash_mapping from response
-            html_dict = dict_hashes_response.html_dict
-            hash_mapping = dict_hashes_response.hash_mapping
+                # Step 1: Get hash mapping from HTML Service
+                dict_hashes_request = Schema__Html__To__Dict__Hashes__Request(html=source_html)
+                dict_hashes_response = self.html_service_client.get_dict_hashes(dict_hashes_request)
 
-            # Step 2: Randomly mask some hashes (LOCAL)
-            modified_mapping = self.local_transformation_svc.transform_xxx_random_via_hashes(
-                html_dict,
-                hash_mapping
+                if not dict_hashes_response.is_successful():
+                    print(f"    ⚠️  Failed to get hash mapping")
+                    return self._error_result(source_html, mode, start_time)
+
+                print(f"    🎲 {mode_name}: Got {dict_hashes_response.total_text_hashes} text nodes")
+
+                # Extract html_dict and hash_mapping from response
+                html_dict = dict_hashes_response.html_dict
+                hash_mapping = dict_hashes_response.hash_mapping
+
+                # Step 2: Transform based on mode (LOCAL PROCESSING)
+                if mode == Enum__HTML__Transformation_Mode.XXX_RANDOM:
+                    print(f"    🎲 xxx-random: Randomly masking ~50% with 'x'...")
+                    modified_mapping = self.local_transformation_svc.transform_xxx_random_via_hashes(
+                        html_dict,
+                        hash_mapping
+                    )
+                    # Count masked nodes
+                    masked_count = sum(1 for k, v in modified_mapping.items()
+                                     if 'x' in v and hash_mapping.get(k, '') != v)
+                    print(f"    🎲 xxx-random: Masked {masked_count}/{len(hash_mapping)} text nodes")
+
+                elif mode == Enum__HTML__Transformation_Mode.HASHES_RANDOM:
+                    print(f"    🎲 hashes-random: Randomly showing ~50% as hashes...")
+                    modified_mapping = self.local_transformation_svc.transform_hashes_random_via_hashes(
+                        html_dict,
+                        hash_mapping
+                    )
+                    # Count nodes showing hashes
+                    hash_count = sum(1 for k, v in modified_mapping.items()
+                                   if v == str(k))
+                    print(f"    🎲 hashes-random: Showing {hash_count}/{len(hash_mapping)} text nodes as hashes")
+
+                else:
+                    # Shouldn't reach here but handle gracefully
+                    modified_mapping = hash_mapping
+
+                # Step 3: Reconstruct HTML with modified hashes
+                print(f"    🎲 {mode_name}: Reconstructing HTML...")
+                reconstruct_request = Schema__Hashes__To__Html__Request(
+                    html_dict    = html_dict,
+                    hash_mapping = modified_mapping
+                )
+                reconstruct_response = self.html_service_client.reconstruct_from_hashes(reconstruct_request)
+
+                if not reconstruct_response.is_successful():
+                    print(f"    ⚠️  Failed to reconstruct HTML")
+                    return self._error_result(source_html, mode, start_time)
+
+                transformed = reconstruct_response.body
+                print(f"    ✅ {mode_name} transformation complete!")
+
+            else:
+                # Unknown local transformation
+                print(f"    ⚠️  Unknown local transformation mode: {mode.value}")
+                transformed = source_html
+
+            call_duration_ms = (time.time() - start_time) * 1000
+
+            return Schema__HTML__Transformation__Result(
+                transformed_html       = transformed,
+                transformation_mode    = mode,
+                content_type           = "text/html",
+                cache_hit              = False,
+                transformation_time_ms = Safe_Float(call_duration_ms)
             )
 
-            # Step 3: Reconstruct HTML with masked hashes
-            reconstruct_request = Schema__Hashes__To__Html__Request(html_dict=html_dict,
-                                                                    hash_mapping=modified_mapping)
-            reconstruct_response = self.html_service_client.reconstruct_from_hashes(reconstruct_request)
-
-            if not reconstruct_response.is_successful():
-                return None
-                #return self._error_result(source_html, mode)
-
-            transformed = reconstruct_response.body
-        else:
-            transformed = source_html
-
-        call_duration_ms = (time.time() - start_time) * 1000
-
-        return Schema__HTML__Transformation__Result(
-            transformed_html       = transformed,
-            transformation_mode    = mode,
-            content_type           = "text/html",
-            cache_hit              = False,
-            transformation_time_ms = Safe_Float(call_duration_ms))
+        except Exception as e:
+            print(f"    ⚠️  Local transformation error for {mode.value}: {e}")
+            import traceback
+            traceback.print_exc()
+            return self._error_result(source_html, mode, start_time)
 
 
     def _error_result(self,
