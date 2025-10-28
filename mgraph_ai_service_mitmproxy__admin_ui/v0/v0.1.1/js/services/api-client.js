@@ -57,7 +57,7 @@ class APIClient {
     }
 
     // Set a cookie without page reload
-    setCookie(name, value, maxAge = 3600) {
+    setCookie(name, value, maxAge = 360000) {
         document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; samesite=Lax`;
         
         // Emit event for real-time updates

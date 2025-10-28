@@ -6,6 +6,7 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
     OFF        = "off"                                                              # No transformation (passthrough)
     DICT       = "dict"                                                             # Tree structure view
     XXX        = "xxx"                                                              # Privacy mask (all text → 'x')
+    XXX_RANDOM = "xxx-random"
     HASHES     = "hashes"                                                           # Hash display mode
     ROUNDTRIP  = "roundtrip"                                                        # Validation test (html→dict→html)
 
@@ -28,16 +29,20 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
         """Check if this mode requires transformation (not OFF)"""
         return self != Enum__HTML__Transformation_Mode.OFF
 
+    def is_local_transformation(self) -> bool:                                      # Check if this transformation is processed locally (not via HTML Service)
+        return self == Enum__HTML__Transformation_Mode.XXX_RANDOM
+
     def requires_caching(self) -> bool:                                             # Check if mode should be cached
         """Check if this transformation should be cached"""
         return self.is_active()                                                     # All active modes are cacheable
 
     def to_endpoint_path(self) -> str:                                              # Convert mode to HTML Service endpoint path"""
         mapping = {
-            Enum__HTML__Transformation_Mode.DICT      : "/html/to/tree/view"       , # BUG this should be to html/to/dict and we should add new TREE_VIEW mode which would be the one that points to /html/to/tree/view
-            Enum__HTML__Transformation_Mode.XXX       : "/html/to/html/xxx"        ,
-            Enum__HTML__Transformation_Mode.HASHES    : "/html/to/html/hashes"     ,
-            Enum__HTML__Transformation_Mode.ROUNDTRIP : "/html/to/html"
+            Enum__HTML__Transformation_Mode.DICT       : "/html/to/tree/view"       , # BUG this should be to html/to/dict and we should add new TREE_VIEW mode which would be the one that points to /html/to/tree/view
+            Enum__HTML__Transformation_Mode.XXX        : "/html/to/html/xxx"        ,
+            Enum__HTML__Transformation_Mode.XXX_RANDOM : ""                         ,  # Empty = local processing
+            Enum__HTML__Transformation_Mode.HASHES     : "/html/to/html/hashes"     ,
+            Enum__HTML__Transformation_Mode.ROUNDTRIP  : "/html/to/html"
         }
         return mapping.get(self, "")
 
@@ -51,10 +56,11 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
     def to_cache_data_key(self) -> str:                                             # Get cache storage key
         """Get cache data key for this transformation mode"""
         mapping = {
-            Enum__HTML__Transformation_Mode.DICT      : "transformations/html-dict"    ,
-            Enum__HTML__Transformation_Mode.XXX       : "transformations/html-xxx"     ,
-            Enum__HTML__Transformation_Mode.HASHES    : "transformations/html-hashes"  ,
-            Enum__HTML__Transformation_Mode.ROUNDTRIP : "transformations/html-roundtrip"
+            Enum__HTML__Transformation_Mode.DICT       : "transformations/html-dict"    ,
+            Enum__HTML__Transformation_Mode.XXX        : "transformations/html-xxx"     ,
+            Enum__HTML__Transformation_Mode.XXX_RANDOM : ""                             ,   # Not cached
+            Enum__HTML__Transformation_Mode.HASHES     : "transformations/html-hashes"  ,
+            Enum__HTML__Transformation_Mode.ROUNDTRIP  : "transformations/html-roundtrip"
         }
         return mapping.get(self, "")
 

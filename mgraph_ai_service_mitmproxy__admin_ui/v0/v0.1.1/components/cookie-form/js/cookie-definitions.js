@@ -8,6 +8,7 @@ const COOKIE_DEFINITIONS = [
         description: 'Control Html content mode',
         type: 'select',
         options: [ { value: 'xxx'        , label: 'Html to XXX'              },
+                   { value: 'xxx-random' , label: 'Html to XXX (Random)'     },
                    { value: 'hashes'     , label: 'Html to Hashes'           },
                    { value: 'roundtrip'  , label: 'Html to Html (roundtrip)' }],
         },
