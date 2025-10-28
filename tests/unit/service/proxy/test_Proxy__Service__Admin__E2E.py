@@ -6,7 +6,6 @@ from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service            
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Content__Service           import Proxy__Content__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service            import Proxy__Cookie__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service             import Proxy__Debug__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service              import Proxy__CORS__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Headers__Service           import Proxy__Headers__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__HTML__Service              import Proxy__HTML__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__JSON__Service              import Proxy__JSON__Service
@@ -14,7 +13,6 @@ from mgraph_ai_service_mitmproxy.service.admin.Proxy__Admin__Service            
 from mgraph_ai_service_mitmproxy.service.wcf.Proxy__WCF__Service                 import Proxy__WCF__Service
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Stats              import Schema__Proxy__Stats
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Request_Data       import Schema__Proxy__Request_Data
-from mgraph_ai_service_mitmproxy.schemas.Schema__CORS__Config                    import Schema__CORS__Config
 
 PATH__MITM_PROXY__COOKIES = '/mitm-proxy/v0/v0.1.0/cookies.html'
 PATH__MITM_PROXY__INDEX   = '/mitm-proxy/v0/v0.1.0/index.html'
@@ -42,12 +40,10 @@ class Test_Proxy__Service__Admin__E2E(TestCase):
         self.debug_service   = Proxy__Debug__Service(wcf_service  = self.wcf_service ,
                                                       html_service = self.html_service,
                                                       json_service = self.json_service)
-        self.cors_service    = Proxy__CORS__Service(cors_config=Schema__CORS__Config())
         self.headers_service = Proxy__Headers__Service()
 
         self.response_service = Proxy__Response__Service(debug_service   = self.debug_service  ,
                                                           stats_service   = self.stats_service  ,
-                                                          cors_service    = self.cors_service   ,
                                                           headers_service = self.headers_service,
                                                           cookie_service  = self.cookie_service )
 

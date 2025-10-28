@@ -5,7 +5,6 @@ from osbot_utils.utils.Objects                                                  
 from mgraph_ai_service_mitmproxy.service.proxy.response.Proxy__Response__Service    import Proxy__Response__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Debug__Service                import Proxy__Debug__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Stats__Service                import Proxy__Stats__Service
-from mgraph_ai_service_mitmproxy.service.proxy.Proxy__CORS__Service                 import Proxy__CORS__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Headers__Service              import Proxy__Headers__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__Cookie__Service               import Proxy__Cookie__Service
 from mgraph_ai_service_mitmproxy.service.proxy.Proxy__HTML__Service                 import Proxy__HTML__Service
@@ -14,7 +13,6 @@ from mgraph_ai_service_mitmproxy.service.wcf.Proxy__WCF__Service                
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Response_Data         import Schema__Proxy__Response_Data
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Response__Processing_Result  import Schema__Response__Processing_Result
 from mgraph_ai_service_mitmproxy.schemas.proxy.Schema__Proxy__Stats                 import Schema__Proxy__Stats
-from mgraph_ai_service_mitmproxy.schemas.Schema__CORS__Config                       import Schema__CORS__Config
 
 
 class test_Proxy__Response__Service(TestCase):
@@ -28,13 +26,11 @@ class test_Proxy__Response__Service(TestCase):
                                                      html_service = html_service ,
                                                      json_service = json_service )
         cls.stats_service   = Proxy__Stats__Service(stats=Schema__Proxy__Stats())
-        cls.cors_service    = Proxy__CORS__Service(cors_config=Schema__CORS__Config())
         cls.headers_service = Proxy__Headers__Service()
         cls.cookie_service  = Proxy__Cookie__Service()
 
         cls.service = Proxy__Response__Service(debug_service   = cls.debug_service  ,
                                                stats_service   = cls.stats_service  ,
-                                               cors_service    = cls.cors_service   ,
                                                headers_service = cls.headers_service,
                                                cookie_service  = cls.cookie_service )
 
@@ -67,7 +63,6 @@ class test_Proxy__Response__Service(TestCase):
 
             assert type(_.debug_service)   is Proxy__Debug__Service
             assert type(_.stats_service)   is Proxy__Stats__Service
-            assert type(_.cors_service)    is Proxy__CORS__Service
             assert type(_.headers_service) is Proxy__Headers__Service
             assert type(_.cookie_service)  is Proxy__Cookie__Service
 
@@ -114,12 +109,6 @@ class test_Proxy__Response__Service(TestCase):
             result = _.process_response(self.test_response_with_cookies)
 
             assert 'x-proxy-cookie-summary' in result.final_headers                           # Cookie summary added
-
-    def test_process_response__cors_headers(self):                                            # Test CORS headers added
-        with self.service as _:
-            result = _.process_response(self.test_response_basic)
-
-            assert 'access-control-allow-origin' in result.final_headers
 
     def test_process_response__content_length_header(self):                                   # Test content-length header
         with self.service as _:
@@ -184,21 +173,6 @@ class test_Proxy__Response__Service(TestCase):
             assert 'content-type'   in final_headers
             assert 'content-length' in final_headers
 
-    def test__preflight_request_handling(self):                                                # Test CORS preflight OPTIONS request
-        preflight_response = Schema__Proxy__Response_Data(
-            request      = {'method': 'OPTIONS', 'host': 'example.com', 'path': '/test', 'headers': {}},
-            response     = {'status_code': 200, 'content_type': 'text/plain', 'body': '', 'headers': {}},
-            stats        = {},
-            version      = 'v1.0.0'
-        )
-
-        with self.service as _:
-            result = _.process_response(preflight_response)
-
-            assert result.final_status_code == 204                                             # No Content for preflight
-            assert result.final_body == ''
-            assert 'access-control-allow-methods' in result.final_headers
-
     def test__error_result_creation(self):                                                     # Test error result creation
         response_data = self.test_response_basic
 
@@ -243,13 +217,7 @@ class test_Proxy__Response__Service(TestCase):
 
         with self.service as _:
             result = _.process_response(response_empty)
-            assert list_set(result.final_headers) == ['access-control-allow-credentials',
-                                                      'access-control-allow-headers',
-                                                      'access-control-allow-methods',
-                                                      'access-control-allow-origin',
-                                                      'access-control-expose-headers',
-                                                      'access-control-max-age',
-                                                      'content-length',
+            assert list_set(result.final_headers) == ['content-length',
                                                       'content-type',
                                                       'x-original-host',
                                                       'x-original-path',
