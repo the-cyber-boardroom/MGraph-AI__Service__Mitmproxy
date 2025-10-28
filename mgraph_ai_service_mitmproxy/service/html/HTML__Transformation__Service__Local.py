@@ -165,12 +165,49 @@ class HTML__Transformation__Service__Local(Type_Safe):
             # Create modified mapping with group letters
             modified_mapping = {}
 
+            # for group_index, hashes in groups.items():
+            #     print(group_index, len(hashes))
+
             for group_index, hashes in groups.items():
                 # Get letter for this group (0='a', 1='b', etc.)
                 group_letter = grouping_service.get_group_letter(group_index)
 
                 # Replace all texts in this group with the letter
                 for hash_key in hashes:
-                    modified_mapping[hash_key] = group_letter
+                    #modified_mapping[hash_key] = group_letter
+                    original_text = hash_mapping[hash_key]
+                    modified_mapping[hash_key] = self._replace_with_letter(original_text, group_letter)
 
             return modified_mapping
+
+    def _replace_with_letter(self, text: str, letter: str) -> str:
+        """
+        Replace text with repeated letter while preserving structure.
+
+        Same pattern as _mask_text but uses the group letter instead of 'x'.
+
+        Examples:
+            "Hello", 'a'        → "aaaaa"
+            "Hello World", 'b'  → "bbbbb bbbbb"
+            "Hello, World!", 'c' → "ccccc, ccccc!"
+
+        Args:
+            text: Original text to replace
+            letter: Group letter to use (a, b, c, d, e, etc.)
+
+        Returns:
+            Text replaced with letter, preserving structure
+        """
+        if not text:
+            return text
+
+        result = []
+        for char in text:
+            if char.isalnum():
+                result.append(letter)
+            elif char.isspace():
+                result.append(' ')  # Keep whitespace for word boundaries
+            else:
+                result.append(char)  # Keep punctuation for readability
+
+        return ''.join(result)

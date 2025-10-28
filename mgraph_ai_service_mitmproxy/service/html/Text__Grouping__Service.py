@@ -22,19 +22,19 @@ class Text__Grouping__Service(Type_Safe):
                        hash_mapping: Dict[Safe_Str__Hash, str]
                       ) -> Dict[int, List[Safe_Str__Hash]]:
         """
-        Group hashes by text length into N equal-sized buckets.
+        Group hashes by text length into N equal-sized buckets (by item count, not length range).
 
         Strategy:
-        1. Get all text lengths
-        2. Calculate length ranges (percentiles)
-        3. Assign each hash to a bucket (0, 1, 2, 3, 4)
+        1. Sort all hashes by their text length
+        2. Divide into N groups with equal number of items per group
+        3. This ensures balanced groups for batch processing
 
-        Example with 5 groups:
-        - Group 0: Very short (0-10 chars) - whitespace, connectors
-        - Group 1: Short (11-30 chars) - menu items, short labels
-        - Group 2: Medium (31-80 chars) - titles, short sentences
-        - Group 3: Long (81-200 chars) - paragraphs, descriptions
-        - Group 4: Very long (200+ chars) - full content blocks
+        Example with 5 groups and 100 items:
+        - Group 0: 20 shortest texts
+        - Group 1: 20 next shortest texts
+        - Group 2: 20 medium texts
+        - Group 3: 20 next longest texts
+        - Group 4: 20 longest texts
 
         Args:
             hash_mapping: Dict of { hash: "text content" }
@@ -43,54 +43,45 @@ class Text__Grouping__Service(Type_Safe):
             Dict of { group_index: [list of hashes in that group] }
 
         Example:
-            Input:  { "abc": "Hi", "def": "Hello World", "ghi": "A long paragraph..." }
-            Output: { 0: ["abc"], 1: ["def"], 3: ["ghi"] }
+            Input:  100 hashes with various lengths
+            Output: { 0: [20 hashes], 1: [20 hashes], 2: [20 hashes], 3: [20 hashes], 4: [20 hashes] }
         """
         if not hash_mapping:
             return {}
 
-        # Step 1: Get all lengths and sort them
-        length_to_hashes = {}
-        for hash_key, text in hash_mapping.items():
-            length = len(text)
-            if length not in length_to_hashes:
-                length_to_hashes[length] = []
-            length_to_hashes[length].append(hash_key)
+        # Step 1: Sort all hashes by text length
+        hashes_by_length = sorted(
+            hash_mapping.items(),
+            key=lambda x: len(x[1])  # Sort by text length
+        )
 
-        # Get sorted unique lengths
-        sorted_lengths = sorted(length_to_hashes.keys())
+        total_items = len(hashes_by_length)
 
-        if not sorted_lengths:
-            return {}
+        # Handle edge case: fewer items than groups
+        if total_items < self.num_groups:
+            # Put each item in its own group
+            return {i: [hashes_by_length[i][0]] for i in range(total_items)}
 
-        # Step 2: Calculate length ranges using percentiles
-        min_length = sorted_lengths[0]
-        max_length = sorted_lengths[-1]
+        # Step 2: Calculate items per group (as evenly as possible)
+        base_size = total_items // self.num_groups
+        remainder = total_items % self.num_groups
 
-        # Handle edge case: all texts same length
-        if min_length == max_length:
-            return {0: list(hash_mapping.keys())}
-
-        # Calculate bucket boundaries
-        range_size = (max_length - min_length) / self.num_groups
-
-        # Step 3: Assign hashes to groups
+        # Step 3: Distribute hashes into groups
         groups = {i: [] for i in range(self.num_groups)}
+        current_index = 0
 
-        for length in sorted_lengths:
-            # Calculate which group this length belongs to
-            if length == max_length:
-                group_index = self.num_groups - 1  # Last group
-            else:
-                group_index = min(
-                    int((length - min_length) / range_size),
-                    self.num_groups - 1
-                )
+        for group_idx in range(self.num_groups):
+            # First 'remainder' groups get one extra item
+            group_size = base_size + (1 if group_idx < remainder else 0)
 
-            # Add all hashes of this length to the group
-            groups[group_index].extend(length_to_hashes[length])
+            # Add hashes to this group
+            for _ in range(group_size):
+                if current_index < total_items:
+                    hash_key, _ = hashes_by_length[current_index]
+                    groups[group_idx].append(hash_key)
+                    current_index += 1
 
-        # Remove empty groups
+        # Remove empty groups (shouldn't happen, but safety check)
         return {k: v for k, v in groups.items() if v}
 
     def get_group_stats(self,

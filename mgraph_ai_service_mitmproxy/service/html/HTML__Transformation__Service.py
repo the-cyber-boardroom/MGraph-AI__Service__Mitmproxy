@@ -222,9 +222,9 @@ class HTML__Transformation__Service(Type_Safe):                                 
                         hash_mapping
                     )
                     # Count how many in each group
-                    from collections import Counter
-                    group_counts = Counter(modified_mapping.values())
-                    print(f"    🎲 abcde-by-size: Groups created - {dict(group_counts)}")
+                    # from collections import Counter
+                    # group_counts = Counter(modified_mapping.values())
+                    # print(f"    🎲 abcde-by-size: Groups created - {dict(group_counts)}")
 
                 else:
                     # Shouldn't reach here but handle gracefully
