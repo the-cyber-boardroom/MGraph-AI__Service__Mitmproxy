@@ -33,17 +33,17 @@ def setup_local_stack() -> Local_Stack:
     return local_stack
 
 def setup__service_fast_api_test_objs():
-        with service_fast_api_test_objs as _:
-            if service_fast_api_test_objs.setup_completed is False:
-                _.fast_api         = Service__Fast_API().setup()
-                _.fast_api__app    = _.fast_api.app()
-                _.fast_api__client = _.fast_api.client()
-                _.local_stack      = setup_local_stack()
-                _.setup_completed  = True
+    with service_fast_api_test_objs as _:
+        if service_fast_api_test_objs.setup_completed is False:
+            _.fast_api         = Service__Fast_API().setup()
+            _.fast_api__app    = _.fast_api.app()
+            _.fast_api__client = _.fast_api.client()
+            _.local_stack      = setup_local_stack()
+            _.setup_completed  = True
 
-                set_env(ENV_VAR__FAST_API__AUTH__API_KEY__NAME , TEST_API_KEY__NAME)
-                set_env(ENV_VAR__FAST_API__AUTH__API_KEY__VALUE, TEST_API_KEY__VALUE)
-        return service_fast_api_test_objs
+            set_env(ENV_VAR__FAST_API__AUTH__API_KEY__NAME , TEST_API_KEY__NAME)
+            set_env(ENV_VAR__FAST_API__AUTH__API_KEY__VALUE, TEST_API_KEY__VALUE)
+    return service_fast_api_test_objs
 
 
 
@@ -129,12 +129,12 @@ def get__cache_service__fast_api_server() -> Cache_Service__Fast_API__Test_Objs:
 # -------------------------------------------------------------------------------
 # Mitmproxy Service Singleton
 # -------------------------------------------------------------------------------
-class Mitmproxy_Service__Fast_API__Test_Objs(FastAPI__Service__Test_Objs):     # Cache FastAPI service configuration
+class Mitmproxy_Service__Fast_API__Test_Objs__Http(FastAPI__Service__Test_Objs):     # Cache FastAPI service configuration
     pass
 
-class Mitmproxy_Service__Fast_API__Singleton(Base__FastAPI__Service__Singleton[Cache_Service__Fast_API__Test_Objs]):
+class Mitmproxy_Service__Fast_API__Singleton(Base__FastAPI__Service__Singleton[Mitmproxy_Service__Fast_API__Test_Objs__Http]):
     service_cls  = Service__Fast_API
-    test_obj_cls = Mitmproxy_Service__Fast_API__Test_Objs
+    test_obj_cls = Mitmproxy_Service__Fast_API__Test_Objs__Http
 
 def get__mitmproxy_service__fast_api_server() -> Cache_Service__Fast_API__Test_Objs:
     set_env(ENV_VAR__CACHE__SERVICE__STORAGE_MODE, 'memory')                            # configure the cache service to use an in-memory db (instead of trying to use S3)
