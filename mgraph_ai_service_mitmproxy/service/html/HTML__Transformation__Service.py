@@ -130,9 +130,9 @@ class HTML__Transformation__Service(Type_Safe):                                 
     def store_original_html(self, target_url    : str                               ,          # Target URL for cache key
                                   original_html : str                                          # Original HTML to store
                              ) -> None:                                                       # No return value
+
         if not self.cache_service or not self.cache_service.cache_config.enabled:
             return
-
 
         page_refs    = self.cache_service.get_or_create_page_entry(target_url)
         cache_id     = page_refs.cache_id

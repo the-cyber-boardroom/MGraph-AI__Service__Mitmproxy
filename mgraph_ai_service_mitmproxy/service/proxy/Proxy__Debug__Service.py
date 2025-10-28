@@ -99,9 +99,7 @@ class Proxy__Debug__Service(Type_Safe):                          # Debug command
                                      modifications  : Schema__Proxy__Modifications,             # Modifications to update
                                 ) -> None:                                                        # Updates modifications are in the modifications object # todo: review this pattern
 
-
         commands = self.parse_debug_commands(debug_params)                                      # Parse commands
-
         for command in commands:                                                                # Process show commands first (they override everything)
             if command.is_show_command():
 

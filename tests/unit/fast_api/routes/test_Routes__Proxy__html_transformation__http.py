@@ -17,7 +17,7 @@ class test_Routes__Proxy__html_transformation__http(TestCase):                 #
 
     @classmethod
     def setUpClass(cls):                                                        # ONE-TIME setup: start HTML, Cache, and Mitmproxy services
-        pytest.skip("race condition with the other FAST API servers")           # todo: figure out why this runs when execute directly but fails when all executed
+        #pytest.skip("race condition with the other FAST API servers")           # todo: figure out why this runs when execute directly but fails when all executed
         with print_duration(action_name='setUpClass'):
             with get__html_service__fast_api_server() as _:
                 cls.html_service_server   = _.fast_api_server

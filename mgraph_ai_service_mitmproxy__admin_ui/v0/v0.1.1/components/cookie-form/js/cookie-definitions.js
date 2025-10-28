@@ -4,6 +4,14 @@
 
 const COOKIE_DEFINITIONS = [
     {
+        name: 'mitm-mode',
+        description: 'Control Html content mode',
+        type: 'select',
+        options: [ { value: 'xxx'        , label: 'Html to XXX'              },
+                   { value: 'hashes'     , label: 'Html to Hashes'           },
+                   { value: 'roundtrip'  , label: 'Html to Html (roundtrip)' }],
+        },
+     {
         name: 'mitm-show',
         description: 'Control content display',
         type: 'select',

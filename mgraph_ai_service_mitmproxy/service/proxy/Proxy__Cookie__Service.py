@@ -311,16 +311,22 @@ class Proxy__Cookie__Service(Type_Safe):                         # Cookie-based 
 
         return cookie[cookie_name].OutputString()
 
-    def get_mitm_mode(self, headers: Dict[str, str]                                     # Request headers containing cookies
-                       ) -> Enum__HTML__Transformation_Mode:                             # Transformation mode from cookie
-        """Extract mitm-mode cookie value and convert to transformation mode"""
+    def get_mitm_mode(self, headers: Dict[str, str]) -> Enum__HTML__Transformation_Mode:        # Extract mitm-mode cookie value and convert to transformation mode
         cookie_header = headers.get('Cookie', headers.get('cookie', ''))
 
         if not cookie_header:
             return Enum__HTML__Transformation_Mode.OFF
 
-        cookies = self._parse_cookie_header(cookie_header)                               # Parse cookie header
-        mitm_mode_value = cookies.get('mitm-mode', '')
+        # ✅ Use the sophisticated parser that handles commas
+        parser_result = self.parse_cookies_from_header(cookie_header)
+        cookies = parser_result.cookies
+
+        # Get mitm-mode from the parsed cookies
+        mitm_mode_value = ''
+        for cookie_name, cookie_value in cookies.items():
+            if str(cookie_name) == 'mitm-mode':
+                mitm_mode_value = str(cookie_value)
+                break
 
         return Enum__HTML__Transformation_Mode.from_cookie_value(mitm_mode_value)
 

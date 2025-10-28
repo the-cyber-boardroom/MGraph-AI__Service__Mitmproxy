@@ -381,14 +381,14 @@ osbot-fast-api-serverless = "*"
 
 [[package]]
 name = "mgraph-ai-service-cache-client"
-version = "0.7.0"
+version = "0.8.0"
 description = "MGraph-AI__Service__Cache__Client"
 optional = false
 python-versions = "<4.0,>=3.12"
 groups = ["main"]
 files = [
-    {file = "mgraph_ai_service_cache_client-0.7.0-py3-none-any.whl", hash = "sha256:63ecac8f59b2235da5cf3943161abbf2cbf74201da6cd8b198674ad53dca87e9"},
-    {file = "mgraph_ai_service_cache_client-0.7.0.tar.gz", hash = "sha256:fe827aa1eeba683a74d087b2e2b9f2f67de30607c2c30175c62d54801d2c0923"},
+    {file = "mgraph_ai_service_cache_client-0.8.0-py3-none-any.whl", hash = "sha256:afea0e2197b4922b9036191ca565c18d5dd66b9eb587d3c7b4c4b5bc8aff4f7a"},
+    {file = "mgraph_ai_service_cache_client-0.8.0.tar.gz", hash = "sha256:b45bf3c8acb472fdd61f442be68ca1c02f4341c036ff910161202d2768fbeced"},
 ]
 
 [package.dependencies]
