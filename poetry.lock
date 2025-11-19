@@ -349,14 +349,14 @@ typing-extensions = "*"
 
 [[package]]
 name = "mgraph-ai-service-cache-client"
-version = "0.10.0"
+version = "0.11.0"
 description = "MGraph-AI__Service__Cache__Client"
 optional = false
 python-versions = "<4.0,>=3.12"
 groups = ["main"]
 files = [
-    {file = "mgraph_ai_service_cache_client-0.10.0-py3-none-any.whl", hash = "sha256:c640f6f9c3574df34e98ba2a3de940d7d918143f7c9975e2b4766bc5420fe194"},
-    {file = "mgraph_ai_service_cache_client-0.10.0.tar.gz", hash = "sha256:3e7a8005f519242f235991f461103109d6a21dc85e4234b8787ed4a38e96f21e"},
+    {file = "mgraph_ai_service_cache_client-0.11.0-py3-none-any.whl", hash = "sha256:7ed9b143bcaa7752fdce918a6dbcda69a3bee2bf1bdca2170d1a7ca52421b42c"},
+    {file = "mgraph_ai_service_cache_client-0.11.0.tar.gz", hash = "sha256:6ea3faf84a005f75459aaf4609b7d71e915861d144d7b23019c60a54a9990dde"},
 ]
 
 [package.dependencies]
@@ -415,14 +415,14 @@ uvicorn = "*"
 
 [[package]]
 name = "osbot-fast-api-serverless"
-version = "1.28.0"
+version = "1.29.0"
 description = "OSBot-Fast-API-Serverless"
 optional = false
 python-versions = "<4.0,>=3.12"
 groups = ["main"]
 files = [
-    {file = "osbot_fast_api_serverless-1.28.0-py3-none-any.whl", hash = "sha256:fd81d424cef6e0d4dd1f439f2513348d0fc43a575adc3b096b185aecb9454aad"},
-    {file = "osbot_fast_api_serverless-1.28.0.tar.gz", hash = "sha256:e5740a9dbf1b578938519dd521da236cb164d4dbb4ee21cd3cd757df7139297a"},
+    {file = "osbot_fast_api_serverless-1.29.0-py3-none-any.whl", hash = "sha256:defd896e7290f5b24ed82458f7c41049cd2e242140482fa13cdad604e5b6c2fd"},
+    {file = "osbot_fast_api_serverless-1.29.0.tar.gz", hash = "sha256:947b9c3f8aa494aae583ca5c6294c25a9ba5f49d19bbb04de442b94c4433119d"},
 ]
 
 [package.dependencies]
@@ -432,14 +432,14 @@ osbot-fast-api = "*"
 
 [[package]]
 name = "osbot-utils"
-version = "3.39.0"
+version = "3.41.0"
 description = "OWASP Security Bot - Utils"
 optional = false
 python-versions = "<4.0,>=3.7"
 groups = ["main"]
 files = [
-    {file = "osbot_utils-3.39.0-py3-none-any.whl", hash = "sha256:7ad143b548e5c2ee1c5e8dde35310bb226160c2044c3e971d6dcf3548d99ab32"},
-    {file = "osbot_utils-3.39.0.tar.gz", hash = "sha256:8b1b15dc3199c987b2ff6fb610ec2bc3f4ed2b40c521d48736deda43ec3cdca5"},
+    {file = "osbot_utils-3.41.0-py3-none-any.whl", hash = "sha256:50ba6cfac4f3c7cc0226303433cdd9f4ff614c60a1269d686dd084dd632e3c3d"},
+    {file = "osbot_utils-3.41.0.tar.gz", hash = "sha256:d4040964199acc13a7d58315aad11a50f64486512f8c2c3823190542b20b25b4"},
 ]
 
 [[package]]
