@@ -1,16 +1,40 @@
 from enum import Enum
+from typing import List, Dict
+
+from mgraph_ai_service_mitmproxy.schemas.semantic_text.client.enums.Enum__Text__Transformation__Mode import Enum__Text__Transformation__Mode
+
 
 # todo: move the logic/code below into a helper class
 # todo: renamed HTML to Html
-class Enum__HTML__Transformation_Mode(str, Enum):                                  # HTML transformation mode types
-    OFF           = "off"                                                              # No transformation (passthrough)
-    DICT          = "dict"                                                             # Tree structure view
-    XXX           = "xxx"                                                              # Privacy mask (all text → 'x')
-    XXX_RANDOM    = "xxx-random"
-    HASHES        = "hashes"                                                           # Hash display mode
-    HASHES_RANDOM = "hashes-random"                                                 # Random hash display (50% text → hash)
-    ABCDE_BY_SIZE = "abcde-by-size"
-    ROUNDTRIP     = "roundtrip"                                                        # Validation test (html→dict→html)
+                                                   # Validation test (html→dict→html)
+class Enum__HTML__Transformation_Mode(str, Enum):
+    # Existing modes
+    OFF           = "off"
+    DICT          = "dict"
+    XXX           = "xxx"              # All text → xxx (no filtering)
+    HASHES        = "hashes"           # All text → hashes (no filtering)
+
+    # 🆕 Sentiment-filtered modes
+    XXX_NEGATIVE          = "xxx-negative"           # Show positive sentiment (negative > 0.3)
+    XXX_NEGATIVE_05       = "xxx-negative-0.5"       # Show positive sentiment (negative > 0.5)
+    XXX_NEGATIVE_1        = "xxx-negative-1"         # Show positive sentiment (negative > 0.1)
+    XXX_NEGATIVE_2        = "xxx-negative-2"         # Show positive sentiment (negative > 0.2)
+    XXX_NEGATIVE_3        = "xxx-negative-3"         # Show positive sentiment (negative > 0.3)
+    XXX_NEGATIVE_4        = "xxx-negative-4"         # Show positive sentiment (negative > 0.4)
+    XXX_HIDE_POSITIVE     = "xxx-hide-positive"      # Mask only positive sentiment
+    XXX_HIDE_NEGATIVE     = "xxx-hide-negative"      # Mask only negative sentiment
+    XXX_HIDE_NEUTRAL      = "xxx-hide-neutral"       # Mask only neutral sentiment
+    XXX_HIDE_MIXED        = "xxx-hide-mixed"         # Mask only mixed sentiment
+
+
+    HASHES_POSITIVE  = "hashes-positive"   # Show hashes for positive
+    HASHES_NEGATIVE  = "hashes-negative"   # Show hashes for negative
+
+    # Existing random/local modes
+    XXX_RANDOM       = "xxx-random"
+    HASHES_RANDOM    = "hashes-random"
+    ABCDE_BY_SIZE    = "abcde-by-size"
+    ROUNDTRIP        = "roundtrip"
 
     @classmethod
     def from_cookie_value(cls, cookie_value: str                                    # Parse cookie value to mode
@@ -73,3 +97,53 @@ class Enum__HTML__Transformation_Mode(str, Enum):                               
 
     def str(self):
         return self.value
+
+
+    def uses_sentiment_analysis(self) -> bool:
+        """Check if mode requires AWS Comprehend sentiment analysis"""
+        sentiment_modes = {
+            Enum__HTML__Transformation_Mode.XXX_NEGATIVE  ,
+            Enum__HTML__Transformation_Mode.XXX_NEGATIVE_05,
+            Enum__HTML__Transformation_Mode.XXX_NEGATIVE_1,
+            Enum__HTML__Transformation_Mode.XXX_NEGATIVE_2,
+            Enum__HTML__Transformation_Mode.XXX_NEGATIVE_3,
+            Enum__HTML__Transformation_Mode.XXX_NEGATIVE_4,
+
+            Enum__HTML__Transformation_Mode.XXX_HIDE_POSITIVE,
+            Enum__HTML__Transformation_Mode.XXX_HIDE_NEGATIVE,
+            Enum__HTML__Transformation_Mode.XXX_HIDE_NEUTRAL ,
+            Enum__HTML__Transformation_Mode.XXX_HIDE_MIXED   ,
+
+            Enum__HTML__Transformation_Mode.HASHES_POSITIVE,
+            Enum__HTML__Transformation_Mode.HASHES_NEGATIVE,
+            #Enum__HTML__Transformation_Mode.XXX_EXTREME,
+            #Enum__HTML__Transformation_Mode.XXX_OPINIONATED,
+        }
+        return self in sentiment_modes
+
+    # improve this since we need to take into account that positive(ish) will also have good neutral and mixed
+    def get_sentiment_filters(self) -> List[Dict]:      # Get sentiment filters for this mode
+        filters_map = { Enum__HTML__Transformation_Mode.XXX_NEGATIVE        : [{"criterion": "negative", "filter_mode": "above", "threshold": 0.3}],
+                        Enum__HTML__Transformation_Mode.XXX_NEGATIVE_05     : [{"criterion": "negative", "filter_mode": "above", "threshold": 0.05}],
+                        Enum__HTML__Transformation_Mode.XXX_NEGATIVE_1      : [{"criterion": "negative", "filter_mode": "above", "threshold": 0.1}],
+                        Enum__HTML__Transformation_Mode.XXX_NEGATIVE_2      : [{"criterion": "negative", "filter_mode": "above", "threshold": 0.2}],
+                        Enum__HTML__Transformation_Mode.XXX_NEGATIVE_3      : [{"criterion": "negative", "filter_mode": "above", "threshold": 0.3}],
+                        Enum__HTML__Transformation_Mode.XXX_NEGATIVE_4      : [{"criterion": "negative", "filter_mode": "above", "threshold": 0.4}],
+                        Enum__HTML__Transformation_Mode.XXX_HIDE_POSITIVE   : [{"criterion": "positive", "filter_mode": "above", "threshold": 0.7} ],
+                        Enum__HTML__Transformation_Mode.XXX_HIDE_NEGATIVE   : [{"criterion": "negative", "filter_mode": "above", "threshold": 0.7} ],
+                        Enum__HTML__Transformation_Mode.XXX_HIDE_NEUTRAL    : [{"criterion": "neutral" , "filter_mode": "above", "threshold": 0.6} ],
+                        Enum__HTML__Transformation_Mode.XXX_HIDE_MIXED      : [{"criterion": "mixed"   , "filter_mode": "above", "threshold": 0.8}]}
+        return filters_map.get(self, [])
+
+    def get_logic_operator(self) -> str:        # Get logic operator for combining filters
+        return "or"                             # for now default to "or"
+        # if self == Enum__HTML__Transformation_Mode.XXX_EXTREME:             # XXX_EXTREME uses OR (match positive OR negative)
+        #     return "or"
+        # return "and"                                                        # Default: all filters must match
+
+    def to_visual_mode(self) -> Enum__Text__Transformation__Mode:       # Convert to visual transformation mode (xxx, hashes, etc)
+        if 'xxx' in self.value:
+            return Enum__Text__Transformation__Mode.XXX
+        elif 'hashes' in self.value:
+            return Enum__Text__Transformation__Mode.HASHES
+        return Enum__Text__Transformation__Mode.XXX

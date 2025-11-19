@@ -8,6 +8,8 @@ from osbot_utils.type_safe.primitives.domains.identifiers.safe_str.Safe_Str__Id 
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                                  import type_safe
 from osbot_utils.utils.Env                                                                                      import get_env
 from osbot_utils.utils.Http                                                                                     import url_join_safe
+from osbot_utils.utils.Json import json_dumps
+
 from mgraph_ai_service_mitmproxy.schemas.semantic_text.client.Schema__Semantic_Text__Transformation__Response   import Schema__Semantic_Text__Transformation__Response
 from mgraph_ai_service_mitmproxy.schemas.semantic_text.client.Schema__Semantic_Text__Transformation__Request    import Schema__Semantic_Text__Transformation__Request
 from mgraph_ai_service_mitmproxy.schemas.semantic_text.const__semantic_text                                     import ENV_VAR__AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__BASE_URL, ENV_VAR__AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_NAME, ENV_VAR__AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_VALUE
@@ -44,6 +46,11 @@ class Semantic_Text__Service__Client(Type_Safe):                                
         url           = url_join_safe(self.server_base_url(), endpoint_path)
         post_headers  = self.headers()
         post_json     = request.json()
+        # print()
+        # print()
+        # print(json_dumps(post_json))
+        # print()
+        # print()
         response = requests.post(url     = url          ,
                                  headers = post_headers ,
                                  json    = post_json    )

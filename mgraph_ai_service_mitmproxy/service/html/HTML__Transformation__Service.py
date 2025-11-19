@@ -1,5 +1,11 @@
 import time
-from typing                                                                                                  import Optional
+from typing import Optional, List
+
+from mgraph_ai_service_mitmproxy.schemas.semantic_text.client.Schema__Classification__Criterion_Filter import Schema__Classification__Criterion_Filter
+from mgraph_ai_service_mitmproxy.schemas.semantic_text.client.enums.Enum__Classification__Filter_Mode import Enum__Classification__Filter_Mode
+from mgraph_ai_service_mitmproxy.schemas.semantic_text.client.enums.Enum__Classification__Logic_Operator import Enum__Classification__Logic_Operator
+from mgraph_ai_service_mitmproxy.schemas.semantic_text.client.enums.Enum__Text__Classification__Criteria import Enum__Text__Classification__Criteria
+from mgraph_ai_service_mitmproxy.schemas.semantic_text.client.enums.Enum__Text__Transformation__Engine_Mode import Enum__Text__Transformation__Engine_Mode
 from osbot_utils.type_safe.Type_Safe                                                                         import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_Float                                                        import Safe_Float
 from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Html                                    import Safe_Str__Html
@@ -22,9 +28,9 @@ class HTML__Transformation__Service(Type_Safe):                                 
     cache_service            : Proxy__Cache__Service           = None                        # Cache service integration
 
     def setup(self) -> 'HTML__Transformation__Service':                                      # Initialize service dependencies
-        self.html_service_client = HTML__Service__Client().setup()
+        self.html_service_client  = HTML__Service__Client().setup()
         self.semantic_text_client = Semantic_Text__Service__Client()
-        self.cache_service = Proxy__Cache__Service().setup()
+        self.cache_service        = Proxy__Cache__Service().setup()
         return self
 
     def transform_html(self, source_html   : str                                  ,          # Source HTML content
@@ -100,10 +106,34 @@ class HTML__Transformation__Service(Type_Safe):                                 
 
         print(f"    🔄 Step 2: Transforming via Semantic Text Service...")
 
-        semantic_mode = Enum__Text__Transformation__Mode(mode)                                # Convert to semantic-text mode
+        # semantic_mode = Enum__Text__Transformation__Mode(mode)                                # Convert to semantic-text mode
+        #
+        # request        = Schema__Semantic_Text__Transformation__Request(hash_mapping         = hash_mapping,
+        #                                                                 transformation_mode  = semantic_mode)
 
-        request        = Schema__Semantic_Text__Transformation__Request(hash_mapping         = hash_mapping,
-                                                                        transformation_mode  = semantic_mode)
+        if mode.uses_sentiment_analysis():                                              # Determine engine mode and filters
+            engine_mode       = Enum__Text__Transformation__Engine_Mode.AWS_COMPREHEND
+            criterion_filters = self._build_criterion_filters(mode)
+            logic_operator    = self._get_logic_operator(mode)
+            print(f"       🧠 Using AWS Comprehend with {len(criterion_filters)} filters")
+        else:
+            # Default to deterministic hash-based
+            engine_mode       = Enum__Text__Transformation__Engine_Mode.TEXT_HASH
+            criterion_filters = []  # Empty = transform all
+            logic_operator    = Enum__Classification__Logic_Operator.AND
+            print(f"       🔢 Using deterministic TEXT_HASH engine")
+
+        # Get visual transformation mode (xxx, hashes, etc)
+        visual_mode = mode.to_visual_mode()
+
+        # 🆕 Build complete request with sentiment filters
+        request = Schema__Semantic_Text__Transformation__Request(
+            hash_mapping=hash_mapping,
+            engine_mode=engine_mode,                    # ← AWS Comprehend!
+            criterion_filters=criterion_filters,         # ← Sentiment filters!
+            logic_operator=logic_operator,              # ← AND/OR
+            transformation_mode=visual_mode             # ← xxx, hashes
+        )
         response = self.semantic_text_client.transform_text(request)
 
         if not response.success:
@@ -137,7 +167,7 @@ class HTML__Transformation__Service(Type_Safe):                                 
 
         if not self.cache_service or not self.cache_service.cache_config.enabled:
             return None
-
+        print(f">>>>>> cache enabled: {self.cache_service.cache_config.enabled}")
         if not mode.requires_caching():
             return None
 
@@ -237,3 +267,35 @@ class HTML__Transformation__Service(Type_Safe):                                 
             cache_hit              = False,
             transformation_time_ms = Safe_Float(call_duration_ms)
         )
+
+    def _build_criterion_filters(self,
+                                 mode: Enum__HTML__Transformation_Mode
+                                ) -> List[Schema__Classification__Criterion_Filter]:
+        """
+        Build criterion filters from transformation mode.
+
+        Converts mode-specific sentiment requirements into filter objects.
+        """
+        filters = []
+        filter_configs = mode.get_sentiment_filters()
+
+        print(f"         Filter Configs: {filter_configs}")
+        for config in filter_configs:
+            criterion   = Enum__Text__Classification__Criteria(config["criterion"])
+            filter_mode = Enum__Classification__Filter_Mode(config["filter_mode"])
+            threshold   = Safe_Float(config["threshold"])
+
+            filter_obj = Schema__Classification__Criterion_Filter(criterion=criterion,
+                                                                  filter_mode=filter_mode,
+                                                                  threshold=threshold)
+            filters.append(filter_obj)
+
+        return filters
+
+
+    def _get_logic_operator(self,
+                           mode: Enum__HTML__Transformation_Mode
+                          ) -> Enum__Classification__Logic_Operator:
+        """Get logic operator for combining filters"""
+        operator_str = mode.get_logic_operator()
+        return Enum__Classification__Logic_Operator(operator_str)

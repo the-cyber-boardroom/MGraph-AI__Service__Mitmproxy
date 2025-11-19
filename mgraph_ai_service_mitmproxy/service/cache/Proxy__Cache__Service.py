@@ -45,13 +45,17 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
         auth__kwargs = dict(base_url       = base_url   ,
                             api_key        = key_value  ,
                             api_key_header = key_name  )
-        if base_url and key_name and key_value:
-            enabled = True
-        else:
-            enabled = False
 
+        if base_url and key_name and key_value:
+            cache_auth_available = True
+        else:
+            cache_auth_available = False
+
+        #cache_enabled        = False # cache_auth_available     # For now disable the cache
+        cache_enabled        = cache_auth_available     # For now disable the cache
         cache_client__config = Service__Fast_API__Client__Config(**auth__kwargs)
-        self.cache_config    = Schema__Cache__Config            (**auth__kwargs, enabled=enabled)
+
+        self.cache_config    = Schema__Cache__Config            (**auth__kwargs, enabled=cache_enabled)
         self.cache_client    = Service__Fast_API__Client        (config=cache_client__config)
 
         return self
