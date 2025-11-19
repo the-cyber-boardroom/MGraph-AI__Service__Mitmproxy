@@ -57,6 +57,9 @@ jobs:
         env:
           FAST_API__AUTH__API_KEY__NAME: 'api-key__in_github_test'
           FAST_API__AUTH__API_KEY__VALUE: 'this-is-the-value-of-the-api-key'
+          AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__BASE_URL : ${{ secrets.AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__BASE_URL  }}
+          AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_NAME : ${{ secrets.AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_NAME  }}
+          AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_VALUE: ${{ secrets.AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_VALUE }}
 
   increment-tag:
     # Always define this job, but skip the actual tag increment step conditionally
@@ -111,19 +114,22 @@ jobs:
       - name: Deploy Service Lambda function
         uses: ./.github/actions/aws__deploy__lambda
         env:
-          AWS_SECRET_ACCESS_KEY                        : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION                           : ${{ secrets.AWS_DEFAULT_REGION }}
-          AWS_ACCOUNT_ID                               : ${{ secrets.AWS_ACCOUNT_ID }}
-          AWS_ACCESS_KEY_ID                            : ${{ secrets.AWS_ACCESS_KEY_ID }}
-          FAST_API__AUTH__API_KEY__NAME                : ${{ secrets.FAST_API__AUTH__API_KEY__NAME }}
-          FAST_API__AUTH__API_KEY__VALUE               : ${{ secrets.FAST_API__AUTH__API_KEY__VALUE }}
-          AUTH__TARGET_SERVER__CACHE_SERVICE__BASE_URL : ${{ secrets.AUTH__TARGET_SERVER__CACHE_SERVICE__BASE_URL  }}
-          AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME : ${{ secrets.AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME  }}
-          AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE: ${{ secrets.AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE }}
-          AUTH__TARGET_SERVER__HTML_SERVICE__BASE_URL  : ${{ secrets.AUTH__TARGET_SERVER__HTML_SERVICE__BASE_URL  }}
-          AUTH__TARGET_SERVER__HTML_SERVICE__KEY_NAME  : ${{ secrets.AUTH__TARGET_SERVER__HTML_SERVICE__KEY_NAME  }}
-          AUTH__TARGET_SERVER__HTML_SERVICE__KEY_VALUE : ${{ secrets.AUTH__TARGET_SERVER__HTML_SERVICE__KEY_VALUE }}
-          WCF_SERVICE__AUTH__API_KEY__NAME             : ${{ secrets.WCF_SERVICE__AUTH__API_KEY__NAME              }}
-          WCF_SERVICE__AUTH__API_KEY__VALUE            : ${{ secrets.WCF_SERVICE__AUTH__API_KEY__VALUE             }}
+          AWS_SECRET_ACCESS_KEY                                : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION                                   : ${{ secrets.AWS_DEFAULT_REGION }}
+          AWS_ACCOUNT_ID                                       : ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_ACCESS_KEY_ID                                    : ${{ secrets.AWS_ACCESS_KEY_ID }}
+          FAST_API__AUTH__API_KEY__NAME                        : ${{ secrets.FAST_API__AUTH__API_KEY__NAME }}
+          FAST_API__AUTH__API_KEY__VALUE                       : ${{ secrets.FAST_API__AUTH__API_KEY__VALUE }}
+          AUTH__TARGET_SERVER__CACHE_SERVICE__BASE_URL         : ${{ secrets.AUTH__TARGET_SERVER__CACHE_SERVICE__BASE_URL          }}
+          AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME         : ${{ secrets.AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME          }}
+          AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE        : ${{ secrets.AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE         }}
+          AUTH__TARGET_SERVER__HTML_SERVICE__BASE_URL          : ${{ secrets.AUTH__TARGET_SERVER__HTML_SERVICE__BASE_URL           }}
+          AUTH__TARGET_SERVER__HTML_SERVICE__KEY_NAME          : ${{ secrets.AUTH__TARGET_SERVER__HTML_SERVICE__KEY_NAME           }}
+          AUTH__TARGET_SERVER__HTML_SERVICE__KEY_VALUE         : ${{ secrets.AUTH__TARGET_SERVER__HTML_SERVICE__KEY_VALUE          }}
+          AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__BASE_URL : ${{ secrets.AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__BASE_URL  }}
+          AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_NAME : ${{ secrets.AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_NAME  }}
+          AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_VALUE: ${{ secrets.AUTH__TARGET_SERVER__SEMANTIC_TEXT_SERVICE__KEY_VALUE }}
+          WCF_SERVICE__AUTH__API_KEY__NAME                     : ${{ secrets.WCF_SERVICE__AUTH__API_KEY__NAME                      }}
+          WCF_SERVICE__AUTH__API_KEY__VALUE                    : ${{ secrets.WCF_SERVICE__AUTH__API_KEY__VALUE                     }}
         with:
           target: ${{ inputs.target_deploy }}
