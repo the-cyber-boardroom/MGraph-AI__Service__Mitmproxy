@@ -1,5 +1,6 @@
 from unittest                                                                       import TestCase
 from osbot_utils.helpers.duration.decorators.print_duration                         import print_duration
+from osbot_utils.testing.Pytest import skip_if_in_github_action
 from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Html           import Safe_Str__Html
 from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict               import Type_Safe__Dict
 from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Transformation__Step_1  import Schema__HTML__Transformation__Step_1
@@ -202,6 +203,7 @@ class test_HTML__Transformation__Service(TestCase):
 
 
     def test_transform_html__caching__with_semantic_text(self):                     # NEW: Test caching with semantic-text transformations
+        skip_if_in_github_action()                                                  # not working in GH action due to lack of credentials to access cache service
         with self.html_transformation_service as _:
             source_html = "<html><body><p>Cache test</p></body></html>"
             target_url  = "https://example.com/cache-test"
