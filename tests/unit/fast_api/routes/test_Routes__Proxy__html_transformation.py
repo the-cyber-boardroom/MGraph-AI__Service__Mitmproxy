@@ -1,8 +1,7 @@
-import pytest
 from unittest                                                                        import TestCase
 from osbot_utils.testing.__                                                          import __, __SKIP__
 from osbot_utils.testing.Temp_Env_Vars                                               import Temp_Env_Vars
-from osbot_utils.utils.Env import not_in_github_action
+from osbot_utils.utils.Env                                                           import not_in_github_action
 from osbot_utils.utils.Http                                                          import GET_json
 from osbot_utils.utils.Misc                                                          import list_set
 from mgraph_ai_service_mitmproxy.fast_api.routes.Routes__Proxy                       import Routes__Proxy
@@ -193,7 +192,7 @@ class test_Routes__Proxy__html_transformation(TestCase):                       #
                                                                              x_proxy_transformation = 'hashes'                 ,
                                                                              x_proxy_cache          = 'miss'                   ,
                                                                              x_html_service_time    = __SKIP__                 ,
-                                                                             content_type           = 'text/html; charset=utf-8' ) ,
+                                                                             content_type           = 'text/html'              ),
                                                 headers_to_remove      = []                                                    ,
                                                 cached_response        = __()                                                  ,
                                                 stats                  = __()                                                  )
@@ -251,7 +250,7 @@ class test_Routes__Proxy__html_transformation(TestCase):                       #
                                                                              x_proxy_transformation = 'xxx'                    ,
                                                                              x_proxy_cache          = 'miss'                   ,
                                                                              x_html_service_time    = __SKIP__                 ,
-                                                                             content_type           = 'text/html; charset=utf-8' ) ,
+                                                                             content_type           = 'text/html'            ) ,
                                                 headers_to_remove      = []                                                    ,
                                                 cached_response        = __()                                                  ,
                                                 stats                  = __()                                                  )
@@ -385,7 +384,7 @@ class test_Routes__Proxy__html_transformation(TestCase):                       #
 
             assert modifications.headers_to_add['x-proxy-transformation'] == 'hashes'
             assert modifications.headers_to_add['x-proxy-cache'         ] in ['hit', 'miss']
-            assert modifications.headers_to_add['content-type'          ] == 'text/html; charset=utf-8'
+            assert modifications.headers_to_add['content-type'          ] == 'text/html'
 
             assert modifications.obj() == __(   block_request          = False                                                 ,
                                                 block_status           = 403                                                   ,
@@ -418,7 +417,7 @@ class test_Routes__Proxy__html_transformation(TestCase):                       #
                                                                              x_proxy_transformation = 'hashes'                 ,
                                                                              x_proxy_cache          = 'miss'                   ,
                                                                              x_html_service_time    = __SKIP__                 ,
-                                                                             content_type           = 'text/html; charset=utf-8' ) ,
+                                                                             content_type           = 'text/html'            ) ,
                                                 headers_to_remove      = []                                                    ,
                                                 cached_response        = __()                                                  ,
                                                 stats                  = __()                                                  )
@@ -474,7 +473,7 @@ class test_Routes__Proxy__html_transformation(TestCase):                       #
                                                                                      x_proxy_transformation = 'hashes'                 ,
                                                                                      x_proxy_cache          = 'miss'                   ,
                                                                                      x_html_service_time    = __SKIP__                 ,
-                                                                                     content_type           = 'text/html; charset=utf-8' ) ,
+                                                                                     content_type           = 'text/html' ) ,
                                                         headers_to_remove      = []                                                    ,
                                                         cached_response        = __()                                                  ,
                                                         stats                  = __()                                                  )

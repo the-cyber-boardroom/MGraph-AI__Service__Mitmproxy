@@ -1,6 +1,7 @@
-from typing import Dict
-from osbot_utils.type_safe.Type_Safe import Type_Safe
-from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash import Safe_Str__Hash
+from typing                                                                         import Dict
+from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text       import Safe_Str__Comprehend__Text
+from osbot_utils.type_safe.Type_Safe                                                import Type_Safe
+from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash  import Safe_Str__Hash
 
 
 class Schema__Hashes__To__Html__Request(Type_Safe):
@@ -11,8 +12,8 @@ class Schema__Hashes__To__Html__Request(Type_Safe):
 
     Takes the html_dict structure and a modified hash_mapping to reconstruct HTML.
     """
-    html_dict    : dict                             # HTML structure (from to__dict__hashes)
-    hash_mapping : Dict[Safe_Str__Hash, str]        # Modified hash mapping (with masked values)
+    html_dict    : dict                                                    # HTML structure (from to__dict__hashes)
+    hash_mapping : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]        # Modified hash mapping (with masked values)
 
     def to_json_payload(self) -> dict:
         """Convert to JSON payload for HTML Service API"""

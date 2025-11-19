@@ -9,8 +9,9 @@ from osbot_utils.utils.Misc             import wait_for, random_uuid_short
 import mgraph_ai_service_mitmproxy
 
 MITMPROXY__PYTHON_FILE = 'fastapi_interceptor.py' # 'add_header.py' #
-DEFAULT__AWS__UBUNTU_LINUX_AMI  = 'ami-046c2381f11878233'
-DEFAULT__AWS__INSTANCE_TYPE     = 't2.micro'
+#DEFAULT__AWS__UBUNTU_LINUX_AMI  = 'ami-046c2381f11878233'          # eu-west-2 image
+DEFAULT__AWS__UBUNTU_LINUX_AMI   = 'ami-0ecb62995f68bb549'          # us-east-1 image for Ubuntu on 18 Nov 2025
+DEFAULT__AWS__INSTANCE_TYPE      = 't2.micro'
 
 class Mitmproxy__Create__EC2_Instance(Type_Safe):
     ec2 : EC2

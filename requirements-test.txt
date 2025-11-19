@@ -2,8 +2,9 @@
 osbot-fast-api-serverless
 mgraph-ai-service-cache-client
 
-# for testing Html service (without using mocks or patches)
+# for testing Html and Semantic-Text services (without using mocks or patches)
 mgraph-ai-service-html
+mgraph_ai_service_semantic_text
 
 # for pytest
 pytest

@@ -1,13 +1,10 @@
-import pytest
 import requests
 from unittest                                                                        import TestCase
 from osbot_utils.helpers.duration.decorators.print_duration                          import print_duration
 from osbot_utils.testing.__                                                          import __, __SKIP__
 from osbot_utils.testing.Temp_Env_Vars                                               import Temp_Env_Vars
 from osbot_utils.testing.__helpers                                                   import obj
-
-from osbot_utils.utils.Http                                                          import GET_json, POST_json, POST
-from osbot_utils.utils.Misc import wait_for
+from osbot_utils.utils.Http                                                          import GET_json
 from tests.unit.Mitmproxy_Service__Fast_API__Test_Objs                               import (get__cache_service__fast_api_server,
                                                                                              get__html_service__fast_api_server,
                                                                                              get__mitmproxy_service__fast_api_server)
@@ -152,7 +149,7 @@ class test_Routes__Proxy__html_transformation__http(TestCase):                 #
                                                                  x_proxy_transformation = 'hashes'                   ,
                                                                  x_proxy_cache          = 'miss'                     ,
                                                                  x_html_service_time    = __SKIP__                   ,
-                                                                 content_type           = 'text/html; charset=utf-8'),
+                                                                 content_type           = 'text/html'                ),
                                     headers_to_remove      = []                                                      ,
                                     cached_response        = __()                                                    ,
                                     block_request          = False                                                   ,
@@ -212,7 +209,7 @@ class test_Routes__Proxy__html_transformation__http(TestCase):                 #
                                                                       x_proxy_transformation   = 'xxx'                    ,
                                                                       x_proxy_cache            = 'miss'                   ,
                                                                       x_html_service_time      = __SKIP__                  ,
-                                                                      content_type             = 'text/html; charset=utf-8')                                                        ,
+                                                                      content_type             = 'text/html'               ),
                                                 headers_to_remove     = []                                                 ,
                                                 cached_response       = __()                                               ,
                                                 block_request         = False                                              ,

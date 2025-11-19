@@ -21,4 +21,4 @@ class Schema__HTML__Transformation__Result(Type_Safe):                # Result o
         return { "x-proxy-transformation"  : self.transformation_mode.value      ,
                   "x-proxy-cache"          : "hit" if self.cache_hit else "miss" ,
                   "x-html-service-time"    : f"{self.transformation_time_ms}ms"  ,
-                  "content-type"           : self.content_type                   }
+                  "content-type"           : str(self.content_type)              }

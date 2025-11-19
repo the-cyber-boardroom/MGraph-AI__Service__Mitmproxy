@@ -1,18 +1,18 @@
 import requests
 import json
-from osbot_utils.type_safe.Type_Safe                                             import Type_Safe
-from osbot_utils.type_safe.primitives.core.Safe_Float                            import Safe_Float
-from osbot_utils.utils.Env                                                       import get_env
-from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Service__Request     import Schema__HTML__Service__Request
-from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Service__Response    import Schema__HTML__Service__Response
-from mgraph_ai_service_mitmproxy.schemas.html.Schema__Hashes__To__Html__Request import Schema__Hashes__To__Html__Request
-from mgraph_ai_service_mitmproxy.schemas.html.Schema__Html__To__Dict__Hashes__Request import Schema__Html__To__Dict__Hashes__Request
-from mgraph_ai_service_mitmproxy.schemas.html.Schema__Html__To__Dict__Hashes__Response import Schema__Html__To__Dict__Hashes__Response
-from mgraph_ai_service_mitmproxy.service.consts.consts__html_service             import (ENV_VAR__AUTH__TARGET_SERVER__HTML_SERVICE__BASE_URL ,
-                                                                                         ENV_VAR__AUTH__TARGET_SERVER__HTML_SERVICE__KEY_NAME ,
-                                                                                         ENV_VAR__AUTH__TARGET_SERVER__HTML_SERVICE__KEY_VALUE,
-                                                                                         DEFAULT__HTML_SERVICE__BASE_URL                      ,
-                                                                                         DEFAULT__HTML_SERVICE__TIMEOUT                       )
+from osbot_utils.type_safe.Type_Safe                                                    import Type_Safe
+from osbot_utils.type_safe.primitives.core.Safe_Float                                   import Safe_Float
+from osbot_utils.utils.Env                                                              import get_env
+from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Service__Request            import Schema__HTML__Service__Request
+from mgraph_ai_service_mitmproxy.schemas.html.Schema__HTML__Service__Response           import Schema__HTML__Service__Response
+from mgraph_ai_service_mitmproxy.schemas.html.Schema__Hashes__To__Html__Request         import Schema__Hashes__To__Html__Request
+from mgraph_ai_service_mitmproxy.schemas.html.Schema__Html__To__Dict__Hashes__Request   import Schema__Html__To__Dict__Hashes__Request
+from mgraph_ai_service_mitmproxy.schemas.html.Schema__Html__To__Dict__Hashes__Response  import Schema__Html__To__Dict__Hashes__Response
+from mgraph_ai_service_mitmproxy.service.consts.consts__html_service                    import (ENV_VAR__AUTH__TARGET_SERVER__HTML_SERVICE__BASE_URL ,
+                                                                                                ENV_VAR__AUTH__TARGET_SERVER__HTML_SERVICE__KEY_NAME ,
+                                                                                                ENV_VAR__AUTH__TARGET_SERVER__HTML_SERVICE__KEY_VALUE,
+                                                                                                DEFAULT__HTML_SERVICE__BASE_URL                      ,
+                                                                                                DEFAULT__HTML_SERVICE__TIMEOUT                       )
 
 
 class HTML__Service__Client(Type_Safe):                                                    # HTTP client for HTML Service API
@@ -100,12 +100,11 @@ class HTML__Service__Client(Type_Safe):                                         
                                                    error_message = f"Unexpected error: {str(e)}")
 
 
-    def get_dict_hashes(self, request: Schema__Html__To__Dict__Hashes__Request) -> Schema__Html__To__Dict__Hashes__Response:
-        """Call HTML Service to get hash mapping"""
+    def get_dict_hashes(self, request: Schema__Html__To__Dict__Hashes__Request) -> Schema__Html__To__Dict__Hashes__Response:    # Call HTML Service to get hash mapping
         endpoint_path = "/html/to/dict/hashes"
-        url = f"{self.base_url}{endpoint_path}"
-        headers = self.get_auth_headers()
-        payload = request.json()
+        url           = f"{self.base_url}{endpoint_path}"
+        headers       = self.get_auth_headers()
+        payload       = request.json()
 
         try:
             response = requests.post(url, headers=headers, json=payload, timeout=float(self.timeout))

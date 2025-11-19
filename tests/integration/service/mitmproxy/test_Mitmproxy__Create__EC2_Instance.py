@@ -21,7 +21,7 @@ class test_Mitmproxy__Create__EC2_Instance(TestCase):
     def test_create_kwargs(self):
         with self.create_ec2_instance as _:
             kwargs = self.create_ec2_instance.create_kwargs()
-            assert kwargs == { 'image_id'           : 'ami-046c2381f11878233'   ,
+            assert kwargs == { 'image_id'           : 'ami-046c2381f11878233'   ,      # eu-west-2 image
                                'instance_type'      : 't2.micro'               ,
                                'key_name'           : self.ssh_key_name         ,
                                'security_group_id'  : self.security_group_id    ,

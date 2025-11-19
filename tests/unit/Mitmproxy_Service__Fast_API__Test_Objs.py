@@ -1,18 +1,18 @@
-from fastapi                                                            import FastAPI
-from mgraph_ai_service_cache.fast_api.Cache_Service__Fast_API           import Cache_Service__Fast_API
-from mgraph_ai_service_cache_client.schemas.consts.const__Storage       import ENV_VAR__CACHE__SERVICE__STORAGE_MODE
-from mgraph_ai_service_html.html__fast_api.Html_Service__Fast_API       import Html_Service__Fast_API
-from osbot_aws.testing.Temp__Random__AWS_Credentials                    import Temp_AWS_Credentials
-from osbot_fast_api.api.Fast_API                                        import ENV_VAR__FAST_API__AUTH__API_KEY__NAME, ENV_VAR__FAST_API__AUTH__API_KEY__VALUE
-from osbot_fast_api.utils.Fast_API_Server                               import Fast_API_Server
-from osbot_fast_api_serverless.fast_api.Serverless__Fast_API__Config    import Serverless__Fast_API__Config
-from osbot_local_stack.local_stack.Local_Stack                          import Local_Stack
-from osbot_utils.type_safe.Type_Safe                                    import Type_Safe
-from osbot_utils.type_safe.primitives.domains.identifiers.Random_Guid   import Random_Guid
-from osbot_utils.utils.Env                                              import set_env
-from osbot_utils.utils.Misc import random_port
-from starlette.testclient                                               import TestClient
-from mgraph_ai_service_mitmproxy.fast_api.Service__Fast_API             import Service__Fast_API
+from fastapi                                                                    import FastAPI
+from mgraph_ai_service_cache.fast_api.Cache_Service__Fast_API                   import Cache_Service__Fast_API
+from mgraph_ai_service_cache_client.schemas.consts.const__Storage               import ENV_VAR__CACHE__SERVICE__STORAGE_MODE
+from mgraph_ai_service_html.html__fast_api.Html_Service__Fast_API               import Html_Service__Fast_API
+from mgraph_ai_service_semantic_text.fast_api.Semantic_Text__Service__Fast_API  import Semantic_Text__Service__Fast_API
+from osbot_aws.testing.Temp__Random__AWS_Credentials                            import Temp_AWS_Credentials
+from osbot_fast_api.api.Fast_API                                                import ENV_VAR__FAST_API__AUTH__API_KEY__NAME, ENV_VAR__FAST_API__AUTH__API_KEY__VALUE
+from osbot_fast_api.utils.Fast_API_Server                                       import Fast_API_Server
+from osbot_fast_api_serverless.fast_api.Serverless__Fast_API__Config            import Serverless__Fast_API__Config
+from osbot_local_stack.local_stack.Local_Stack                                  import Local_Stack
+from osbot_utils.type_safe.Type_Safe                                            import Type_Safe
+from osbot_utils.type_safe.primitives.domains.identifiers.Random_Guid           import Random_Guid
+from osbot_utils.utils.Env                                                      import set_env
+from starlette.testclient                                                       import TestClient
+from mgraph_ai_service_mitmproxy.fast_api.Service__Fast_API                     import Service__Fast_API
 
 TEST_API_KEY__NAME = 'key-used-in-pytest'
 TEST_API_KEY__VALUE = Random_Guid()
@@ -55,6 +55,7 @@ from osbot_utils.type_safe.Type_Safe                                       impor
 from osbot_utils.type_safe.primitives.domains.web.safe_str.Safe_Str__Url   import Safe_Str__Url
 
 
+# todo: move this to the Fast_API project (since this is used in multiple projects)
 
 T = TypeVar("T", bound="FastAPI__Service__Test_Objs")                      # Generic type for service test objs
 
@@ -139,3 +140,16 @@ class Mitmproxy_Service__Fast_API__Singleton(Base__FastAPI__Service__Singleton[M
 def get__mitmproxy_service__fast_api_server() -> Cache_Service__Fast_API__Test_Objs:
     set_env(ENV_VAR__CACHE__SERVICE__STORAGE_MODE, 'memory')                            # configure the cache service to use an in-memory db (instead of trying to use S3)
     return Mitmproxy_Service__Fast_API__Singleton.get_instance()
+
+# -------------------------------------------------------------------------------
+# HTML Service Singleton
+# -------------------------------------------------------------------------------
+class Semantic_Text_Service__Fast_API__Test_Objs(FastAPI__Service__Test_Objs):      # HTML FastAPI service configuration
+    pass
+
+class Semantic_Text_Service__Fast_API__Singleton(Base__FastAPI__Service__Singleton[Semantic_Text_Service__Fast_API__Test_Objs]):
+    service_cls  = Semantic_Text__Service__Fast_API
+    test_obj_cls = Semantic_Text_Service__Fast_API__Test_Objs
+
+def get__semantic_text_service__fast_api_server() -> Semantic_Text_Service__Fast_API__Test_Objs:
+    return Semantic_Text_Service__Fast_API__Singleton.get_instance()
