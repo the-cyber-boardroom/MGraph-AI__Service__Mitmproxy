@@ -51,8 +51,8 @@ class Proxy__Cache__Service(Type_Safe):                         # Cache service 
         else:
             cache_auth_available = False
 
-        cache_enabled        = False # cache_auth_available     # For now disable the cache
-        #cache_enabled        = cache_auth_available     # For now disable the cache
+        #cache_enabled        = False # cache_auth_available     # For now disable the cache
+        cache_enabled        = cache_auth_available     # For now disable the cache
         cache_client__config = Service__Fast_API__Client__Config(**auth__kwargs)
 
         self.cache_config    = Schema__Cache__Config            (**auth__kwargs, enabled=cache_enabled)
