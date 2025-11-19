@@ -2,13 +2,13 @@ from unittest                                                                   
 from memory_fs.storage_fs.providers.Storage_FS__Memory                                  import Storage_FS__Memory
 from mgraph_ai_service_cache.fast_api.Cache_Service__Fast_API                           import Cache_Service__Fast_API
 from mgraph_ai_service_cache.service.cache.Cache__Config                                import Cache__Config
-from mgraph_ai_service_cache.service.cache.Cache__Hash__Generator                       import Cache__Hash__Generator
 from mgraph_ai_service_cache.service.cache.Cache__Service                               import Cache__Service
 from mgraph_ai_service_cache_client.client_contract.Service__Fast_API__Client           import Service__Fast_API__Client
 from mgraph_ai_service_cache_client.client_contract.Service__Fast_API__Client__Config   import Service__Fast_API__Client__Config
 from mgraph_ai_service_cache_client.schemas.cache.enums.Enum__Cache__Storage_Mode       import Enum__Cache__Storage_Mode
 from osbot_fast_api.utils.Fast_API_Server                                               import Fast_API_Server
 from osbot_fast_api_serverless.fast_api.Serverless__Fast_API__Config                    import Serverless__Fast_API__Config
+from osbot_utils.helpers.cache.Cache__Hash__Generator import Cache__Hash__Generator
 from osbot_utils.helpers.duration.decorators.capture_duration                           import capture_duration
 from osbot_utils.testing.__                                                             import __, __SKIP__
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                    import Safe_UInt
