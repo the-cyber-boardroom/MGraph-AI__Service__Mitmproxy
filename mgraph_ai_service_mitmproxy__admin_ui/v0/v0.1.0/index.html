@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MITM Proxy Dashboard</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Component -->
+        <header class="header">
+            <h1>🔧 MITM Proxy Dashboard</h1>
+            <p class="subtitle">Managing proxy for: <strong id="host-name">Loading...</strong></p>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid" id="stats-grid">
+            <!-- Stats cards will be injected here -->
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="nav-links">
+            <h2>🔗 Admin Pages</h2>
+            <ul class="link-list" id="nav-links">
+                <!-- Links will be injected here -->
+            </ul>
+        </nav>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>MITM Proxy Admin Interface | Generated at <span id="timestamp">...</span> UTC</p>
+        </footer>
+    </div>
+
+    <!-- Web Components -->
+    <script src="js/components/stats-card.js"></script>
+    <script src="js/components/navigation.js"></script>
+
+    <!-- Services -->
+    <script src="js/services/api-client.js"></script>
+
+    <!-- Main App -->
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

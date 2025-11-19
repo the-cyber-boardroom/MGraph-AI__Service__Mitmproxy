@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MITM Proxy Dashboard</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Top Navigation -->
+        <top-nav></top-nav>
+
+        <!-- Header -->
+        <header class="page-header">
+            <h1>🔧 MITM Proxy Dashboard</h1>
+            <p class="subtitle">Managing proxy for: <strong id="host-name">Loading...</strong></p>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="stats-grid">
+            <!-- Stats will be loaded here -->
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3>⚡ Quick Actions</h3>
+            <div class="action-grid">
+                <a href="cookies.html" class="action-btn">
+                    <span class="icon">🍪</span>
+                    Manage Cookies
+                </a>
+                <a href="api-data.html" class="action-btn">
+                    <span class="icon">📊</span>
+                    View API Data
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>MITM Proxy Admin Interface v0.1.1 | Generated at <span id="timestamp">...</span> UTC</p>
+        </footer>
+    </div>
+
+    <!-- Components -->
+    <script src="./components/top-nav/top-nav.js"></script>
+
+    <!-- Services -->
+    <script src="js/services/api-client.js"></script>
+
+    <!-- Main App -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const statsGrid = document.getElementById('stats-grid');
+            const hostName = document.getElementById('host-name');
+            const timestamp = document.getElementById('timestamp');
+
+            try {
+                // Fetch real API data
+                const apiData = await window.apiClient.fetchAPIData();
+
+                // Update host name
+                hostName.textContent = apiData.request.host;
+
+                // Update timestamp
+                const now = new Date(apiData.timestamp);
+                timestamp.textContent = now.toISOString().replace('T', ' ').split('.')[0];
+
+                // Create stats cards
+                const stats = apiData.stats;
+                const cookies = apiData.cookies;
+
+                // Proxy Statistics Card
+                const proxyStatsHTML = `
+                    <div class="stat-card">
+                        <h3>📈 Proxy Statistics</h3>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Requests</span>
+                            <span class="stat-value">${stats.total_requests}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Responses</span>
+                            <span class="stat-value">${stats.total_responses}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Bytes Processed</span>
+                            <span class="stat-value">${stats.total_bytes_processed.toLocaleString()}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Content Modifications</span>
+                            <span class="stat-value">${stats.content_modifications}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Cookie Status Card
+                let cookieStatsHTML = `
+                    <div class="stat-card">
+                        <h3>🍪 Cookie Status</h3>
+                        <div class="stat-item">
+                            <span class="stat-label">Active Proxy Cookies</span>
+                            <span class="stat-value">${cookies.count}</span>
+                        </div>
+                `;
+
+                if (cookies.count > 0) {
+                    Object.entries(cookies.active).forEach(([name, value]) => {
+                        cookieStatsHTML += `
+                            <div class="stat-item">
+                                <span class="stat-label">${name}</span>
+                                <span class="stat-value" style="font-family: monospace; font-size: 0.9em;">${value}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                cookieStatsHTML += '</div>';
+
+                // Current Request Card
+                const requestHTML = `
+                    <div class="stat-card">
+                        <h3>🌐 Current Request</h3>
+                        <div class="stat-item">
+                            <span class="stat-label">Host</span>
+                            <span class="stat-value">${apiData.request.host}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Method</span>
+                            <span class="stat-value">${apiData.request.method}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Path</span>
+                            <span class="stat-value" style="font-size: 0.8em; word-break: break-all;">${apiData.request.path}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Server Info Card
+                const serverHTML = `
+                    <div class="stat-card">
+                        <h3>⚙️ Server Information</h3>
+                        <div class="stat-item">
+                            <span class="stat-label">Version</span>
+                            <span class="stat-value">${apiData.server.version}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">UI Version</span>
+                            <span class="stat-value">${apiData.server.current_ui_version}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Inject all cards
+                statsGrid.innerHTML = proxyStatsHTML + cookieStatsHTML + requestHTML + serverHTML;
+
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+                statsGrid.innerHTML = `
+                    <div class="stat-card" style="grid-column: 1 / -1;">
+                        <h3>❌ Failed to Load Data</h3>
+                        <p style="color: #666;">Could not fetch API data: ${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

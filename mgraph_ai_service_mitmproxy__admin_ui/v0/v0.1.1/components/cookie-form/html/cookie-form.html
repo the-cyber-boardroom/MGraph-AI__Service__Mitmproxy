@@ -1,0 +1,28 @@
+<div class="cookie-form-container">
+    <div class="form-message" style="display: none;"></div>
+    
+    <form id="cookieForm">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="cookieName">Cookie Name</label>
+                <select id="cookieName" name="cookieName" required>
+                    <option value="">-- Select Cookie --</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="cookieValue">Cookie Value</label>
+                <div id="valueInputContainer">
+                    <input type="text" id="cookieValue" name="cookieValue" 
+                           placeholder="Select a cookie first..." disabled required>
+                </div>
+                <div class="help-text" id="helpText">Select a cookie to configure</div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Set Cookie</button>
+            <button type="button" class="btn btn-secondary" id="clearAllBtn">Clear All Cookies</button>
+        </div>
+    </form>
+</div>

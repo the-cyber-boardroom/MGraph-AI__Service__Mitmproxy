@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - MITM Proxy</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/error.css">
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <h1>Admin Page Not Found</h1>
+        <p>The admin endpoint <strong id="endpoint">...</strong> does not exist.</p>
+        <a href="index.html" class="back-link">← Return to Dashboard</a>
+    </div>
+    
+    <script>
+        // Get endpoint from URL
+        const path = window.location.pathname;
+        const endpoint = path.split('/').pop() || 'index';
+        document.getElementById('endpoint').textContent = `/${endpoint}`;
+    </script>
+</body>
+</html>

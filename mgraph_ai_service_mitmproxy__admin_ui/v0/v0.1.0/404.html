@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - MITM Proxy</title>
+    <link rel="stylesheet" href="css/common.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .error-container {
+            background: white;
+            border-radius: 10px;
+            padding: 50px;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .error-code {
+            font-size: 6em;
+            color: #667eea;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        h1 {
+            color: #333;
+            margin: 20px 0;
+        }
+        
+        p {
+            color: #666;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <h1>Admin Page Not Found</h1>
+        <p>The admin endpoint <strong id="endpoint">...</strong> does not exist.</p>
+        <a href="/mitm-proxy/" class="back-link">← Return to Dashboard</a>
+    </div>
+    
+    <script>
+        // Get endpoint from URL
+        const path = window.location.pathname;
+        const endpoint = path.replace('/mitm-proxy/', '') || 'index';
+        document.getElementById('endpoint').textContent = `/${endpoint}`;
+    </script>
+</body>
+</html>
