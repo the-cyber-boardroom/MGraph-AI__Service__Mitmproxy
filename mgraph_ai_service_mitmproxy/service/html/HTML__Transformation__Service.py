@@ -59,7 +59,7 @@ class HTML__Transformation__Service(Type_Safe):                                 
         start_time = time.time()
 
         try:
-            step_1_result = self._step_1__get_hash_mapping(source_html)           # Step 1: HTML → Hash Mapping
+            step_1_result = self._step_1__get_hash_mapping(source_html)                     # Step 1: HTML → Hash Mapping
             html_dict     = step_1_result.html_dict
             hash_mapping  = step_1_result.hash_mapping
             transformed_mapping = self._step_2__transform_mapping(hash_mapping, mode)       # Step 2: Transform Hash Mapping
